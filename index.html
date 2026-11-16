@@ -404,7 +404,7 @@ const hairList = [];
 for (let i = 0; i < 72; i++) {
   const a = lerp(.92 * Math.PI, 2.08 * Math.PI, i / 71), yEnd = 1.3 + rnd() * .07, pts = [V(Math.cos(a) * .03, 1.722, Math.sin(a) * .03)];
   for (let y = 1.70; y >= yEnd; y -= .035) {
-    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.55 - y) * .25, cr = y < 1.46 ? interp(coatTab, y)[0] + .012 : 0;
+    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.62 - y) * .45 + .018, cr = y < 1.46 ? interp(coatTab, y)[0] + .012 : 0;
     pts.push(V(Math.cos(a) * Math.max(hx + .012 + fl, cr), y, Math.sin(a) * Math.max(hz + .012 + fl, cr * CD)));
   }
   hairList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
@@ -418,13 +418,13 @@ const spikeTips = [];
   const H = headP.inner;
   H.add(loop(ringPts(0, 1.665, 0, .1, .113, 40, .12), M.garment));
   H.add(loop(ringPts(0, 1.695, 0, .092, .104, 40, .12), M.garment));
-  const O = V(0, 1.70, -0.01);
+  const O = V(0, 1.69, -0.01);
   for (let i = 0; i < 13; i++) {
-    const ang = lerp(-1.25, 1.25, i / 12), L = i % 2 ? .17 : .22, r0 = .1, h = r0 + L * .6;
-    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-0.28, 0, -ang); H.add(g);
+    const ang = lerp(-1.35, 1.35, i / 12), L = i % 2 ? .25 : .33, r0 = .065, h = r0 + L * .6;
+    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-0.16, 0, -ang); H.add(g);
     g.add(line([V(0, r0, 0), V(0, h, 0)], M.garment));
     const kind = i % 3;
-    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .016, .028, 18).map(p => V(p.x, h + .028 + p.z, 0)), M.garment));
+    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), M.garment));
     if (kind === 1) {
       const t = [V(-.014, h, 0), V(.014, h, 0)];
       for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0));
@@ -695,6 +695,7 @@ function tick(now) {
   rotY += lerp(k0.spin, k1.spin, b) * dt;
   const lockW = clamp(w[6] + w[7] + w[8], 0, 1);
   if (lockW > 0) { const target = w[8] > Math.max(w[6], w[7]) ? Math.PI / 2 : 0; rotY += angDiff(rotY, target) * .08 * lockW; }
+  if (w[4] > 0) rotY += angDiff(rotY, .66 + Math.sin(t * .5) * .35) * .08 * w[4];  // keep the crown fan facing the camera
   if (!dragging) { userRot += vel; vel *= .92; userRot *= .985; }
   model.rotation.y = rotY + userRot * (1 - w[6]);
 
