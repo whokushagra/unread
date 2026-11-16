@@ -75,6 +75,13 @@
   .lab.mini span::before { display: none; }
   .lab.mini.amber span { color: var(--ray); }
   .lab.sensor::before { background: var(--ray); }
+  .lab.gap::before { background: var(--alert); }
+  .lab.gap span { color: var(--alert); }
+  #outfit { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; border: 1px solid var(--faint); background: rgba(27,52,120,.9); opacity: 0; pointer-events: none; transition: opacity .4s; }
+  #outfit span { font-size: 9px; letter-spacing: 2px; color: var(--soft); padding: 0 10px 0 12px; }
+  #outfit button { font: inherit; font-size: 10px; letter-spacing: 2px; color: var(--soft); background: none; border: 0; border-left: 1px solid var(--faint); padding: 9px 14px; cursor: pointer; }
+  #outfit button.on { background: var(--ray); color: var(--bp-deep); font-weight: 700; }
+  #outfit button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
   .lab.sensor span { color: var(--ray); font-weight: 500; }
   #robotq { position: fixed; z-index: 3; pointer-events: none; transform: translate(-50%, -100%); text-align: center; opacity: 0; transition: opacity .3s; }
   #robotq b { display: block; font-size: 56px; line-height: 1; color: var(--ray); animation: wob 1s ease-in-out infinite; }
@@ -192,7 +199,7 @@
   <div class="cap" data-i="3">
     <div class="eyebrow">03 · COVERED</div>
     <h2>Cover what gives you away.</h2>
-    <p>Your face, your throat, your chest, your hands, the way you walk. Each piece hides one of them.</p>
+    <p>Your face, your throat, your chest, your hands, the way you walk. Each piece hides one of them. Switch outfits at the top to compare.</p>
   </div>
   <div class="cap" data-i="4">
     <div class="eyebrow">04 · REFLECT</div>
@@ -232,6 +239,7 @@
 <div id="labels"></div>
 <div id="robotq"><b>?</b><span>NO MATCH</span></div>
 <div class="drag-hint" id="draghint">DRAG TO TURN THE FIGURE</div>
+<div id="outfit" role="group" aria-label="Outfit"><span>OUTFIT</span><button type="button" data-o="hf" class="on" aria-pressed="true">HIGH FASHION</button><button type="button" data-o="diy" aria-pressed="false">HOUSEHOLD</button></div>
 
 <main>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
@@ -472,6 +480,104 @@ const pieces = [
 const garmentMats = [M.garment, M.garmentSoft, M.coatEdge, M.coatStrand, M.shell, M.veil];
 garmentMats.forEach(m => m.userData.base = m.opacity);
 
+// ---------- the household (DIY) outfit: foil, cutlery, a sieve, a lined cape ----------
+const fadeMat = m => (m.userData.fade = true, m);
+const DM = {
+  foil: mat(.95), foilSoft: fadeMat(mat(.45)), cape: fadeMat(mat(.8)), strip: fadeMat(mat(.6)),
+  card: fadeMat(new THREE.LineDashedMaterial({ color: 0xffffff, transparent: true, opacity: .5, dashSize: .02, gapSize: .015 })),
+};
+const diyMats = Object.values(DM); diyMats.forEach(m => m.userData.base = m.opacity);
+[M.coatStrand, M.coatEdge, M.garmentSoft, M.shell].forEach(fadeMat);
+const capeTab = [[0.86,.36],[1.1,.34],[1.3,.31],[1.38,.27],[1.43,.2],[1.46,.12]];
+const KD = .8;
+const capePt = (a, y, extra = 0) => { const r = interp(capeTab, Math.max(y, .86))[0] + extra; return V(Math.cos(a) * r, y, Math.sin(a) * r * KD); };
+
+// crown of mismatched cutlery on a crushed foil band, and a sieve held over the face
+const dHead = piece(V(0, 1.7, 0)); model.add(dHead.outer);
+const diyTips = [];
+{
+  const H = dHead.inner;
+  H.add(loop(ringPts(0, 1.665, 0, .108, .12, 36, .3), DM.foil));
+  H.add(loop(ringPts(0, 1.69, 0, .1, .11, 36, .3), DM.foilSoft));
+  const O = V(0, 1.68, 0);
+  for (let i = 0; i < 13; i++) {
+    const ang = lerp(-1.5, 1.5, i / 12) + (rnd() - .5) * .16, L = .22 + rnd() * .09, r0 = .07, h = r0 + L * .6;
+    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-.08 + (rnd() - .5) * .2, 0, -ang); H.add(g);
+    g.add(line([V(0, r0, 0), V(0, h, 0)], DM.foil));
+    const kind = (i * 7) % 3;
+    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), DM.foil));
+    if (kind === 1) { const t = [V(-.014, h, 0), V(.014, h, 0)]; for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0)); g.add(segs(t, DM.foil)); }
+    if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], DM.foil));
+    g.updateMatrix();
+    const tip = V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
+    diyTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
+  }
+  const C = V(0, 1.6, .1), sv = [];
+  for (let v = -.8; v <= .81; v += .2) { const w = Math.sqrt(1 - v * v); for (let u = -w; u < w - .001; u += w / 6) { const z = (uu, vv) => C.z + .055 * Math.sqrt(Math.max(0, 1 - uu * uu - vv * vv)); sv.push(V(C.x + u * .085, C.y + v * .1, z(u, v)), V(C.x + (u + w / 6) * .085, C.y + v * .1, z(u + w / 6, v))); } }
+  for (let u = -.8; u <= .81; u += .2) { const w = Math.sqrt(1 - u * u); for (let v = -w; v < w - .001; v += w / 6) { const z = (uu, vv) => C.z + .055 * Math.sqrt(Math.max(0, 1 - uu * uu - vv * vv)); sv.push(V(C.x + u * .085, C.y + v * .1, z(u, v)), V(C.x + u * .085, C.y + (v + w / 6) * .1, z(u, v + w / 6))); } }
+  H.add(segs(sv, DM.foilSoft));
+  H.add(loop(ringPts(0, 0, 0, .085, .1, 32).map(p => V(p.x, C.y + p.z, C.z)), DM.foil));
+  H.add(line([V(.085, 1.6, C.z), V(.2, 1.55, C.z + .02)], DM.foil));
+}
+
+const dRuff = piece(V(0, 1.45, 0)); model.add(dRuff.outer);
+[[.27, 1.465, .5], [.24, 1.45, .45], [.21, 1.437, .4]].forEach(([r, y, j], k) =>
+  dRuff.inner.add(loop(ringPts(0, y, 0, r, r * .9, 44 + k * 6, j).map((p, i) => (p.y += Math.sin(i * 1.7) * .01, p)), k ? DM.foilSoft : DM.foil)));
+
+// cape lined with an emergency blanket, chip-bag patches, foil strips at the hem
+const dCape = piece(V(0, 1.15, 0)); model.add(dCape.outer);
+{
+  const C = dCape.inner;
+  for (let y = 1.44; y >= .87; y -= .045) { const r = interp(capeTab, y)[0]; C.add(loop(ringPts(0, y, 0, r, r * KD, 60).map((p, i) => (p.y += Math.sin(i * 2.7 + y * 40) * .008, p)), DM.cape)); }
+  C.add(loop(ringPts(0, .86, 0, .36, .36 * KD, 60), DM.foil));
+  for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2 + .2, pts = []; for (let y = 1.45; y >= .86; y -= .03) pts.push(capePt(a + Math.sin(y * 30 + k) * .03, y, .003)); C.add(line(pts, DM.foilSoft)); }
+  [[.9, 1.2], [2.2, 1.0], [3.6, 1.25], [4.6, .95], [1.4, .95], [5.6, 1.15]].forEach(([a, y]) =>
+    C.add(loop([capePt(a - .14, y - .05, .008), capePt(a + .14, y - .055, .008), capePt(a + .13, y + .05, .008), capePt(a - .12, y + .055, .008)], DM.foil)));
+  for (let y = 1.12; y <= 1.36; y += .06) { const l = loop(ringPts(0, y, 0, .25, .2, 40), DM.card); l.computeLineDistances(); C.add(l); }
+}
+const stripList = [];
+for (let i = 0; i < 84; i++) {
+  const a = i / 84 * Math.PI * 2 + (rnd() - .5) * .05, L = .18 + rnd() * .07, pts = [];
+  for (let j = 0; j <= 3; j++) pts.push(capePt(a, .86 - L * j / 3, .01 + j * .01));
+  stripList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+}
+const capeStrips = new Strands(dCape.inner, DM.strip, stripList);
+
+// foil cuffs, a ring and loose chains on each wrist (they ride on the arms)
+const chainSets = [];
+const dCuffs = arms.map((g, i) => {
+  const s = i ? 1 : -1, cx = s * .046, p = piece(V(cx, -.55, 0)); g.add(p.outer);
+  for (let k = 0; k < 3; k++) p.inner.add(loop(ringPts(cx, -.5 - k * .025, 0, .045, .048, 16, .3), DM.foil));
+  p.inner.add(loop(ringPts(cx + s * .004, -.665, .015, .014, .014, 12), DM.foil));
+  const list = [];
+  for (let c = 0; c < 4; c++) { const a = c / 4 * Math.PI * 2 + .4, pts = []; for (let j = 0; j <= 6; j++) pts.push(V(cx + Math.cos(a) * .05, -.55 - j * .016, Math.sin(a) * .052)); list.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) }); }
+  chainSets.push(new Strands(p.inner, DM.foilSoft, list));
+  return p;
+});
+
+// foil wrapped up to the knee; the thighs stay exposed
+const dWraps = legs.map(g => {
+  const p = piece(V(0, -0.6, 0)); g.add(p.outer);
+  for (let y = 0.06; y <= 0.5; y += 0.028) { const [rx, rz] = interp(legTab, y); p.inner.add(loop(ringPts(0, y - 0.84, 0, rx + .016, rz + .016, 22, .25), DM.foil)); }
+  return p;
+});
+
+const diyPieces = [
+  { p: dCape, off: V(0.2, 0.4, -2.2), rot: V(-0.6, 0.8, 0), win: [0, .55] },
+  { p: dWraps[0], off: V(-0.8, -0.4, 1.2), rot: V(0.5, 0, 0.3), win: [.15, .65] },
+  { p: dWraps[1], off: V(-0.6, -0.5, 1.4), rot: V(0.5, 0, -0.3), win: [.2, .7] },
+  { p: dCuffs[0], off: V(-1.0, 0.2, 0.8), rot: V(0, 0, 1), win: [.3, .8] },
+  { p: dCuffs[1], off: V(1.0, 0.2, 0.8), rot: V(0, 0, -1), win: [.35, .82] },
+  { p: dRuff, off: V(-1.8, 0.4, 0.4), rot: V(0, 0, -0.9), win: [.45, .9] },
+  { p: dHead, off: V(-0.2, 1.4, 0.4), rot: V(0, -2.4, 0.2), win: [.55, 1] },
+];
+const OUTFITS = {
+  hf: { pieces, mats: garmentMats, vis: 1, surf: coatPt, tips: spikeTips },
+  diy: { pieces: diyPieces, mats: diyMats, vis: 0, surf: capePt, tips: diyTips },
+};
+let outfit = "hf";
+const curOutfit = () => OUTFITS.hf.vis >= OUTFITS.diy.vis ? OUTFITS.hf : OUTFITS.diy;
+
 // ---------- cross-section of the coat wall (scene 06) ----------
 const xs = new THREE.Group(); model.add(xs);
 const XM = { line: mat(.95), soft: mat(.55), wave: mat(1, 0xffc96b) };
@@ -541,8 +647,8 @@ function rayGroup() {
   return { g, rays: [], mIn: mat(.9, 0xffc96b), mOut: new THREE.LineDashedMaterial({ color: 0xffc96b, transparent: true, opacity: .85, dashSize: .04, gapSize: .03, depthWrite: false }), mDot: new THREE.MeshBasicMaterial({ color: 0xffc96b, transparent: true }) };
 }
 const DOT = new THREE.SphereGeometry(.014, 8, 6);
-function addRay(G, si, local, normal, kind) {
-  const r = { s: SENS[si], local, normal: normal || V(0, 0, 1), kind, phase: rnd() };
+function addRay(G, si, local, normal, kind, get) {
+  const r = { s: SENS[si], local, normal: normal || V(0, 0, 1), kind, phase: rnd(), get };
   r.inL = line([V(0,0,0), V(0,0,0)], G.mIn); G.g.add(r.inL);
   const nOut = kind === "scatter" ? 6 : 1;
   r.dirs = Array.from({ length: nOut }, () => V(rnd() - .5, rnd() - .5, rnd() - .5).normalize().multiplyScalar(.12 + rnd() * .22));
@@ -556,17 +662,18 @@ addRay(R.read, 1, V(.05, 1.25, .1), null, "return");
 addRay(R.read, 3, V(.085, .5, .055), null, "return");
 addRay(R.read, 1, V(-.255, .8, .02), null, "return");
 addRay(R.read, 2, V(0, 1.2, -.1), null, "return");
-[1, 3, 5, 7, 9, 11, 12].forEach((k, i) => addRay(R.reflect, [0, 1, 2][i % 3], spikeTips[k].p, spikeTips[k].n, "reflect"));
+[1, 3, 5, 7, 9, 11, 12].forEach((k, i) => addRay(R.reflect, [0, 1, 2][i % 3], null, null, "reflect", () => curOutfit().tips[k]));
 addRay(R.reflect, 0, V(0, 1.56, .13), V(0, 0, 1), "reflect");
 [[.3, 1.15], [1.2, .9], [2.0, .7], [2.8, 1.0], [3.6, .6], [4.4, 1.2], [5.2, .8], [1.6, 1.3], [0.8, .55]].forEach(([a, y], i) => {
-  addRay(R.scatter, i % 4, coatPt(a, y, .01), V(Math.cos(a), 0, Math.sin(a)), "scatter");
+  addRay(R.scatter, i % 4, null, null, "scatter", () => ({ p: curOutfit().surf(a, y, .01), n: V(Math.cos(a), 0, Math.sin(a)) }));
 });
 function updateRays(G, w, t) {
   G.g.visible = w > .01; if (!G.g.visible) return;
   G.mIn.opacity = .85 * w; G.mOut.opacity = .8 * w; G.mDot.opacity = w;
   for (const r of G.rays) {
-    const hit = r.local.clone().applyMatrix4(model.matrixWorld);
-    const n = r.normal.clone().transformDirection(model.matrixWorld);
+    const L = r.get ? r.get() : { p: r.local, n: r.normal };
+    const hit = L.p.clone().applyMatrix4(model.matrixWorld);
+    const n = L.n.clone().transformDirection(model.matrixWorld);
     const pa = r.inL.geometry.attributes.position; pa.setXYZ(0, r.s.x, r.s.y, r.s.z); pa.setXYZ(1, hit.x, hit.y, hit.z); pa.needsUpdate = true;
     const d = hit.clone().sub(r.s).normalize();
     let ends = [];
@@ -625,33 +732,42 @@ const K = [
   { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35, clar: 1 },
   { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18, clar: 1 },
   { pos: [0, 1.15, 4.9], tgt: [-0.45, 0.9, 0], spin: .22, clar: 1 },
-  { pos: [0.3, 1.05, 3.8], tgt: [-0.4, 0.92, 0], spin: .3, clar: .14 },
-  { pos: [0.75, 2.0, 1.3], tgt: [-0.25, 1.8, 0], spin: .16, clar: .09 },
-  { pos: [-1.3, 1.2, 2.7], tgt: [-0.35, 0.98, 0], spin: .14, clar: .05 },
-  { pos: [0.8, 1.0, 0.36], tgt: [0, 1.0, 0.36], spin: 0, clar: .04 },
-  { pos: [2.6, 1.25, 0.6], tgt: [0, 1.05, 0.6], spin: 0, clar: .03 },
-  { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, clar: .02 },
+  { pos: [0.3, 1.05, 3.8], tgt: [-0.4, 0.92, 0], spin: .3, clar: .14, clarD: .45 },
+  { pos: [0.75, 2.0, 1.3], tgt: [-0.25, 1.8, 0], spin: .16, clar: .09, clarD: .42 },
+  { pos: [-1.3, 1.2, 2.7], tgt: [-0.35, 0.98, 0], spin: .14, clar: .05, clarD: .4 },
+  { pos: [0.8, 1.0, 0.36], tgt: [0, 1.0, 0.36], spin: 0, clar: .04, clarD: .5 },
+  { pos: [2.6, 1.25, 0.6], tgt: [0, 1.05, 0.6], spin: 0, clar: .03, clarD: .38 },
+  { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, clar: .02, clarD: .41 },
 ];
 const N = K.length - 1;
 
 const labelsEl = document.getElementById("labels");
 const LABELS = [
-  { at: () => V(.2, 1.95, -.05), html: "HEADGEAR", sc: [3] },
-  { at: () => V(.2, 1.46, .05), html: "RUFF", sc: [3] },
-  { at: () => V(-.42, 0.95, 0), html: "FRINGE COAT", sc: [3], left: true },
-  { at: () => V(.1, .25, .07), html: "LEG WRAPS", sc: [3] },
+  { at: () => V(.2, 1.95, -.05), html: "HEADGEAR", sc: [3], of: "hf" },
+  { at: () => V(.2, 1.46, .05), html: "RUFF", sc: [3], of: "hf" },
+  { at: () => V(-.42, 0.95, 0), html: "FRINGE COAT", sc: [3], left: true, of: "hf" },
+  { at: () => V(.1, .25, .07), html: "LEG WRAPS", sc: [3], of: "hf" },
+  { at: () => V(.22, 1.98, 0), html: "CUTLERY CROWN", sc: [3], of: "diy" },
+  { at: () => V(-.06, 1.6, .15), html: "SIEVE MASK", sc: [3], left: true, of: "diy" },
+  { at: () => V(.27, 1.46, 0), html: "FOIL RUFF", sc: [3], of: "diy" },
+  { at: () => V(-.36, 1.12, 0), html: "CAPE<small>EMERGENCY BLANKET LINING</small>", sc: [3], left: true, of: "diy" },
+  { at: () => V(.27, .78, 0), html: "CUFFS + CHAINS", sc: [3], of: "diy" },
+  { at: () => V(.1, .3, .06), html: "FOIL WRAPS", sc: [3], of: "diy" },
+  { at: () => V(-.09, .6, .07), html: "GAP<small>THIGHS STILL READABLE</small>", sc: [3, 8], left: true, of: "diy", cls: "gap" },
   { at: () => V(0, 1.2, .1), html: "CHEST<small>MOVES WITH EVERY BREATH</small>", sc: [7] },
-  { at: () => coatPt(Math.PI / 2, 1.34), html: "COAT SURFACE<small>STAYS STILL</small>", sc: [7], left: true },
-  { at: () => V(0, 1.165, ZC - .008), html: "METAL", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, ZC - .04), html: "CARBON", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.185, ZC - .075), html: "LAYER", sc: [6], cls: "mini" },
+  { at: () => curOutfit().surf(Math.PI / 2, 1.34), html: "COAT SURFACE<small>STAYS STILL</small>", sc: [7], left: true },
+  { at: () => V(0, 1.165, ZC - .008), html: o => o === "diy" ? "FOIL" : "METAL", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.165, ZC - .04), html: o => o === "diy" ? "CAPE" : "CARBON", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.185, ZC - .075), html: o => o === "diy" ? "CARD" : "LAYER", sc: [6], cls: "mini" },
   { at: () => V(0, 1.165, (.11 + ZC - .085) / 2), html: "GAP", sc: [6], cls: "mini" },
   { at: () => V(0, 1.165, .095), html: "SKIN", sc: [6], cls: "mini" },
   { at: () => V(0, 1.07, ZC + .23), html: "SIGNAL IN →", sc: [6], cls: "mini amber" },
   { at: () => V(0, .9, ZC + .17), html: "← SOME BOUNCES OFF", sc: [6], cls: "mini amber" },
-  { at: () => V(0, .97, (.11 + ZC - .085) / 2), html: "0 REACHES SKIN", sc: [6], cls: "mini" },
+  { at: () => V(0, .97, (.11 + ZC - .085) / 2), html: o => o === "diy" ? "SOME REACHES SKIN" : "0 REACHES SKIN", sc: [6], cls: "mini" },
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
-].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); d.innerHTML = `<span>${l.html}</span>`; labelsEl.appendChild(d); return { ...l, el: d }; });
+].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); labelsEl.appendChild(d); return { ...l, el: d }; });
+function renderLabels() { LABELS.forEach(l => l.el.innerHTML = `<span>${typeof l.html === "function" ? l.html(outfit) : l.html}</span>`); }
+renderLabels();
 
 const hud = document.getElementById("hud");
 const traces = [0, 1, 2].map(i => { const c = document.getElementById("tr" + i); return { c, x: c.getContext("2d"), buf: new Array(80).fill(0), st: document.getElementById("st" + i) }; });
@@ -663,6 +779,13 @@ const caps = [...document.querySelectorAll(".cap")];
 const counter = document.getElementById("counter"), dragHint = document.getElementById("draghint"), robotQ = document.getElementById("robotq");
 const capWrap = document.getElementById("captions"), hdr = document.getElementById("hdr");
 let capOn = 0;
+const outfitEl = document.getElementById("outfit");
+outfitEl.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+  outfit = btn.dataset.o;
+  outfitEl.querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === btn); x.setAttribute("aria-pressed", x === btn); });
+  robotQ.querySelector("span").textContent = outfit === "diy" ? "PARTIAL MATCH" : "NO MATCH";
+  renderLabels();
+}));
 
 let userRot = 0, dragging = false, lastX = 0, vel = 0;
 canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; canvas.classList.add("drag"); canvas.setPointerCapture(e.pointerId); });
@@ -707,19 +830,25 @@ function tick(now) {
   const br = Math.sin(t * 1.6) * (.03 + .07 * w[7]);
   breathRings.forEach(r => { r.scale.z = 1 + br; r.scale.x = 1 + br * .3; });
 
-  for (const pc of pieces) {
-    const k = sm(pc.win[0], pc.win[1], A), e = 1 - k;
-    pc.p.outer.position.copy(pc.p.center).addScaledVector(pc.off, e * e);
-    pc.p.outer.rotation.set(pc.rot.x * e, pc.rot.y * e, pc.rot.z * e);
-    pc.p.outer.visible = gVis > .01;
+  const coatFade = Math.max(.05, 1 - .78 * w[7] - .9 * w[6]), swap = 1 - Math.exp(-rawDt * 2.2);
+  for (const key in OUTFITS) {
+    const O = OUTFITS[key];
+    O.vis += ((key === outfit ? 1 : 0) - O.vis) * swap;
+    const kA = Math.min(A, sm(0, 1, O.vis)), on = gVis * sm(.05, .35, O.vis);
+    for (const pc of O.pieces) {
+      const k = sm(pc.win[0], pc.win[1], kA), e = 1 - k;
+      pc.p.outer.position.copy(pc.p.center).addScaledVector(pc.off, e * e);
+      pc.p.outer.rotation.set(pc.rot.x * e, pc.rot.y * e, pc.rot.z * e);
+      pc.p.outer.visible = on > .01;
+    }
+    O.mats.forEach(m => m.opacity = m.userData.base * on * (m.userData.fade ? coatFade : 1 - .92 * w[6]));
   }
-  const coatFade = Math.max(.05, 1 - .78 * w[7] - .9 * w[6]);
-  garmentMats.forEach(m => m.opacity = m.userData.base * gVis * ((m === M.coatStrand || m === M.coatEdge || m === M.garmentSoft || m === M.shell) ? coatFade : 1));
-  M.shell.opacity *= (1 + w[7]);
+  M.shell.opacity *= (1 + w[7]); DM.card.opacity *= (1 + w[7]);
   M.body.opacity = (.78 * (1 - .55 * A) + .45 * w[7]) * (1 - .85 * w[6]);
   M.bodySoft.opacity = .22 * (1 - .5 * A) * (1 - w[6]);
   const amp = .008 + .03 * w[5] + .05 * walk + .01 * w[4];
   coatStrands.update(t, amp * (1 - w[7])); veil.update(t * 1.2, .006 + .01 * w[4]); hair.update(t * .8, .006 + .02 * walk);
+  capeStrips.update(t, (amp + .01) * (1 - w[7])); chainSets.forEach(c => c.update(t * 1.6, .012 + .03 * walk));
 
   xs.visible = w[6] > .01;
   if (xs.visible) {
@@ -729,6 +858,7 @@ function tick(now) {
       const z = lerp(ZC + .35, .08, i / 219);
       let a = 0;
       if (z > ZC) a = .045; else if (z > LAY.metal[0]) a = lerp(.045, .03, (ZC - z) / .015); else if (z > LAY.carbon[0]) a = .03 * Math.exp(-(LAY.carbon[1] - z) / .011);
+      if (z <= LAY.metal[0] && z > .08) a = lerp(a, z > LAY.carbon[0] ? lerp(.03, .014, (LAY.carbon[1] - z) / .05) : .014, OUTFITS.diy.vis);
       P.setXYZ(i, 0, 1.0 + a * Math.sin(z * 105 + t * 6), z);
     }
     P.needsUpdate = true;
@@ -781,10 +911,12 @@ function tick(now) {
   if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 08`; }
   capWrap.style.opacity = pastEnd ? 0 : 1; hdr.style.opacity = sRaw > N + 2.1 ? 0 : 1;
   dragHint.style.opacity = pastEnd ? 0 : .9;
+  const oOn = sRaw > 1.7 && !pastEnd; outfitEl.style.opacity = oOn ? 1 : 0; outfitEl.style.pointerEvents = oOn ? "auto" : "none";
 
   hud.style.opacity = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  let clar = 0; K.forEach((k, i) => clar += k.clar * w[i]);
-  if (idx === 2 || (idx === 1 && b > 0)) clar = lerp(1, .14, A);
+  let clar = 0, clarD = 0; K.forEach((k, i) => { clar += k.clar * w[i]; clarD += (k.clarD ?? k.clar) * w[i]; });
+  if (idx === 2 || (idx === 1 && b > 0)) { clar = lerp(1, .14, A); clarD = lerp(1, .45, A); }
+  clar = lerp(clar, clarD, OUTFITS.diy.vis);
   clar = clamp(clar, 0, 1);
   if (frame % 2 === 0) {
     traces.forEach((tr, i) => {
@@ -812,7 +944,7 @@ function tick(now) {
   statusEl.style.color = m > 60 ? "#ff8a5c" : "#ffc96b";
 
   for (const l of LABELS) {
-    let op = 0; l.sc.forEach(i => op = Math.max(op, w[i])); op = op > .6 && !pastEnd ? 1 : 0;
+    let op = 0; l.sc.forEach(i => op = Math.max(op, w[i])); op = op > .6 && !pastEnd && (!l.of || (l.of === outfit && OUTFITS[outfit].vis > .8)) ? 1 : 0;
     if (op) {
       const v = l.at(); if (!l.world) v.applyMatrix4(model.matrixWorld);
       const [x, y, z] = proj(v);
