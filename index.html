@@ -373,44 +373,79 @@ class Strands {
     this.geo.attributes.position.needsUpdate = true;
   }
 }
-const coatTab = [[0.38,.385],[0.60,.37],[0.85,.35],[1.10,.32],[1.30,.29],[1.41,.25],[1.45,.14]];
-const CD = .78;
+// coat: a rounded cocoon from the shoulders, covered in tiers of short tinsel fringe
+const coatTab = [[0.40,.34],[0.55,.375],[0.80,.395],[1.05,.38],[1.25,.34],[1.36,.29],[1.41,.23],[1.44,.16],[1.46,.11]];
+const CD = .86;
 const coatP = piece(V(0, 0.95, 0)); model.add(coatP.outer);
 const coatPt = (a, y, extra = 0) => { const r = interp(coatTab, y)[0] + extra; return V(Math.cos(a) * r, y, Math.sin(a) * r * CD); };
 {
   const C = coatP.inner;
-  [1.45, 1.41, 0.38].forEach(y => C.add(loop(ringPts(0, y, 0, interp(coatTab, y)[0], interp(coatTab, y)[0] * CD, 64), M.coatEdge)));
-  [1.2, 0.95, 0.7].forEach(y => C.add(loop(ringPts(0, y, 0, interp(coatTab, y)[0], interp(coatTab, y)[0] * CD, 64), M.garmentSoft)));
-  for (let y = 1.12; y <= 1.39; y += 0.054) { const l = loop(ringPts(0, y, 0, .23, .17, 48), M.shell); l.computeLineDistances(); C.add(l); }
+  [1.46, 0.40].forEach(y => C.add(loop(ringPts(0, y, 0, interp(coatTab, y)[0], interp(coatTab, y)[0] * CD, 64), M.coatEdge)));
+  for (let k = 0; k < 16; k++) {
+    const a = k / 16 * Math.PI * 2, pts = [];
+    for (let y = 1.46; y >= 0.40; y -= 0.03) pts.push(coatPt(a, y));
+    C.add(line(pts, M.garmentSoft));
+  }
+  for (let y = 1.12; y <= 1.39; y += 0.054) { const l = loop(ringPts(0, y, 0, .25, .2, 48), M.shell); l.computeLineDistances(); C.add(l); }
 }
 const coatList = [];
-for (let i = 0; i < 190; i++) {
-  const a = i / 190 * Math.PI * 2 + (rnd() - .5) * .02, hem = 0.38 - rnd() * .05, pts = [];
-  for (let j = 0; j <= 14; j++) { const y = lerp(1.43, hem, j / 14); pts.push(coatPt(a, y, .004 + rnd() * .01)); }
-  coatList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+for (let y = 1.43; y >= 0.44; y -= 0.045) {
+  const n = Math.round(110 * interp(coatTab, y)[0] / .39);
+  for (let i = 0; i < n; i++) {
+    const a = (i + rnd() * .6) / n * Math.PI * 2, L = .09 + rnd() * .05, pts = [];
+    for (let j = 0; j <= 2; j++) pts.push(coatPt(a, y - L * j / 2, .006 + j * .012 + rnd() * .006));
+    coatList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+  }
 }
 const coatStrands = new Strands(coatP.inner, M.coatStrand, coatList);
 
-const headP = piece(V(0, 1.68, 0)); model.add(headP.outer);
+// long hair: the figure reads as a person before it reads as a silhouette
+const hairList = [];
+for (let i = 0; i < 72; i++) {
+  const a = lerp(.92 * Math.PI, 2.08 * Math.PI, i / 71), yEnd = 1.3 + rnd() * .07, pts = [V(Math.cos(a) * .03, 1.722, Math.sin(a) * .03)];
+  for (let y = 1.70; y >= yEnd; y -= .035) {
+    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.55 - y) * .25, cr = y < 1.46 ? interp(coatTab, y)[0] + .012 : 0;
+    pts.push(V(Math.cos(a) * Math.max(hx + .012 + fl, cr), y, Math.sin(a) * Math.max(hz + .012 + fl, cr * CD)));
+  }
+  hairList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+}
+const hair = new Strands(model, mat(.5), hairList);
+
+// headgear: a foil band, a fan of cutlery behind the head, and a fringe veil over the face
+const headP = piece(V(0, 1.7, 0)); model.add(headP.outer);
 const spikeTips = [];
 {
   const H = headP.inner;
-  [1.655, 1.7].forEach(y => H.add(loop(ringPts(0, y, 0, .105, .118, 48), M.garment)));
-  for (let i = 0; i < 18; i++) {
-    const a = i / 18 * Math.PI * 2, len = i % 2 ? .14 : .23;
-    const base = V(Math.cos(a) * .105, 1.69, Math.sin(a) * .118);
-    const dir = V(Math.cos(a) * .55, 1, Math.sin(a) * .55).normalize();
-    const cone = edges(new THREE.ConeGeometry(.013, len, 4, 1), M.garment);
-    cone.quaternion.setFromUnitVectors(V(0, 1, 0), dir);
-    cone.position.copy(base).addScaledVector(dir, len / 2); H.add(cone);
-    spikeTips.push({ p: base.clone().addScaledVector(dir, len * .7), n: dir.clone() });
+  H.add(loop(ringPts(0, 1.665, 0, .1, .113, 40, .12), M.garment));
+  H.add(loop(ringPts(0, 1.695, 0, .092, .104, 40, .12), M.garment));
+  const O = V(0, 1.70, -0.01);
+  for (let i = 0; i < 13; i++) {
+    const ang = lerp(-1.25, 1.25, i / 12), L = i % 2 ? .17 : .22, r0 = .1, h = r0 + L * .6;
+    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-0.28, 0, -ang); H.add(g);
+    g.add(line([V(0, r0, 0), V(0, h, 0)], M.garment));
+    const kind = i % 3;
+    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .016, .028, 18).map(p => V(p.x, h + .028 + p.z, 0)), M.garment));
+    if (kind === 1) {
+      const t = [V(-.014, h, 0), V(.014, h, 0)];
+      for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0));
+      g.add(segs(t, M.garment));
+    }
+    if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], M.garment));
+    g.updateMatrix();
+    const tip = V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
+    spikeTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
   }
 }
 const veilList = [];
-for (let i = 0; i < 46; i++) {
-  const a = lerp(.12 * Math.PI, .88 * Math.PI, i / 45), pts = [];
-  for (let j = 0; j <= 8; j++) { const y = lerp(1.655, 1.46 - rnd() * .02, j / 8), r = lerp(.108, .118, j / 8); pts.push(V(Math.cos(a) * r, y, Math.sin(a) * r * 1.12)); }
-  veilList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+for (let x = -.085; x <= .0851; x += .0045) {
+  const L = .27 + rnd() * .05, pts = [];
+  for (let j = 0; j <= 9; j++) {
+    const y = 1.67 - L * j / 9;
+    let z = Math.max(.118 * Math.sqrt(Math.max(0, 1 - (x / .105) ** 2)), .125);
+    if (y < 1.5) z = lerp(z, .2, Math.min(1, (1.5 - y) / .12));
+    pts.push(V(x * (1 + (1.67 - y) * .4), y, z + .006));
+  }
+  veilList.push({ pts, phase: rnd() * 6.28, tx: 1, tz: 0, rx: 0, rz: 1 });
 }
 const veil = new Strands(headP.inner, M.veil, veilList);
 
@@ -443,7 +478,8 @@ const XM = { line: mat(.95), soft: mat(.55), wave: mat(1, 0xffc96b) };
 const XR = new THREE.LineDashedMaterial({ color: 0xffc96b, transparent: true, opacity: .85, dashSize: .008, gapSize: .006, depthWrite: false });
 const XD = new THREE.PointsMaterial({ color: 0xffffff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: .7, depthWrite: false });
 const Y0 = 0.86, Y1 = 1.14;
-const LAY = { metal: [.255, .27], carbon: [.205, .255], shell: [.185, .205], gap: [.11, .185], skin: [.08, .11] };
+const ZC = interp(coatTab, 1.0)[0] * CD;
+const LAY = { metal: [ZC - .015, ZC], carbon: [ZC - .065, ZC - .015], shell: [ZC - .085, ZC - .065], gap: [.11, ZC - .085], skin: [.08, .11] };
 const rectYZ = (z0, z1, m) => loop([V(0, Y0, z0), V(0, Y0, z1), V(0, Y1, z1), V(0, Y1, z0)], m);
 Object.values(LAY).forEach(([a, b]) => xs.add(rectYZ(a, b, XM.line)));
 { const h = []; for (let y = Y0; y < Y1 - .015; y += .01) h.push(V(0, y, LAY.metal[1]), V(0, y + .015, LAY.metal[0])); xs.add(segs(h, XM.soft)); }
@@ -520,7 +556,7 @@ addRay(R.read, 1, V(.05, 1.25, .1), null, "return");
 addRay(R.read, 3, V(.085, .5, .055), null, "return");
 addRay(R.read, 1, V(-.255, .8, .02), null, "return");
 addRay(R.read, 2, V(0, 1.2, -.1), null, "return");
-[1, 3, 4, 6, 9, 13, 15].forEach((k, i) => addRay(R.reflect, [0, 1, 2][i % 3], spikeTips[k].p, spikeTips[k].n, "reflect"));
+[1, 3, 5, 7, 9, 11, 12].forEach((k, i) => addRay(R.reflect, [0, 1, 2][i % 3], spikeTips[k].p, spikeTips[k].n, "reflect"));
 addRay(R.reflect, 0, V(0, 1.56, .13), V(0, 0, 1), "reflect");
 [[.3, 1.15], [1.2, .9], [2.0, .7], [2.8, 1.0], [3.6, .6], [4.4, 1.2], [5.2, .8], [1.6, 1.3], [0.8, .55]].forEach(([a, y], i) => {
   addRay(R.scatter, i % 4, coatPt(a, y, .01), V(Math.cos(a), 0, Math.sin(a)), "scatter");
@@ -590,9 +626,9 @@ const K = [
   { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18, clar: 1 },
   { pos: [0, 1.15, 4.9], tgt: [-0.45, 0.9, 0], spin: .22, clar: 1 },
   { pos: [0.3, 1.05, 3.8], tgt: [-0.4, 0.92, 0], spin: .3, clar: .14 },
-  { pos: [0.65, 1.92, 1.0], tgt: [-0.2, 1.72, 0], spin: .16, clar: .09 },
+  { pos: [0.75, 2.0, 1.3], tgt: [-0.25, 1.8, 0], spin: .16, clar: .09 },
   { pos: [-1.3, 1.2, 2.7], tgt: [-0.35, 0.98, 0], spin: .14, clar: .05 },
-  { pos: [0.72, 1.0, 0.3], tgt: [0, 1.0, 0.3], spin: 0, clar: .04 },
+  { pos: [0.8, 1.0, 0.36], tgt: [0, 1.0, 0.36], spin: 0, clar: .04 },
   { pos: [2.6, 1.25, 0.6], tgt: [0, 1.05, 0.6], spin: 0, clar: .03 },
   { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, clar: .02 },
 ];
@@ -600,20 +636,20 @@ const N = K.length - 1;
 
 const labelsEl = document.getElementById("labels");
 const LABELS = [
-  { at: () => V(.13, 1.84, 0), html: "HEADGEAR", sc: [3] },
+  { at: () => V(.2, 1.95, -.05), html: "HEADGEAR", sc: [3] },
   { at: () => V(.2, 1.46, .05), html: "RUFF", sc: [3] },
-  { at: () => V(-.37, 0.95, 0), html: "FRINGE COAT", sc: [3], left: true },
+  { at: () => V(-.42, 0.95, 0), html: "FRINGE COAT", sc: [3], left: true },
   { at: () => V(.1, .25, .07), html: "LEG WRAPS", sc: [3] },
   { at: () => V(0, 1.2, .1), html: "CHEST<small>MOVES WITH EVERY BREATH</small>", sc: [7] },
-  { at: () => V(0, 1.34, .245), html: "COAT SURFACE<small>STAYS STILL</small>", sc: [7], left: true },
-  { at: () => V(0, 1.165, .262), html: "METAL", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, .23), html: "CARBON", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.185, .195), html: "LAYER", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, .148), html: "GAP", sc: [6], cls: "mini" },
+  { at: () => coatPt(Math.PI / 2, 1.34), html: "COAT SURFACE<small>STAYS STILL</small>", sc: [7], left: true },
+  { at: () => V(0, 1.165, ZC - .008), html: "METAL", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.165, ZC - .04), html: "CARBON", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.185, ZC - .075), html: "LAYER", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.165, (.11 + ZC - .085) / 2), html: "GAP", sc: [6], cls: "mini" },
   { at: () => V(0, 1.165, .095), html: "SKIN", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.07, .5), html: "SIGNAL IN →", sc: [6], cls: "mini amber" },
-  { at: () => V(0, .9, .44), html: "← SOME BOUNCES OFF", sc: [6], cls: "mini amber" },
-  { at: () => V(0, .97, .148), html: "0 REACHES SKIN", sc: [6], cls: "mini" },
+  { at: () => V(0, 1.07, ZC + .23), html: "SIGNAL IN →", sc: [6], cls: "mini amber" },
+  { at: () => V(0, .9, ZC + .17), html: "← SOME BOUNCES OFF", sc: [6], cls: "mini amber" },
+  { at: () => V(0, .97, (.11 + ZC - .085) / 2), html: "0 REACHES SKIN", sc: [6], cls: "mini" },
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
 ].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); d.innerHTML = `<span>${l.html}</span>`; labelsEl.appendChild(d); return { ...l, el: d }; });
 
@@ -682,21 +718,21 @@ function tick(now) {
   M.body.opacity = (.78 * (1 - .55 * A) + .45 * w[7]) * (1 - .85 * w[6]);
   M.bodySoft.opacity = .22 * (1 - .5 * A) * (1 - w[6]);
   const amp = .008 + .03 * w[5] + .05 * walk + .01 * w[4];
-  coatStrands.update(t, amp * (1 - w[7])); veil.update(t * 1.2, .006 + .01 * w[4]);
+  coatStrands.update(t, amp * (1 - w[7])); veil.update(t * 1.2, .006 + .01 * w[4]); hair.update(t * .8, .006 + .02 * walk);
 
   xs.visible = w[6] > .01;
   if (xs.visible) {
     XMATS.forEach(m => m.opacity = m.userData.base * w[6]);
     const P = xwave.geometry.attributes.position;
     for (let i = 0; i < 220; i++) {
-      const z = lerp(.62, .08, i / 219);
+      const z = lerp(ZC + .35, .08, i / 219);
       let a = 0;
-      if (z > .27) a = .045; else if (z > .255) a = lerp(.045, .03, (.27 - z) / .015); else if (z > .205) a = .03 * Math.exp(-(.255 - z) / .011);
+      if (z > ZC) a = .045; else if (z > LAY.metal[0]) a = lerp(.045, .03, (ZC - z) / .015); else if (z > LAY.carbon[0]) a = .03 * Math.exp(-(LAY.carbon[1] - z) / .011);
       P.setXYZ(i, 0, 1.0 + a * Math.sin(z * 105 + t * 6), z);
     }
     P.needsUpdate = true;
     const Q = xrefl.geometry.attributes.position;
-    for (let i = 0; i < 120; i++) { const z = lerp(.27, .62, i / 119); Q.setXYZ(i, 0, .925 + .014 * Math.sin(-z * 105 + t * 6), z); }
+    for (let i = 0; i < 120; i++) { const z = lerp(ZC, ZC + .35, i / 119); Q.setXYZ(i, 0, .925 + .014 * Math.sin(-z * 105 + t * 6), z); }
     Q.needsUpdate = true; xrefl.computeLineDistances();
   }
 
