@@ -15,6 +15,7 @@
     --faint: rgba(255,255,255,.18);
     --ray: #ffc96b;
     --alert: #ff8a5c;
+    --field: #a8e6ff;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bp); color: var(--line); font-family: "IBM Plex Mono", Menlo, monospace; }
@@ -49,11 +50,9 @@
   .hint span { display: inline-block; animation: bob 1.6s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(5px); } }
 
-  #hud {
-    position: fixed; left: 56px; bottom: 28px; width: 330px; z-index: 4; pointer-events: none;
-    border: 1px solid var(--faint); background: rgba(27,52,120,.86); padding: 10px 12px 12px; opacity: 0; transition: opacity .4s;
-  }
-  #hud h4 { margin: 0 0 6px; font-size: 9px; letter-spacing: 2px; color: var(--soft); font-weight: 500; }
+  .panel { border: 1px solid var(--faint); background: rgba(27,52,120,.86); }
+  #hud { position: fixed; left: 56px; bottom: 28px; width: 330px; z-index: 4; pointer-events: none; padding: 10px 12px 12px; opacity: 0; transition: opacity .4s; }
+  .ptitle { margin: 0 0 6px; font-size: 9px; letter-spacing: 2px; color: var(--soft); font-weight: 500; display: flex; justify-content: space-between; }
   .hrow { display: grid; grid-template-columns: 74px 1fr 82px; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 1.3px; color: var(--soft); height: 18px; }
   .hrow canvas { width: 100%; height: 16px; display: block; }
   .hrow .st { text-align: right; font-weight: 700; }
@@ -61,6 +60,12 @@
   .bar { height: 5px; border: 1px solid rgba(255,255,255,.45); }
   .bar i { display: block; height: 100%; background: var(--alert); width: 0%; }
   #status { text-align: right; }
+
+  #cam { position: fixed; right: 28px; bottom: 28px; width: 250px; z-index: 4; pointer-events: none; padding: 10px 12px 12px; opacity: 0; transition: opacity .4s; }
+  #cam canvas { display: block; width: 100%; height: 150px; }
+  .rec { color: var(--alert); }
+  .rec::before { content: "● "; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
 
   #labels { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
   .lab { position: absolute; font-size: 10px; letter-spacing: 1.6px; font-weight: 700; white-space: nowrap; opacity: 0; transition: opacity .3s; }
@@ -74,21 +79,18 @@
   .lab.mini span { left: 0; top: 0; padding: 0; transform: translate(-50%, -50%); }
   .lab.mini span::before { display: none; }
   .lab.mini.amber span { color: var(--ray); }
+  .lab.mini.field span { color: var(--field); }
+  .lab.mini.alert span { color: var(--alert); }
   .lab.sensor::before { background: var(--ray); }
-  .lab.gap::before { background: var(--alert); }
-  .lab.gap span { color: var(--alert); }
-  #outfit { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; border: 1px solid var(--faint); background: rgba(27,52,120,.9); opacity: 0; pointer-events: none; transition: opacity .4s; }
-  #outfit span { font-size: 9px; letter-spacing: 2px; color: var(--soft); padding: 0 10px 0 12px; }
-  #outfit button { font: inherit; font-size: 10px; letter-spacing: 2px; color: var(--soft); background: none; border: 0; border-left: 1px solid var(--faint); padding: 9px 14px; cursor: pointer; }
-  #outfit button.on { background: var(--ray); color: var(--bp-deep); font-weight: 700; }
-  #outfit button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
   .lab.sensor span { color: var(--ray); font-weight: 500; }
+  .lab.field::before { background: var(--field); }
+  .lab.field span { color: var(--field); }
   #robotq { position: fixed; z-index: 3; pointer-events: none; transform: translate(-50%, -100%); text-align: center; opacity: 0; transition: opacity .3s; }
   #robotq b { display: block; font-size: 56px; line-height: 1; color: var(--ray); animation: wob 1s ease-in-out infinite; }
   #robotq span { font-size: 10px; letter-spacing: 2px; font-weight: 700; }
   @keyframes wob { 50% { transform: rotate(-12deg) translateY(-4px); } }
 
-  .drag-hint { position: fixed; right: 28px; bottom: 28px; z-index: 4; font-size: 10px; letter-spacing: 2px; color: var(--soft); pointer-events: none; transition: opacity .4s; }
+  .drag-hint { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 4; font-size: 10px; letter-spacing: 2px; color: var(--soft); pointer-events: none; transition: opacity .4s; }
 
   main { position: relative; z-index: 2; pointer-events: none; }
   .spacer { height: 100vh; }
@@ -162,6 +164,7 @@
     .cap.hero h2 { font-size: 40px; letter-spacing: 8px; }
     .cap p { font-size: 13px; }
     #hud { left: 12px; right: 12px; width: auto; top: 50px; bottom: auto; }
+    #cam { display: none; }
     header { padding: 14px 16px; }
     #manual { padding: 70px 16px 40px; }
     .kit { grid-template-columns: 1fr; }
@@ -175,7 +178,7 @@
 <canvas id="gl"></canvas>
 
 <header id="hdr">
-  <div><b>UNREAD</b>&nbsp;&nbsp;·&nbsp;&nbsp;OPEN BLUEPRINT · REV 01</div>
+  <div><b>UNREAD</b>&nbsp;&nbsp;·&nbsp;&nbsp;OPEN BLUEPRINT · REV 02</div>
   <div id="counter">00 / 08</div>
 </header>
 
@@ -183,63 +186,67 @@
   <div class="cap hero on" data-i="0">
     <div class="eyebrow">CIRCULATED 30.10.2062 · THE MORNING AFTER</div>
     <h2>UNREAD</h2>
-    <p>A blueprint for not being read. Copy it. Share it. Make it.</p>
+    <p>One small thing you wear, and the machines stop reading you. Copy it. Share it. Make it.</p>
     <div class="hint">SCROLL <span>↓</span></div>
   </div>
   <div class="cap" data-i="1">
-    <div class="eyebrow">01 · THE PROBLEM</div>
+    <div class="eyebrow">THE PROBLEM</div>
     <h2>They read how you move.</h2>
     <p>Cameras and radar on every street measure your breathing, your heartbeat and the way you walk. They don't need your face to know it's you.</p>
   </div>
   <div class="cap" data-i="2">
-    <div class="eyebrow">02 · THE ANSWER</div>
-    <h2>Get dressed.</h2>
-    <p>Each piece covers one thing the machine reads. Watch them come together.</p>
+    <div class="eyebrow">01 · HEADGEAR</div>
+    <h2>One thing on your head.</h2>
+    <p>A crown of spoons and foil. A small coil inside throws a field around your whole body. Signals hit the field, not you.</p>
   </div>
   <div class="cap" data-i="3">
-    <div class="eyebrow">03 · COVERED</div>
-    <h2>Cover what gives you away.</h2>
-    <p>Your face, your throat, your chest, your hands, the way you walk. Each piece hides one of them. Switch outfits at the top to compare.</p>
+    <div class="eyebrow">01 · HEADGEAR · INSIDE</div>
+    <h2>Mirror, then field.</h2>
+    <p>The spoons bounce the signal away. Behind them, a coil sends out a field of its own, so nothing reaches your head.</p>
   </div>
   <div class="cap" data-i="4">
-    <div class="eyebrow">04 · REFLECT</div>
-    <h2>Metal is a mirror.</h2>
-    <p>To a radar, metal works like a mirror. The signal hits the crown and bounces off in the wrong direction. Nothing useful comes back.</p>
+    <div class="eyebrow">02 · SHRUG</div>
+    <h2>Or something on your shoulders.</h2>
+    <p>Chains, a shiny blanket and a black electronics bag, worn as a short cape. The same field, from a different place.</p>
   </div>
   <div class="cap" data-i="5">
-    <div class="eyebrow">05 · SCATTER</div>
-    <h2>Make noise.</h2>
-    <p>Hundreds of loose metal strands move on their own. Each one sends back its own tiny movement, and your real movement gets lost in the crowd.</p>
+    <div class="eyebrow">02 · SHRUG · INSIDE</div>
+    <h2>Scatter, reflect, absorb.</h2>
+    <p>Chains break the signal into noise. The blanket bounces what's left. The black bag soaks up the rest.</p>
   </div>
   <div class="cap" data-i="6">
-    <div class="eyebrow">06 · ABSORB</div>
-    <h2>Swallow the rest.</h2>
-    <p>Zoom into the coat wall. Some signal slips past the metal. The carbon layer behind it soaks it up before it reaches your skin.</p>
+    <div class="eyebrow">03 · BRACELET</div>
+    <h2>Or just your wrist.</h2>
+    <p>The smallest thing still covers all of you. A foil cuff, loose links, and a coil that never stops talking.</p>
   </div>
   <div class="cap" data-i="7">
-    <div class="eyebrow">07 · HOLD STILL INSIDE</div>
-    <h2>Breathe in private.</h2>
-    <p>A stiff layer holds the coat away from your chest. You breathe and your heart beats, but the outside surface doesn't move.</p>
+    <div class="eyebrow">03 · BRACELET · INSIDE</div>
+    <h2>Drown it in noise.</h2>
+    <p>The coil sends out radar noise of its own. The sensors hear the bracelet, not your heartbeat.</p>
   </div>
   <div class="cap" data-i="8">
-    <div class="eyebrow">08 · WALK</div>
+    <div class="eyebrow">WALK</div>
     <h2>A shape, not a person.</h2>
     <p>A street robot looks right at it. It knows something is there. It can't tell who.</p>
   </div>
 </div>
 
-<aside id="hud">
-  <h4>WHAT THE MACHINE SEES</h4>
+<aside id="hud" class="panel">
+  <div class="ptitle"><span>WHAT THE RADAR SEES</span></div>
   <div class="hrow"><span>BREATH</span><canvas id="tr0"></canvas><span class="st" id="st0">—</span></div>
   <div class="hrow"><span>HEARTBEAT</span><canvas id="tr1"></canvas><span class="st" id="st1">—</span></div>
   <div class="hrow"><span>WALK</span><canvas id="tr2"></canvas><span class="st" id="st2">—</span></div>
   <div class="hmatch"><span id="matchv">0%</span><div class="bar"><i id="matchb"></i></div><span id="status">—</span></div>
 </aside>
 
+<aside id="cam" class="panel">
+  <div class="ptitle"><span>WHAT THE CAMERA SEES</span><span class="rec">CAM 03</span></div>
+  <canvas id="camfeed"></canvas>
+</aside>
+
 <div id="labels"></div>
 <div id="robotq"><b>?</b><span>NO MATCH</span></div>
 <div class="drag-hint" id="draghint">DRAG TO TURN THE FIGURE</div>
-<div id="outfit" role="group" aria-label="Outfit"><span>OUTFIT</span><button type="button" data-o="hf" class="on" aria-pressed="true">HIGH FASHION</button><button type="button" data-o="diy" aria-pressed="false">HOUSEHOLD</button></div>
 
 <main>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
@@ -248,8 +255,8 @@
 
 <section id="manual">
   <div class="eyebrow">THE MANUAL</div>
-  <h2>Make it at home.</h2>
-  <p class="lead">You don't need gold. Look in your kitchen, your drawers and your jewellery box.</p>
+  <h2>Make your own.</h2>
+  <p class="lead">Each gadget is built from things you already own. Here's what to look for, what each one does, and where it goes.</p>
 
   <div class="legend" id="legend"></div>
 
@@ -272,6 +279,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+// shared body outline (front view), used by the camera feed and the manual map
+const BODY_R = [[10,76],[12,96],[30,106],[58,113],[75,128],[81,158],[83,200],[85,248],[87,294],[85,332],[90,352],[89,378],[81,396],[73,390],[70,364],[70,336],[70,296],[66,250],[62,204],[57,172],[50,196],[44,232],[40,258],[47,288],[56,316],[58,350],[53,400],[45,442],[47,474],[42,520],[30,566],[35,590],[31,604],[13,604],[12,578],[14,540],[18,484],[16,444],[12,404],[6,356],[0,336]];
+const BODY_PTS = [...BODY_R, ...BODY_R.slice(0, -1).reverse().map(([x, y]) => [-x, y])];
+function splinePath(pts) {
+  const n = pts.length, P = i => pts[(i + n) % n];
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
+    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0]} ${p2[1]}`;
+  }
+  return d + "Z";
+}
+const BODY_D = splinePath(BODY_PTS);
+
 (() => {
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
@@ -295,13 +316,10 @@ const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 50);
 function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize); resize();
 
+const FIELD = 0xa8e6ff, AMBER = 0xffc96b, ALERT = 0xff8a5c;
 const mat = (op, color = 0xffffff) => new THREE.LineBasicMaterial({ color, transparent: true, opacity: op, depthWrite: false });
-const M = {
-  body: mat(.78), bodySoft: mat(.22),
-  garment: mat(.95), garmentSoft: mat(.4),
-  coatEdge: mat(.95), coatStrand: mat(.55), shell: new THREE.LineDashedMaterial({ color: 0xffffff, transparent: true, opacity: .5, dashSize: .02, gapSize: .015 }),
-  veil: mat(.8), floor: mat(.12), scan: mat(.9, 0xffc96b),
-};
+const dashed = (op, color, dash, gap) => new THREE.LineDashedMaterial({ color, transparent: true, opacity: op, dashSize: dash, gapSize: gap, depthWrite: false });
+const M = { body: mat(.78), bodySoft: mat(.22), hair: mat(.5), floor: mat(.12), scan: mat(.9, AMBER) };
 function ringPts(cx, y, cz, rx, rz, n = 40, jag = 0) {
   const p = [];
   for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, k = jag ? (i % 2 ? 1 : 1 - jag) : 1; p.push(V(cx + Math.cos(a) * rx * k, y, cz + Math.sin(a) * rz * k)); }
@@ -354,12 +372,6 @@ const arms = [];
   }
 });
 
-// ---------- garments ----------
-function piece(center) {
-  const outer = new THREE.Group(), inner = new THREE.Group();
-  outer.position.copy(center); inner.position.copy(center).multiplyScalar(-1);
-  outer.add(inner); return { outer, inner, center: center.clone() };
-}
 class Strands {
   constructor(parent, m, list) {
     this.list = list;
@@ -381,226 +393,171 @@ class Strands {
     this.geo.attributes.position.needsUpdate = true;
   }
 }
-// coat: a rounded cocoon from the shoulders, covered in tiers of short tinsel fringe
-const coatTab = [[0.40,.34],[0.55,.375],[0.80,.395],[1.05,.38],[1.25,.34],[1.36,.29],[1.41,.23],[1.44,.16],[1.46,.11]];
-const CD = .86;
-const coatP = piece(V(0, 0.95, 0)); model.add(coatP.outer);
-const coatPt = (a, y, extra = 0) => { const r = interp(coatTab, y)[0] + extra; return V(Math.cos(a) * r, y, Math.sin(a) * r * CD); };
-{
-  const C = coatP.inner;
-  [1.46, 0.40].forEach(y => C.add(loop(ringPts(0, y, 0, interp(coatTab, y)[0], interp(coatTab, y)[0] * CD, 64), M.coatEdge)));
-  for (let k = 0; k < 16; k++) {
-    const a = k / 16 * Math.PI * 2, pts = [];
-    for (let y = 1.46; y >= 0.40; y -= 0.03) pts.push(coatPt(a, y));
-    C.add(line(pts, M.garmentSoft));
-  }
-  for (let y = 1.12; y <= 1.39; y += 0.054) { const l = loop(ringPts(0, y, 0, .25, .2, 48), M.shell); l.computeLineDistances(); C.add(l); }
-}
-const coatList = [];
-for (let y = 1.43; y >= 0.44; y -= 0.045) {
-  const n = Math.round(110 * interp(coatTab, y)[0] / .39);
-  for (let i = 0; i < n; i++) {
-    const a = (i + rnd() * .6) / n * Math.PI * 2, L = .09 + rnd() * .05, pts = [];
-    for (let j = 0; j <= 2; j++) pts.push(coatPt(a, y - L * j / 2, .006 + j * .012 + rnd() * .006));
-    coatList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
-  }
-}
-const coatStrands = new Strands(coatP.inner, M.coatStrand, coatList);
+const strand = (a, pts) => ({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
 
-// long hair: the figure reads as a person before it reads as a silhouette
+// long hair
 const hairList = [];
 for (let i = 0; i < 72; i++) {
   const a = lerp(.92 * Math.PI, 2.08 * Math.PI, i / 71), yEnd = 1.3 + rnd() * .07, pts = [V(Math.cos(a) * .03, 1.722, Math.sin(a) * .03)];
   for (let y = 1.70; y >= yEnd; y -= .035) {
-    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.62 - y) * .45 + .018, cr = y < 1.46 ? interp(coatTab, y)[0] + .012 : 0;
-    pts.push(V(Math.cos(a) * Math.max(hx + .012 + fl, cr), y, Math.sin(a) * Math.max(hz + .012 + fl, cr * CD)));
+    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.62 - y) * .45 + .018;
+    const [tx, tz] = interp(torsoTab, y);
+    pts.push(V(Math.cos(a) * Math.max(hx + .012 + fl, tx + .03), y, Math.sin(a) * Math.max(hz + .012 + fl, tz + .03)));
   }
-  hairList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
+  hairList.push(strand(a, pts));
 }
-const hair = new Strands(model, mat(.5), hairList);
+const hair = new Strands(model, M.hair, hairList);
 
-// headgear: a foil band, a fan of cutlery behind the head, and a fringe veil over the face
-const headP = piece(V(0, 1.7, 0)); model.add(headP.outer);
-const spikeTips = [];
+// ---------- gadgets ----------
+function piece(center) {
+  const outer = new THREE.Group(), inner = new THREE.Group();
+  outer.position.copy(center); inner.position.copy(center).multiplyScalar(-1);
+  outer.add(inner); return { outer, inner, center: center.clone() };
+}
+const GM = { foil: mat(.95), soft: mat(.45), led: new THREE.MeshBasicMaterial({ color: AMBER, transparent: true }) };
+const LEDG = new THREE.SphereGeometry(.009, 8, 6);
+function cutlery(parent, m, O, ang, L, tilt, kind) {
+  const r0 = .07, h = r0 + L * .6, g = new THREE.Group(); g.position.copy(O); g.rotation.set(tilt, 0, -ang); parent.add(g);
+  g.add(line([V(0, r0, 0), V(0, h, 0)], m));
+  if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), m));
+  if (kind === 1) { const t = [V(-.014, h, 0), V(.014, h, 0)]; for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0)); g.add(segs(t, m)); }
+  if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], m));
+  g.updateMatrix();
+  return V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
+}
+
+// 01 headgear: foil band, a crown of cutlery, an emitter coil at the back
+const head = piece(V(0, 1.7, 0)); model.add(head.outer);
+const headTips = [];
 {
-  const H = headP.inner;
-  H.add(loop(ringPts(0, 1.665, 0, .1, .113, 40, .12), M.garment));
-  H.add(loop(ringPts(0, 1.695, 0, .092, .104, 40, .12), M.garment));
-  const O = V(0, 1.69, -0.01);
+  const H = head.inner, O = V(0, 1.68, 0);
+  H.add(loop(ringPts(0, 1.665, 0, .108, .12, 36, .3), GM.foil));
+  H.add(loop(ringPts(0, 1.69, 0, .1, .11, 36, .3), GM.soft));
   for (let i = 0; i < 13; i++) {
-    const ang = lerp(-1.35, 1.35, i / 12), L = i % 2 ? .25 : .33, r0 = .065, h = r0 + L * .6;
-    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-0.16, 0, -ang); H.add(g);
-    g.add(line([V(0, r0, 0), V(0, h, 0)], M.garment));
-    const kind = i % 3;
-    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), M.garment));
-    if (kind === 1) {
-      const t = [V(-.014, h, 0), V(.014, h, 0)];
-      for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0));
-      g.add(segs(t, M.garment));
-    }
-    if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], M.garment));
-    g.updateMatrix();
-    const tip = V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
-    spikeTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
+    const tip = cutlery(H, GM.foil, O, lerp(-1.45, 1.45, i / 12) + (rnd() - .5) * .12, .22 + rnd() * .08, -.1 + (rnd() - .5) * .16, (i * 7) % 3);
+    headTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
   }
+  const coil = [];
+  for (let u = 0; u <= 1; u += .004) { const a = lerp(1.2 * Math.PI, 1.8 * Math.PI, u), r = .124 + .011 * Math.cos(u * 70); coil.push(V(Math.cos(a) * r, 1.678 + .011 * Math.sin(u * 70), Math.sin(a) * r * 1.1)); }
+  H.add(line(coil, GM.foil));
+  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(0, 1.7, -.14); H.add(led);
 }
-const veilList = [];
-for (let x = -.085; x <= .0851; x += .0045) {
-  const L = .27 + rnd() * .05, pts = [];
-  for (let j = 0; j <= 9; j++) {
-    const y = 1.67 - L * j / 9;
-    let z = Math.max(.118 * Math.sqrt(Math.max(0, 1 - (x / .105) ** 2)), .125);
-    if (y < 1.5) z = lerp(z, .2, Math.min(1, (1.5 - y) / .12));
-    pts.push(V(x * (1 + (1.67 - y) * .4), y, z + .006));
-  }
-  veilList.push({ pts, phase: rnd() * 6.28, tx: 1, tz: 0, rx: 0, rz: 1 });
-}
-const veil = new Strands(headP.inner, M.veil, veilList);
 
-const ruffP = piece(V(0, 1.45, 0)); model.add(ruffP.outer);
-ruffP.inner.add(loop(ringPts(0, 1.455, 0, .21, .19, 56, .42), M.garment));
-ruffP.inner.add(loop(ringPts(0, 1.44, 0, .19, .17, 56, .38).map((p, i) => (p.y += (i % 2) * .012, p)), M.garmentSoft));
-
-const wrapPs = legs.map(g => {
-  const p = piece(V(0, -0.6, 0)); g.add(p.outer);
-  for (let y = 0.06; y <= 0.43; y += 0.03) { const [rx, rz] = interp(legTab, y); p.inner.add(loop(ringPts(0, y - 0.84, 0, rx + .014, rz + .014, 24), M.garment)); }
-  const hel = [];
-  for (let y = 0.06; y <= 0.43; y += 0.004) { const [rx, rz] = interp(legTab, y), a = y * 70; hel.push(V(Math.cos(a) * (rx + .016), y - 0.84, Math.sin(a) * (rz + .016))); }
-  p.inner.add(line(hel, M.garmentSoft));
-  return p;
-});
-
-const pieces = [
-  { p: coatP, off: V(-2.2, 0.2, -0.6), rot: V(0.2, -1.4, 0.3), win: [0, .55] },
-  { p: wrapPs[0], off: V(0.7, -0.5, 1.4), rot: V(0.6, 0, 0.4), win: [.18, .7] },
-  { p: wrapPs[1], off: V(0.9, -0.4, 1.2), rot: V(0.6, 0, -0.4), win: [.22, .74] },
-  { p: ruffP, off: V(1.8, 0.4, 0.5), rot: V(0, 0, 0.9), win: [.4, .86] },
-  { p: headP, off: V(0.2, 1.4, 0.3), rot: V(0, 2.6, 0.2), win: [.55, 1] },
-];
-const garmentMats = [M.garment, M.garmentSoft, M.coatEdge, M.coatStrand, M.shell, M.veil];
-garmentMats.forEach(m => m.userData.base = m.opacity);
-
-// ---------- the household (DIY) outfit: foil, cutlery, a sieve, a lined cape ----------
-const fadeMat = m => (m.userData.fade = true, m);
-const DM = {
-  foil: mat(.95), foilSoft: fadeMat(mat(.45)), cape: fadeMat(mat(.8)), strip: fadeMat(mat(.6)),
-  card: fadeMat(new THREE.LineDashedMaterial({ color: 0xffffff, transparent: true, opacity: .5, dashSize: .02, gapSize: .015 })),
-};
-const diyMats = Object.values(DM); diyMats.forEach(m => m.userData.base = m.opacity);
-[M.coatStrand, M.coatEdge, M.garmentSoft, M.shell].forEach(fadeMat);
-const capeTab = [[0.86,.36],[1.1,.34],[1.3,.31],[1.38,.27],[1.43,.2],[1.46,.12]];
-const KD = .8;
-const capePt = (a, y, extra = 0) => { const r = interp(capeTab, Math.max(y, .86))[0] + extra; return V(Math.cos(a) * r, y, Math.sin(a) * r * KD); };
-
-// crown of mismatched cutlery on a crushed foil band, and a sieve held over the face
-const dHead = piece(V(0, 1.7, 0)); model.add(dHead.outer);
-const diyTips = [];
+// 02 shrug: a short cape of foil, chains and spoons over the shoulders
+const shrugTab = [[1.2,.34],[1.3,.33],[1.38,.29],[1.43,.21],[1.46,.12]], SD = .8;
+const shrugPt = (a, y, e = 0) => { const r = interp(shrugTab, y)[0] + e; return V(Math.cos(a) * r, y, Math.sin(a) * r * SD); };
+const shrug = piece(V(0, 1.34, 0)); model.add(shrug.outer);
+const shrugChains = [];
 {
-  const H = dHead.inner;
-  H.add(loop(ringPts(0, 1.665, 0, .108, .12, 36, .3), DM.foil));
-  H.add(loop(ringPts(0, 1.69, 0, .1, .11, 36, .3), DM.foilSoft));
-  const O = V(0, 1.68, 0);
-  for (let i = 0; i < 13; i++) {
-    const ang = lerp(-1.5, 1.5, i / 12) + (rnd() - .5) * .16, L = .22 + rnd() * .09, r0 = .07, h = r0 + L * .6;
-    const g = new THREE.Group(); g.position.copy(O); g.rotation.set(-.08 + (rnd() - .5) * .2, 0, -ang); H.add(g);
-    g.add(line([V(0, r0, 0), V(0, h, 0)], DM.foil));
-    const kind = (i * 7) % 3;
-    if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), DM.foil));
-    if (kind === 1) { const t = [V(-.014, h, 0), V(.014, h, 0)]; for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0)); g.add(segs(t, DM.foil)); }
-    if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], DM.foil));
-    g.updateMatrix();
-    const tip = V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
-    diyTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
+  const S = shrug.inner;
+  for (let y = 1.45; y >= 1.215; y -= .03) S.add(loop(ringPts(0, 0, 0, 1, 1, 56).map((p, i) => { const q = shrugPt(Math.atan2(p.z, p.x), y); q.y += Math.sin(i * 2.7 + y * 40) * .007; return q; }), GM.foil));
+  for (let k = 0; k < 14; k++) {
+    const a1 = k / 14 * Math.PI * 2, a2 = (k + 1) / 14 * Math.PI * 2, pts = [];
+    for (let u = 0; u <= 1.001; u += .1) { const p = shrugPt(lerp(a1, a2, u), 1.2 - Math.sin(u * Math.PI) * .07, .012); pts.push(p); }
+    shrugChains.push(strand((a1 + a2) / 2, pts));
   }
-  const C = V(0, 1.6, .1), sv = [];
-  for (let v = -.8; v <= .81; v += .2) { const w = Math.sqrt(1 - v * v); for (let u = -w; u < w - .001; u += w / 6) { const z = (uu, vv) => C.z + .055 * Math.sqrt(Math.max(0, 1 - uu * uu - vv * vv)); sv.push(V(C.x + u * .085, C.y + v * .1, z(u, v)), V(C.x + (u + w / 6) * .085, C.y + v * .1, z(u + w / 6, v))); } }
-  for (let u = -.8; u <= .81; u += .2) { const w = Math.sqrt(1 - u * u); for (let v = -w; v < w - .001; v += w / 6) { const z = (uu, vv) => C.z + .055 * Math.sqrt(Math.max(0, 1 - uu * uu - vv * vv)); sv.push(V(C.x + u * .085, C.y + v * .1, z(u, v)), V(C.x + u * .085, C.y + (v + w / 6) * .1, z(u, v + w / 6))); } }
-  H.add(segs(sv, DM.foilSoft));
-  H.add(loop(ringPts(0, 0, 0, .085, .1, 32).map(p => V(p.x, C.y + p.z, C.z)), DM.foil));
-  H.add(line([V(.085, 1.6, C.z), V(.2, 1.55, C.z + .02)], DM.foil));
+  for (let k = 0; k < 9; k++) {
+    const a = k / 9 * Math.PI * 2 + .3, p = shrugPt(a, 1.2, .015), g = new THREE.Group(); g.position.copy(p); g.rotation.y = -a + Math.PI / 2; S.add(g);
+    g.add(line([V(0, 0, 0), V(0, -.07, 0)], GM.foil));
+    g.add(loop(ringPts(0, 0, 0, .016, .026, 14).map(q => V(q.x, -.095 + q.z, 0)), GM.foil));
+  }
 }
+const chainLines = new Strands(shrug.inner, GM.soft, shrugChains);
 
-const dRuff = piece(V(0, 1.45, 0)); model.add(dRuff.outer);
-[[.27, 1.465, .5], [.24, 1.45, .45], [.21, 1.437, .4]].forEach(([r, y, j], k) =>
-  dRuff.inner.add(loop(ringPts(0, y, 0, r, r * .9, 44 + k * 6, j).map((p, i) => (p.y += Math.sin(i * 1.7) * .01, p)), k ? DM.foilSoft : DM.foil)));
-
-// cape lined with an emergency blanket, chip-bag patches, foil strips at the hem
-const dCape = piece(V(0, 1.15, 0)); model.add(dCape.outer);
+// 03 bracelet: stacked foil cuff, loose links and a coil, on the right wrist
+const brace = piece(V(.046, -.55, 0)); arms[1].add(brace.outer);
+const braceLinks = [];
 {
-  const C = dCape.inner;
-  for (let y = 1.44; y >= .87; y -= .045) { const r = interp(capeTab, y)[0]; C.add(loop(ringPts(0, y, 0, r, r * KD, 60).map((p, i) => (p.y += Math.sin(i * 2.7 + y * 40) * .008, p)), DM.cape)); }
-  C.add(loop(ringPts(0, .86, 0, .36, .36 * KD, 60), DM.foil));
-  for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2 + .2, pts = []; for (let y = 1.45; y >= .86; y -= .03) pts.push(capePt(a + Math.sin(y * 30 + k) * .03, y, .003)); C.add(line(pts, DM.foilSoft)); }
-  [[.9, 1.2], [2.2, 1.0], [3.6, 1.25], [4.6, .95], [1.4, .95], [5.6, 1.15]].forEach(([a, y]) =>
-    C.add(loop([capePt(a - .14, y - .05, .008), capePt(a + .14, y - .055, .008), capePt(a + .13, y + .05, .008), capePt(a - .12, y + .055, .008)], DM.foil)));
-  for (let y = 1.12; y <= 1.36; y += .06) { const l = loop(ringPts(0, y, 0, .25, .2, 40), DM.card); l.computeLineDistances(); C.add(l); }
+  const B = brace.inner, cx = .046;
+  for (let k = 0; k < 4; k++) B.add(loop(ringPts(cx, -.5 - k * .02, 0, .045, .048, 18, .28), GM.foil));
+  const coil = [];
+  for (let u = 0; u <= 1; u += .005) { const a = u * Math.PI * 2 * 1.0, r = .052 + .007 * Math.cos(u * 90); coil.push(V(cx + Math.cos(a) * r, -.535 + .007 * Math.sin(u * 90), Math.sin(a) * r * 1.05)); }
+  B.add(line(coil, GM.foil));
+  for (let c = 0; c < 6; c++) { const a = c / 6 * Math.PI * 2 + .3, pts = []; for (let j = 0; j <= 5; j++) pts.push(V(cx + Math.cos(a) * .056, -.55 - j * .014, Math.sin(a) * .058)); braceLinks.push(strand(a, pts)); }
+  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(cx + .05, -.5, .02); B.add(led);
 }
-const stripList = [];
-for (let i = 0; i < 84; i++) {
-  const a = i / 84 * Math.PI * 2 + (rnd() - .5) * .05, L = .18 + rnd() * .07, pts = [];
-  for (let j = 0; j <= 3; j++) pts.push(capePt(a, .86 - L * j / 3, .01 + j * .01));
-  stripList.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
-}
-const capeStrips = new Strands(dCape.inner, DM.strip, stripList);
+const braceChains = new Strands(brace.inner, GM.soft, braceLinks);
 
-// foil cuffs, a ring and loose chains on each wrist (they ride on the arms)
-const chainSets = [];
-const dCuffs = arms.map((g, i) => {
-  const s = i ? 1 : -1, cx = s * .046, p = piece(V(cx, -.55, 0)); g.add(p.outer);
-  for (let k = 0; k < 3; k++) p.inner.add(loop(ringPts(cx, -.5 - k * .025, 0, .045, .048, 16, .3), DM.foil));
-  p.inner.add(loop(ringPts(cx + s * .004, -.665, .015, .014, .014, 12), DM.foil));
-  const list = [];
-  for (let c = 0; c < 4; c++) { const a = c / 4 * Math.PI * 2 + .4, pts = []; for (let j = 0; j <= 6; j++) pts.push(V(cx + Math.cos(a) * .05, -.55 - j * .016, Math.sin(a) * .052)); list.push({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) }); }
-  chainSets.push(new Strands(p.inner, DM.foilSoft, list));
-  return p;
-});
-
-// foil wrapped up to the knee; the thighs stay exposed
-const dWraps = legs.map(g => {
-  const p = piece(V(0, -0.6, 0)); g.add(p.outer);
-  for (let y = 0.06; y <= 0.5; y += 0.028) { const [rx, rz] = interp(legTab, y); p.inner.add(loop(ringPts(0, y - 0.84, 0, rx + .016, rz + .016, 22, .25), DM.foil)); }
-  return p;
-});
-
-const diyPieces = [
-  { p: dCape, off: V(0.2, 0.4, -2.2), rot: V(-0.6, 0.8, 0), win: [0, .55] },
-  { p: dWraps[0], off: V(-0.8, -0.4, 1.2), rot: V(0.5, 0, 0.3), win: [.15, .65] },
-  { p: dWraps[1], off: V(-0.6, -0.5, 1.4), rot: V(0.5, 0, -0.3), win: [.2, .7] },
-  { p: dCuffs[0], off: V(-1.0, 0.2, 0.8), rot: V(0, 0, 1), win: [.3, .8] },
-  { p: dCuffs[1], off: V(1.0, 0.2, 0.8), rot: V(0, 0, -1), win: [.35, .82] },
-  { p: dRuff, off: V(-1.8, 0.4, 0.4), rot: V(0, 0, -0.9), win: [.45, .9] },
-  { p: dHead, off: V(-0.2, 1.4, 0.4), rot: V(0, -2.4, 0.2), win: [.55, 1] },
+const GADGETS = [
+  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [1.4, 1.95, 3.55, 3.75], anchor: () => V(0, 1.7, 0) },
+  { p: shrug, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [3.6, 4.0, 5.55, 5.75], anchor: () => V(0, 1.34, 0) },
+  { p: brace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.6, 6.0, 99, 100], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))) },
 ];
-const OUTFITS = {
-  hf: { pieces, mats: garmentMats, vis: 1, surf: coatPt, tips: spikeTips },
-  diy: { pieces: diyPieces, mats: diyMats, vis: 0, surf: capePt, tips: diyTips },
-};
-let outfit = "hf";
-const curOutfit = () => OUTFITS.hf.vis >= OUTFITS.diy.vis ? OUTFITS.hf : OUTFITS.diy;
+const GMATS = [GM.foil, GM.soft]; GMATS.forEach(m => m.userData.base = m.opacity);
 
-// ---------- cross-section of the coat wall (scene 06) ----------
-const xs = new THREE.Group(); model.add(xs);
-const XM = { line: mat(.95), soft: mat(.55), wave: mat(1, 0xffc96b) };
-const XR = new THREE.LineDashedMaterial({ color: 0xffc96b, transparent: true, opacity: .85, dashSize: .008, gapSize: .006, depthWrite: false });
-const XD = new THREE.PointsMaterial({ color: 0xffffff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: .7, depthWrite: false });
-const Y0 = 0.86, Y1 = 1.14;
-const ZC = interp(coatTab, 1.0)[0] * CD;
-const LAY = { metal: [ZC - .015, ZC], carbon: [ZC - .065, ZC - .015], shell: [ZC - .085, ZC - .065], gap: [.11, ZC - .085], skin: [.08, .11] };
-const rectYZ = (z0, z1, m) => loop([V(0, Y0, z0), V(0, Y0, z1), V(0, Y1, z1), V(0, Y1, z0)], m);
-Object.values(LAY).forEach(([a, b]) => xs.add(rectYZ(a, b, XM.line)));
-{ const h = []; for (let y = Y0; y < Y1 - .015; y += .01) h.push(V(0, y, LAY.metal[1]), V(0, y + .015, LAY.metal[0])); xs.add(segs(h, XM.soft)); }
-{ const pts = []; for (let z = LAY.carbon[0] + .004; z < LAY.carbon[1]; z += .006) for (let y = Y0 + .006; y < Y1; y += .01) pts.push(V(0, y, z)); xs.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), XD)); }
-{ const p = []; for (let y = Y0; y < Y1 - .02; y += .03) p.push(V(0, y, LAY.shell[0] + .004), V(0, y + .02, LAY.shell[1] - .004)); xs.add(segs(p, XM.soft)); }
-{ const p = []; for (let y = Y0; y <= Y1; y += .004) p.push(V(0, y, .096 + Math.sin(y * 90) * .006)); xs.add(line(p, XM.soft)); }
-const xwave = line(new Array(220).fill(0).map(() => V(0, 0, 0)), XM.wave); xs.add(xwave);
-const xrefl = line(new Array(120).fill(0).map(() => V(0, 0, 0)), XR); xs.add(xrefl);
-const XMATS = [XM.line, XM.soft, XM.wave, XR, XD]; XMATS.forEach(m => m.userData.base = m.opacity);
+// ---------- the field: a shell around the whole body ----------
+const shellTab = [[0,.27],[.25,.31],[.6,.37],[.95,.43],[1.3,.44],[1.55,.37],[1.75,.31],[1.9,.23],[2.0,.13],[2.05,.02]], FD = .78;
+const shellPt = (a, y, e = 0) => { const r = interp(shellTab, y)[0] + e; return V(Math.cos(a) * r, y, Math.sin(a) * r * FD); };
+const shell = new THREE.Group(); model.add(shell);
+const shellRings = [];
+for (let y = .03; y <= 2.03; y += .05) {
+  const r = interp(shellTab, y)[0], m = mat(0, FIELD);
+  const l = loop(ringPts(0, y, 0, r, r * FD, 72), m); shell.add(l); shellRings.push({ l, m, y });
+}
+const merMat = mat(0, FIELD), mer = [];
+for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; for (let y = .03; y < 2.0; y += .05) mer.push(shellPt(a, y), shellPt(a, y + .05)); }
+shell.add(segs(mer, merMat));
+
+// ---------- inside views: a cut through each gadget ----------
+const SECTS = [];
+function section(X, Yc, layers, opt) {
+  const g = new THREE.Group(); model.add(g);
+  const H = .13, Y0 = Yc - H, Y1 = Yc + H;
+  const mL = mat(.95), mS = mat(.55), mW = mat(1, AMBER), mF = mat(.9, FIELD), mN = mat(.9, ALERT);
+  const mR = dashed(.85, AMBER, .008, .006), mD = new THREE.PointsMaterial({ color: 0xffffff, size: 2.2, sizeAttenuation: false, transparent: true, opacity: .7, depthWrite: false });
+  const P = (y, z) => V(X, y, z);
+  const zMin = Math.min(...layers.map(l => l.z[0])), zMax = Math.max(...layers.map(l => l.z[1]));
+  layers.forEach(({ z: [a, b], style }) => {
+    g.add(loop([P(Y0, a), P(Y0, b), P(Y1, b), P(Y1, a)], style === "links" || style === "bowls" ? mS : mL));
+    if (style === "hatch") { const h = []; for (let y = Y0; y < Y1 - .015; y += .01) h.push(P(y, b), P(y + .015, a)); g.add(segs(h, mS)); }
+    if (style === "dots") { const pts = []; for (let z = a + .004; z < b; z += .006) for (let y = Y0 + .006; y < Y1; y += .01) pts.push(P(y, z)); g.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), mD)); }
+    if (style === "coil") { const p = []; let i = 0; for (let y = Y0; y <= Y1; y += .012) p.push(P(y, i++ % 2 ? a + .004 : b - .004)); g.add(line(p, mL)); }
+    if (style === "skin") { const p = []; for (let y = Y0; y <= Y1; y += .004) p.push(P(y, (a + b) / 2 + Math.sin(y * 90) * (b - a) * .25)); g.add(line(p, mS)); }
+    if (style === "links") for (let y = Y0 + .02; y < Y1; y += .034) g.add(loop(ringPts(0, 0, 0, 1, 1, 16).map(q => P(y + q.z * .012, (a + b) / 2 + q.x * (b - a) * .35 + (rnd() - .5) * .006)), mL));
+    if (style === "bowls") for (let y = Y0 + .025; y < Y1; y += .05) { const p = []; for (let t = -1.3; t <= 1.31; t += .1) p.push(P(y + Math.sin(t) * .02, a + (b - a) * .2 + Math.cos(t) * (b - a) * .7)); g.add(line(p, mL)); }
+  });
+  const zIn = zMax + .35;
+  const wave = line(new Array(220).fill(0).map(() => V(0, 0, 0)), mW); g.add(wave);
+  const refl = line(new Array(100).fill(0).map(() => V(0, 0, 0)), mR); g.add(refl);
+  const arcs = opt.emit != null ? [0, 1, 2].map(() => { const l = line(new Array(30).fill(0).map(() => V(0, 0, 0)), mF.clone()); g.add(l); return l; }) : [];
+  const noise = opt.noise != null ? line(new Array(60).fill(0).map(() => V(0, 0, 0)), mN) : null; if (noise) g.add(noise);
+  const scat = opt.scatter != null ? segs(new Array(10).fill(0).map(() => V(0, 0, 0)), mR) : null; if (scat) g.add(scat);
+  const mats = [mL, mS, mW, mF, mN, mR, mD]; mats.forEach(m => m.userData.base = m.opacity);
+  const S = { g, mats, X, Yc, zMin, zMax, update(t, w) {
+    g.visible = w > .01; if (!g.visible) return;
+    mats.forEach(m => m.opacity = m.userData.base * w);
+    const A = wave.geometry.attributes.position;
+    for (let i = 0; i < 220; i++) { const z = lerp(zIn, zMin, i / 219); A.setXYZ(i, X, Yc + opt.amp(z) * Math.sin(z * 105 + t * 6), z); }
+    A.needsUpdate = true;
+    const R = refl.geometry.attributes.position;
+    for (let i = 0; i < 100; i++) { const z = lerp(zMax, zIn, i / 99); R.setXYZ(i, X, Yc - .075 + .014 * Math.sin(-z * 105 + t * 6), z); }
+    R.needsUpdate = true; refl.computeLineDistances();
+    arcs.forEach((l, k) => {
+      const u = (t * .5 + k / 3) % 1, r = .03 + u * .36, Q = l.geometry.attributes.position;
+      for (let i = 0; i < 30; i++) { const th = lerp(-1.25, 1.25, i / 29); Q.setXYZ(i, X, Yc + Math.sin(th) * r, opt.emit + Math.cos(th) * r); }
+      Q.needsUpdate = true; l.material.opacity = (1 - u) * .85 * w;
+    });
+    if (noise) { const Q = noise.geometry.attributes.position; for (let i = 0; i < 60; i++) { const z = lerp(opt.noise, zIn, i / 59); Q.setXYZ(i, X, Yc + .085 + (rnd() - .5) * .04 * Math.min(1, i / 8), z); } Q.needsUpdate = true; }
+    if (scat) { const Q = scat.geometry.attributes.position; for (let i = 0; i < 5; i++) { const a = -1 + i * .5 + Math.sin(t * 3 + i) * .15, L = .08 + .05 * Math.sin(t * 5 + i * 2); Q.setXYZ(i * 2, X, Yc, opt.scatter); Q.setXYZ(i * 2 + 1, X, Yc + Math.sin(a) * L, opt.scatter + Math.cos(a) * L); } Q.needsUpdate = true; scat.computeLineDistances(); }
+  } };
+  SECTS.push(S); return S;
+}
+const expo = (a0, z0, z1) => z => z > z1 ? a0 : 0;
+section(0, 1.72, [
+  { z: [0, .07], style: "skin" }, { z: [.07, .09], style: "empty" }, { z: [.09, .13], style: "coil" }, { z: [.13, .145], style: "hatch" }, { z: [.145, .2], style: "bowls" },
+], { emit: .11, amp: z => z > .2 ? .045 : z > .145 ? lerp(.012, .045, (z - .145) / .055) : z > .13 ? .004 : 0 });
+section(0, 1.3, [
+  { z: [.04, .1], style: "skin" }, { z: [.1, .14], style: "empty" }, { z: [.14, .18], style: "dots" }, { z: [.18, .192], style: "hatch" }, { z: [.192, .26], style: "links" },
+], { emit: .186, scatter: .23, amp: z => z > .26 ? .045 : z > .192 ? lerp(.025, .045, (z - .192) / .068) : z > .18 ? .015 : z > .14 ? .015 * Math.exp(-(.18 - z) / .009) : 0 });
+section(.36, .8, [
+  { z: [-.03, .03], style: "skin" }, { z: [.03, .045], style: "hatch" }, { z: [.045, .075], style: "coil" }, { z: [.075, .14], style: "links" },
+], { emit: .06, noise: .06, amp: z => z > .14 ? .045 : z > .075 ? lerp(.02, .045, (z - .075) / .065) : z > .045 ? .006 : 0 });
 
 // ---------- sensors: cameras and radar ----------
 const SENS = [V(-1.3, 2.05, 1.0), V(1.45, 1.75, 0.9), V(0.65, 2.3, -1.3), V(-1.0, 0.55, 1.4)];
 const SENS_NAMES = ["DOME CAMERA", "STREET CAMERA", "RADAR PANEL · 40 M", "BENCH SENSOR"];
 const sensorG = new THREE.Group(); scene.add(sensorG);
-const sensorMat = mat(.95), sensorSoft = mat(.45), ledMat = new THREE.MeshBasicMaterial({ color: 0xffc96b, transparent: true });
+const sensorMat = mat(.95), sensorSoft = mat(.45), ledMat = new THREE.MeshBasicMaterial({ color: AMBER, transparent: true });
 const waves = [];
 const LOOK = V(0, 1.1, 0);
 const flat = (pts, z) => pts.map(p => V(p.x, p.z, z));
@@ -630,9 +587,7 @@ function buildSensor(type) {
     g.add(segs(pad, sensorSoft));
   }
   const led = new THREE.Mesh(new THREE.SphereGeometry(.008, 6, 4), ledMat); led.position.set(.03, -.03, .07); g.add(led);
-  for (let k = 0; k < 3; k++) {
-    const w = loop(flat(ringPts(0, 0, 0, 1, 1, 40), 0), mat(.8, 0xffc96b)); w.userData.k = k; g.add(w); waves.push(w);
-  }
+  for (let k = 0; k < 3; k++) { const w = loop(flat(ringPts(0, 0, 0, 1, 1, 40), 0), mat(.8, AMBER)); w.userData.k = k; g.add(w); waves.push(w); }
   return g;
 }
 ["dome", "box", "radar", "small"].forEach((type, i) => {
@@ -644,55 +599,39 @@ function buildSensor(type) {
 // ---------- rays ----------
 function rayGroup() {
   const g = new THREE.Group(); scene.add(g);
-  return { g, rays: [], mIn: mat(.9, 0xffc96b), mOut: new THREE.LineDashedMaterial({ color: 0xffc96b, transparent: true, opacity: .85, dashSize: .04, gapSize: .03, depthWrite: false }), mDot: new THREE.MeshBasicMaterial({ color: 0xffc96b, transparent: true }) };
+  return { g, rays: [], mIn: mat(.9, AMBER), mOut: dashed(.85, AMBER, .04, .03), mDot: new THREE.MeshBasicMaterial({ color: AMBER, transparent: true }) };
 }
 const DOT = new THREE.SphereGeometry(.014, 8, 6);
-function addRay(G, si, local, normal, kind, get) {
-  const r = { s: SENS[si], local, normal: normal || V(0, 0, 1), kind, phase: rnd(), get };
+function addRay(G, si, get, kind) {
+  const r = { s: SENS[si], get, kind, phase: rnd() };
   r.inL = line([V(0,0,0), V(0,0,0)], G.mIn); G.g.add(r.inL);
-  const nOut = kind === "scatter" ? 6 : 1;
-  r.dirs = Array.from({ length: nOut }, () => V(rnd() - .5, rnd() - .5, rnd() - .5).normalize().multiplyScalar(.12 + rnd() * .22));
-  r.outL = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(new Array(nOut * 2).fill(0).map(() => V(0,0,0))), kind === "return" ? G.mIn : G.mOut); G.g.add(r.outL);
+  r.outL = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([V(0,0,0), V(0,0,0)]), kind === "return" ? G.mIn : G.mOut); G.g.add(r.outL);
   r.dot = new THREE.Mesh(DOT, G.mDot); G.g.add(r.dot);
   G.rays.push(r);
 }
-const R = { read: rayGroup(), reflect: rayGroup(), scatter: rayGroup() };
-addRay(R.read, 0, V(0, 1.6, .1), null, "return");
-addRay(R.read, 1, V(.05, 1.25, .1), null, "return");
-addRay(R.read, 3, V(.085, .5, .055), null, "return");
-addRay(R.read, 1, V(-.255, .8, .02), null, "return");
-addRay(R.read, 2, V(0, 1.2, -.1), null, "return");
-[1, 3, 5, 7, 9, 11, 12].forEach((k, i) => addRay(R.reflect, [0, 1, 2][i % 3], null, null, "reflect", () => curOutfit().tips[k]));
-addRay(R.reflect, 0, V(0, 1.56, .13), V(0, 0, 1), "reflect");
-[[.3, 1.15], [1.2, .9], [2.0, .7], [2.8, 1.0], [3.6, .6], [4.4, 1.2], [5.2, .8], [1.6, 1.3], [0.8, .55]].forEach(([a, y], i) => {
-  addRay(R.scatter, i % 4, null, null, "scatter", () => ({ p: curOutfit().surf(a, y, .01), n: V(Math.cos(a), 0, Math.sin(a)) }));
-});
+const R = { read: rayGroup(), field: rayGroup() };
+[[0, V(0, 1.6, .1)], [1, V(.05, 1.25, .1)], [3, V(.085, .5, .055)], [1, V(-.255, .8, .02)], [2, V(0, 1.2, -.1)]].forEach(([si, p]) => addRay(R.read, si, () => ({ p, n: V(0, 0, 1) }), "return"));
+[[.4, 1.6], [1.2, 1.1], [2.0, .6], [2.8, 1.3], [3.6, .9], [4.4, 1.5], [5.2, .4], [1.6, 1.8], [.8, .3]].forEach(([a, y], i) =>
+  addRay(R.field, i % 4, () => ({ p: shellPt(a, y), n: V(Math.cos(a), .15, Math.sin(a) * FD).normalize() }), "reflect"));
 function updateRays(G, w, t) {
   G.g.visible = w > .01; if (!G.g.visible) return;
   G.mIn.opacity = .85 * w; G.mOut.opacity = .8 * w; G.mDot.opacity = w;
   for (const r of G.rays) {
-    const L = r.get ? r.get() : { p: r.local, n: r.normal };
-    const hit = L.p.clone().applyMatrix4(model.matrixWorld);
-    const n = L.n.clone().transformDirection(model.matrixWorld);
+    const L = r.get(), hit = L.p.clone().applyMatrix4(model.matrixWorld), n = L.n.clone().transformDirection(model.matrixWorld);
     const pa = r.inL.geometry.attributes.position; pa.setXYZ(0, r.s.x, r.s.y, r.s.z); pa.setXYZ(1, hit.x, hit.y, hit.z); pa.needsUpdate = true;
     const d = hit.clone().sub(r.s).normalize();
-    let ends = [];
-    if (r.kind === "return") ends = [r.s.clone().lerp(hit, .02)];
-    if (r.kind === "reflect") { const ref = d.clone().sub(n.clone().multiplyScalar(2 * d.dot(n))); ends = [hit.clone().addScaledVector(ref, .9)]; }
-    if (r.kind === "scatter") ends = r.dirs.map(v => hit.clone().add(v));
-    const po = r.outL.geometry.attributes.position;
-    ends.forEach((e, i) => { po.setXYZ(i * 2, hit.x, hit.y, hit.z); po.setXYZ(i * 2 + 1, e.x, e.y, e.z); });
-    po.needsUpdate = true; r.outL.computeLineDistances();
+    const end = r.kind === "return" ? r.s.clone().lerp(hit, .02) : hit.clone().addScaledVector(d.clone().sub(n.clone().multiplyScalar(2 * d.dot(n))), .9);
+    const po = r.outL.geometry.attributes.position; po.setXYZ(0, hit.x, hit.y, hit.z); po.setXYZ(1, end.x, end.y, end.z); po.needsUpdate = true; r.outL.computeLineDistances();
     const u = (t * .55 + r.phase) % 1;
     if (u < .5) { r.dot.position.copy(r.s).lerp(hit, u / .5); r.dot.scale.setScalar(1); }
-    else { const e = ends[Math.floor(r.phase * 97) % ends.length]; r.dot.position.copy(hit).lerp(e, (u - .5) / .5); r.dot.scale.setScalar(r.kind === "return" ? 1.2 : .7); }
+    else { r.dot.position.copy(hit).lerp(end, (u - .5) / .5); r.dot.scale.setScalar(r.kind === "return" ? 1.2 : .7); }
   }
 }
 const scan = loop(ringPts(0, 0, 0, .5, .42, 72), M.scan); scene.add(scan);
 
-// ---------- robot (scene 08) ----------
+// ---------- robot (walk scene) ----------
 const robot = new THREE.Group(); scene.add(robot);
-const RM = mat(.92), RS = mat(.4), REye = new THREE.MeshBasicMaterial({ color: 0xffc96b, transparent: true });
+const RM = mat(.92), RS = mat(.4), REye = new THREE.MeshBasicMaterial({ color: AMBER, transparent: true });
 const rbox = (w, h, d, m = RM) => edges(new THREE.BoxGeometry(w, h, d), m);
 const rLegs = [-1, 1].map(s => {
   const g = new THREE.Group(); g.position.set(s * .1, .8, 0);
@@ -722,70 +661,91 @@ const rArms = [-1, 1].map(s => {
   robot.add(up); return { up, el };
 });
 robot.rotation.y = -Math.PI / 2;
-const beamMat = mat(.8, 0xffc96b);
+const beamMat = mat(.8, AMBER);
 const beam = segs(new Array(12).fill(0).map(() => V(0, 0, 0)), beamMat); scene.add(beam);
 const BEAM_PTS = [V(0, 1.62, .12), V(0, 1.2, .3), V(.2, 0.9, .3), V(-.2, 0.9, .3), V(.08, .3, .1), V(-.08, .3, .1)];
 const RMATS = [RM, RS]; RMATS.forEach(m => m.userData.base = m.opacity);
 
 // ---------- scenes ----------
+// 0 hero · 1 read · 2 headgear · 3 inside · 4 shrug · 5 inside · 6 bracelet · 7 inside · 8 walk
 const K = [
-  { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35, clar: 1 },
-  { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18, clar: 1 },
-  { pos: [0, 1.15, 4.9], tgt: [-0.45, 0.9, 0], spin: .22, clar: 1 },
-  { pos: [0.3, 1.05, 3.8], tgt: [-0.4, 0.92, 0], spin: .3, clar: .14, clarD: .45 },
-  { pos: [0.75, 2.0, 1.3], tgt: [-0.25, 1.8, 0], spin: .16, clar: .09, clarD: .42 },
-  { pos: [-1.3, 1.2, 2.7], tgt: [-0.35, 0.98, 0], spin: .14, clar: .05, clarD: .4 },
-  { pos: [0.8, 1.0, 0.36], tgt: [0, 1.0, 0.36], spin: 0, clar: .04, clarD: .5 },
-  { pos: [2.6, 1.25, 0.6], tgt: [0, 1.05, 0.6], spin: 0, clar: .03, clarD: .38 },
-  { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, clar: .02, clarD: .41 },
+  { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35 },
+  { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18 },
+  { pos: [0.2, 1.3, 4.2], tgt: [-0.5, 1.05, 0], spin: .3 },
+  { pos: [0.8, 1.72, 0.32], tgt: [0, 1.72, 0.32], spin: 0, lock: 0 },
+  { pos: [-0.2, 1.3, 4.0], tgt: [-0.5, 1.05, 0], spin: .3 },
+  { pos: [0.8, 1.3, 0.38], tgt: [0, 1.3, 0.38], spin: 0, lock: 0 },
+  { pos: [1.6, 1.1, 3.0], tgt: [-0.2, 0.95, 0], spin: .25 },
+  { pos: [1.16, 0.8, 0.28], tgt: [0.36, 0.8, 0.28], spin: 0, lock: 0 },
+  { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, lock: Math.PI / 2 },
 ];
 const N = K.length - 1;
 
 const labelsEl = document.getElementById("labels");
+const L1 = (z, y, html, sc, cls = "mini") => ({ at: () => V(SECTS[sc].X, y, z), html, sc: [[3, 5, 7][sc]], cls });
 const LABELS = [
-  { at: () => V(.2, 1.95, -.05), html: "HEADGEAR", sc: [3], of: "hf" },
-  { at: () => V(.2, 1.46, .05), html: "RUFF", sc: [3], of: "hf" },
-  { at: () => V(-.42, 0.95, 0), html: "FRINGE COAT", sc: [3], left: true, of: "hf" },
-  { at: () => V(.1, .25, .07), html: "LEG WRAPS", sc: [3], of: "hf" },
-  { at: () => V(.22, 1.98, 0), html: "CUTLERY CROWN", sc: [3], of: "diy" },
-  { at: () => V(-.06, 1.6, .15), html: "SIEVE MASK", sc: [3], left: true, of: "diy" },
-  { at: () => V(.27, 1.46, 0), html: "FOIL RUFF", sc: [3], of: "diy" },
-  { at: () => V(-.36, 1.12, 0), html: "CAPE<small>EMERGENCY BLANKET LINING</small>", sc: [3], left: true, of: "diy" },
-  { at: () => V(.27, .78, 0), html: "CUFFS + CHAINS", sc: [3], of: "diy" },
-  { at: () => V(.1, .3, .06), html: "FOIL WRAPS", sc: [3], of: "diy" },
-  { at: () => V(-.09, .6, .07), html: "GAP<small>THIGHS STILL READABLE</small>", sc: [3, 8], left: true, of: "diy", cls: "gap" },
-  { at: () => V(0, 1.2, .1), html: "CHEST<small>MOVES WITH EVERY BREATH</small>", sc: [7] },
-  { at: () => curOutfit().surf(Math.PI / 2, 1.34), html: "COAT SURFACE<small>STAYS STILL</small>", sc: [7], left: true },
-  { at: () => V(0, 1.165, ZC - .008), html: o => o === "diy" ? "FOIL" : "METAL", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, ZC - .04), html: o => o === "diy" ? "CAPE" : "CARBON", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.185, ZC - .075), html: o => o === "diy" ? "CARD" : "LAYER", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, (.11 + ZC - .085) / 2), html: "GAP", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.165, .095), html: "SKIN", sc: [6], cls: "mini" },
-  { at: () => V(0, 1.07, ZC + .23), html: "SIGNAL IN →", sc: [6], cls: "mini amber" },
-  { at: () => V(0, .9, ZC + .17), html: "← SOME BOUNCES OFF", sc: [6], cls: "mini amber" },
-  { at: () => V(0, .97, (.11 + ZC - .085) / 2), html: o => o === "diy" ? "SOME REACHES SKIN" : "0 REACHES SKIN", sc: [6], cls: "mini" },
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
-].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); labelsEl.appendChild(d); return { ...l, el: d }; });
-function renderLabels() { LABELS.forEach(l => l.el.innerHTML = `<span>${typeof l.html === "function" ? l.html(outfit) : l.html}</span>`); }
-renderLabels();
+  { at: () => V(.22, 1.98, 0), html: "HEADGEAR<small>SPOONS · FOIL · A COIL</small>", sc: [2], gate: () => GADGETS[0].vis > .9 },
+  { at: () => V(.3, 1.4, 0), html: "SHRUG<small>CHAINS · BLANKET · BLACK BAG</small>", sc: [4], gate: () => GADGETS[1].vis > .9 },
+  { at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET<small>FOIL CUFF · LINKS · A COIL</small>", sc: [6], gate: () => GADGETS[2].vis > .9 },
+  { at: () => shellPt(Math.PI * 1.1, 1.0), html: "FIELD<small>AROUND THE WHOLE BODY</small>", sc: [2, 4, 6], left: true, cls: "field", gate: () => fieldGrow > .7 },
+  L1(.035, 1.865, "HEAD", 0), L1(.08, 1.885, "FELT", 0), L1(.11, 1.865, "COIL", 0), L1(.138, 1.885, "FOIL", 0), L1(.172, 1.865, "SPOONS", 0),
+  L1(.46, 1.79, "SIGNAL IN →", 0, "mini amber"), L1(.42, 1.62, "← BOUNCED", 0, "mini amber"), L1(.36, 1.88, "FIELD OUT", 0, "mini field"), L1(.035, 1.905, "0 REACHES HEAD", 0, "mini field"),
+  L1(.07, 1.445, "SKIN", 1), L1(.12, 1.465, "GAP", 1), L1(.16, 1.445, "BLACK BAG", 1), L1(.186, 1.465, "BLANKET", 1), L1(.226, 1.445, "CHAINS", 1),
+  L1(.52, 1.37, "SIGNAL IN →", 1, "mini amber"), L1(.47, 1.2, "← BOUNCED", 1, "mini amber"), L1(.3, 1.4, "SCATTERED", 1, "mini amber"), L1(.07, 1.485, "0 REACHES SKIN", 1, "mini field"),
+  L1(0, .945, "WRIST", 2), L1(.037, .965, "FOIL", 2), L1(.06, .945, "COIL", 2), L1(.107, .965, "LINKS", 2),
+  L1(.4, .87, "SIGNAL IN →", 2, "mini amber"), L1(.36, .72, "← BOUNCED", 2, "mini amber"), L1(.36, .905, "NOISE OUT · JAMS THE RADAR", 2, "mini alert"), L1(0, .985, "0 REACHES SKIN", 2, "mini field"),
+].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); d.innerHTML = `<span>${l.html}</span>`; labelsEl.appendChild(d); return { ...l, el: d }; });
 
-const hud = document.getElementById("hud");
+const hud = document.getElementById("hud"), camPanel = document.getElementById("cam");
 const traces = [0, 1, 2].map(i => { const c = document.getElementById("tr" + i); return { c, x: c.getContext("2d"), buf: new Array(80).fill(0), st: document.getElementById("st" + i) }; });
-function sizeTraces() { traces.forEach(tr => { const r = tr.c.getBoundingClientRect(); tr.c.width = Math.max(10, r.width * 2); tr.c.height = Math.max(10, r.height * 2); }); }
-addEventListener("resize", sizeTraces); sizeTraces();
+const feed = document.getElementById("camfeed"), fx = feed.getContext("2d");
+function sizeCanvases() {
+  traces.forEach(tr => { const r = tr.c.getBoundingClientRect(); tr.c.width = Math.max(10, r.width * 2); tr.c.height = Math.max(10, r.height * 2); });
+  const r = feed.getBoundingClientRect(); feed.width = Math.max(10, r.width * 2); feed.height = Math.max(10, r.height * 2);
+}
+addEventListener("resize", sizeCanvases); sizeCanvases();
+const bodyPath = new Path2D(BODY_D);
+const KP = [[0, 40], [-58, 113], [58, 113], [-84, 248], [84, 248], [-86, 340], [86, 340], [-45, 320], [45, 320], [-40, 444], [40, 444], [-28, 560], [28, 560]];
+const BONES = [[0, 1], [0, 2], [1, 3], [3, 5], [2, 4], [4, 6], [1, 7], [2, 8], [7, 8], [7, 9], [9, 11], [8, 10], [10, 12]];
+function drawFeed(prot, t) {
+  const W = feed.width, Hh = feed.height, c = fx;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, Hh);
+  c.fillStyle = "rgba(10,20,52,.9)"; c.fillRect(0, 0, W, Hh);
+  c.strokeStyle = "rgba(255,255,255,.06)"; c.lineWidth = 1;
+  for (let y = 0; y < Hh; y += 4) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+  const sc = Hh / 700, sway = Math.sin(t * 1.3) * 3;
+  c.setTransform(sc, 0, 0, sc, W / 2 + sway, Hh * .06);
+  const clear = 1 - prot;
+  if (clear > .02) {
+    c.globalAlpha = clear;
+    c.fillStyle = "rgba(255,255,255,.16)"; c.fill(bodyPath); c.lineWidth = 3; c.strokeStyle = "rgba(255,255,255,.7)"; c.stroke(bodyPath);
+    c.beginPath(); c.ellipse(0, 40, 29, 39, 0, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.strokeStyle = "#ffc96b"; c.lineWidth = 4;
+    BONES.forEach(([a, b]) => { c.beginPath(); c.moveTo(...KP[a]); c.lineTo(...KP[b]); c.stroke(); });
+    c.fillStyle = "#ffc96b"; KP.forEach(([x, y]) => { c.beginPath(); c.arc(x, y, 9, 0, Math.PI * 2); c.fill(); });
+    c.strokeStyle = "#ff8a5c"; c.lineWidth = 5; c.strokeRect(-130, -20, 260, 650);
+  }
+  if (prot > .02) {
+    c.globalAlpha = prot;
+    for (let i = 0; i < 46; i++) {
+      const y = 20 + (i / 46) * 600 + (rnd() - .5) * 30, x = (rnd() - .5) * 70, rx = 70 + rnd() * 60, ry = 40 + rnd() * 50;
+      c.fillStyle = `rgba(3,6,18,${.16 + rnd() * .12})`; c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); c.fill();
+    }
+    for (let i = 0; i < 14; i++) { c.fillStyle = rnd() > .5 ? "rgba(255,255,255,.08)" : "rgba(0,0,0,.35)"; c.fillRect((rnd() - .5) * 240, rnd() * 620, 20 + rnd() * 60, 6 + rnd() * 14); }
+    c.setLineDash([14, 10]); c.strokeStyle = "rgba(255,255,255,.5)"; c.lineWidth = 4; c.strokeRect(-150, -20, 300, 660); c.setLineDash([]);
+  }
+  c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1;
+  c.font = `700 ${Math.round(Hh * .07)}px "IBM Plex Mono", Menlo, monospace`;
+  c.fillStyle = prot > .5 ? "#fff" : "#ff8a5c";
+  c.fillText(prot > .5 ? "UNKNOWN · NO FACE · NO POSE" : "PERSON · 96%", W * .04, Hh * .94);
+}
 const matchv = document.getElementById("matchv"), matchb = document.getElementById("matchb"), statusEl = document.getElementById("status");
 let matchShown = 0;
 const caps = [...document.querySelectorAll(".cap")];
 const counter = document.getElementById("counter"), dragHint = document.getElementById("draghint"), robotQ = document.getElementById("robotq");
 const capWrap = document.getElementById("captions"), hdr = document.getElementById("hdr");
-let capOn = 0;
-const outfitEl = document.getElementById("outfit");
-outfitEl.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
-  outfit = btn.dataset.o;
-  outfitEl.querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === btn); x.setAttribute("aria-pressed", x === btn); });
-  robotQ.querySelector("span").textContent = outfit === "diy" ? "PARTIAL MATCH" : "NO MATCH";
-  renderLabels();
-}));
+let capOn = 0, fieldGrow = 0;
 
 let userRot = 0, dragging = false, lastX = 0, vel = 0;
 canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; canvas.classList.add("drag"); canvas.setPointerCapture(e.pointerId); });
@@ -805,78 +765,71 @@ function tick(now) {
   const idx = Math.min(N - 1, Math.floor(s)), f = s - idx, b = sm(.5, 1, f);
   const sEff = idx + b;
   const w = K.map((_, k) => clamp(1 - Math.abs(sEff - k), 0, 1));
-  const A = sm(1.85, 2.8, s), gVis = sm(1.55, 2.0, s);
+  const zoomW = w[3] + w[5] + w[7];
   const rT = clamp((sRaw - 7.7) / 1.5, 0, 1);
   const pastEnd = sRaw > N + 1.75;
 
+  // camera
   const k0 = K[idx], k1 = K[Math.min(N, idx + 1)];
   const tp = V(...k0.pos).lerp(V(...k1.pos), b), tt = V(...k0.tgt).lerp(V(...k1.tgt), b);
   if (innerWidth < 760) { tt.x *= .2; tp.multiplyScalar(1.1); }
   camPos.lerp(tp, ease); camTgt.lerp(tt, ease);
   camera.position.copy(camPos); camera.lookAt(camTgt);
 
+  // figure rotation: spins while showing, holds still for the inside views and the walk
   rotY += lerp(k0.spin, k1.spin, b) * dt;
-  const lockW = clamp(w[6] + w[7] + w[8], 0, 1);
-  if (lockW > 0) { const target = w[8] > Math.max(w[6], w[7]) ? Math.PI / 2 : 0; rotY += angDiff(rotY, target) * .08 * lockW; }
-  if (w[4] > 0) rotY += angDiff(rotY, .66 + Math.sin(t * .5) * .35) * .08 * w[4];  // keep the crown fan facing the camera
+  K.forEach((k, i) => { if (k.lock != null && w[i] > 0) rotY += angDiff(rotY, k.lock) * .08 * w[i]; });
   if (!dragging) { userRot += vel; vel *= .92; userRot *= .985; }
-  model.rotation.y = rotY + userRot * (1 - w[6]);
+  model.rotation.y = rotY + userRot * (1 - zoomW);
 
+  // walking + breathing
   const walk = w[8] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
   legs[0].rotation.x = Math.sin(ph) * .42 * walk; legs[1].rotation.x = -Math.sin(ph) * .42 * walk;
   arms[0].rotation.x = -Math.sin(ph) * .25 * walk; arms[1].rotation.x = Math.sin(ph) * .25 * walk;
   model.position.y = Math.abs(Math.sin(ph)) * .018 * walk;
   floor.position.x = -((t * .55) % .25) * walk;
-  const br = Math.sin(t * 1.6) * (.03 + .07 * w[7]);
+  const br = Math.sin(t * 1.6) * .03;
   breathRings.forEach(r => { r.scale.z = 1 + br; r.scale.x = 1 + br * .3; });
 
-  const coatFade = Math.max(.05, 1 - .78 * w[7] - .9 * w[6]), swap = 1 - Math.exp(-rawDt * 2.2);
-  for (const key in OUTFITS) {
-    const O = OUTFITS[key];
-    O.vis += ((key === outfit ? 1 : 0) - O.vis) * swap;
-    const kA = Math.min(A, sm(0, 1, O.vis)), on = gVis * sm(.05, .35, O.vis);
-    for (const pc of O.pieces) {
-      const k = sm(pc.win[0], pc.win[1], kA), e = 1 - k;
-      pc.p.outer.position.copy(pc.p.center).addScaledVector(pc.off, e * e);
-      pc.p.outer.rotation.set(pc.rot.x * e, pc.rot.y * e, pc.rot.z * e);
-      pc.p.outer.visible = on > .01;
-    }
-    O.mats.forEach(m => m.opacity = m.userData.base * on * (m.userData.fade ? coatFade : 1 - .92 * w[6]));
-  }
-  M.shell.opacity *= (1 + w[7]); DM.card.opacity *= (1 + w[7]);
-  M.body.opacity = (.78 * (1 - .55 * A) + .45 * w[7]) * (1 - .85 * w[6]);
-  M.bodySoft.opacity = .22 * (1 - .5 * A) * (1 - w[6]);
-  const amp = .008 + .03 * w[5] + .05 * walk + .01 * w[4];
-  coatStrands.update(t, amp * (1 - w[7])); veil.update(t * 1.2, .006 + .01 * w[4]); hair.update(t * .8, .006 + .02 * walk);
-  capeStrips.update(t, (amp + .01) * (1 - w[7])); chainSets.forEach(c => c.update(t * 1.6, .012 + .03 * walk));
+  // gadgets fly on and off; the field grows out of whichever one is worn
+  let grow = 0, ay = 1, aw = 0;
+  GADGETS.forEach(G => {
+    const [a0, a1, b0, b1] = G.on, on = sm(a0, a1, s) * (1 - sm(b0, b1, s)), e = 1 - on;
+    G.p.outer.position.copy(G.p.center).addScaledVector(G.off, e * e);
+    G.p.outer.rotation.set(G.rot.x * e, G.rot.y * e, G.rot.z * e);
+    G.p.outer.visible = on > .01;
+    G.vis = on;
+    if (on > .01) { const fo = sm(.55, 1, on); grow = Math.max(grow, fo); ay = lerp(ay, G.anchor().y, on / (aw + on)); aw += on; }
+  });
+  const fadeZ = 1 - .85 * zoomW;
+  GMATS.forEach(m => m.opacity = m.userData.base * fadeZ);
+  GM.led.opacity = (.5 + .5 * Math.sin(t * 8)) * fadeZ;
+  M.body.opacity = .78 * fadeZ; M.bodySoft.opacity = .22 * fadeZ; M.hair.opacity = .5 * fadeZ;
+  hair.update(t * .8, .006 + .02 * walk);
+  chainLines.update(t * 1.4, .008 + .02 * walk); braceChains.update(t * 1.6, .01 + .03 * walk);
 
-  xs.visible = w[6] > .01;
-  if (xs.visible) {
-    XMATS.forEach(m => m.opacity = m.userData.base * w[6]);
-    const P = xwave.geometry.attributes.position;
-    for (let i = 0; i < 220; i++) {
-      const z = lerp(ZC + .35, .08, i / 219);
-      let a = 0;
-      if (z > ZC) a = .045; else if (z > LAY.metal[0]) a = lerp(.045, .03, (ZC - z) / .015); else if (z > LAY.carbon[0]) a = .03 * Math.exp(-(LAY.carbon[1] - z) / .011);
-      if (z <= LAY.metal[0] && z > .08) a = lerp(a, z > LAY.carbon[0] ? lerp(.03, .014, (LAY.carbon[1] - z) / .05) : .014, OUTFITS.diy.vis);
-      P.setXYZ(i, 0, 1.0 + a * Math.sin(z * 105 + t * 6), z);
-    }
-    P.needsUpdate = true;
-    const Q = xrefl.geometry.attributes.position;
-    for (let i = 0; i < 120; i++) { const z = lerp(ZC, ZC + .35, i / 119); Q.setXYZ(i, 0, .925 + .014 * Math.sin(-z * 105 + t * 6), z); }
-    Q.needsUpdate = true; xrefl.computeLineDistances();
-  }
+  fieldGrow = grow;
+  const fieldVis = grow * (1 - .9 * zoomW);
+  shellRings.forEach(R2 => {
+    const d = Math.abs(R2.y - ay), rev = clamp((grow * 2.3 - d) / .25, 0, 1);
+    R2.m.opacity = rev * (.28 + .22 * Math.sin(t * 3 - R2.y * 7)) * (1 - .9 * zoomW);
+    R2.l.scale.setScalar(.92 + .08 * rev + Math.sin(t * 2 + R2.y * 3) * .006);
+  });
+  merMat.opacity = fieldVis * fieldVis * .16;
+
+  SECTS.forEach((S, i) => S.update(t, w[[3, 5, 7][i]]));
 
   scan.visible = w[0] > .01; M.scan.opacity = .9 * w[0];
   scan.position.y = .9 + .82 * Math.sin(t * .9);
 
-  const rayW = { read: w[1], reflect: w[4], scatter: w[5] + w[8] * .7 };
-  const sW = clamp(rayW.read + rayW.reflect + rayW.scatter + w[7] * .5 + w[3] * .4 + w[2] * .3, 0, 1);
+  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[6] + w[8] * .8) * grow };
+  const sW = clamp(rayW.read + rayW.field + w[1], 0, 1) * (1 - zoomW);
   sensorG.visible = sW > .01; sensorMat.opacity = .95 * sW; sensorSoft.opacity = .45 * sW; ledMat.opacity = sW * (.5 + .5 * Math.sin(t * 6));
   waves.forEach(wv => { const u = (t * .7 + wv.userData.k / 3) % 1; wv.scale.setScalar(.03 + u * .16); wv.position.z = .05 + u * .35; wv.material.opacity = (1 - u) * .7 * sW; });
   model.updateMatrixWorld();
   for (const key in R) updateRays(R[key], clamp(rayW[key], 0, 1), t);
 
+  // robot
   robot.visible = rT > .001;
   if (robot.visible) {
     const rv = sm(0, .08, rT);
@@ -891,7 +844,7 @@ function tick(now) {
     rArms[1].el.rotation.z = (2.31 + Math.sin(t * 14) * .14) * sc;
     const look = sm(.42, .52, rT);
     rHead.rotation.z = -.2 * sc; rHead.rotation.x = (.12 + Math.sin(t * 2.2) * .08) * look * (1 - sc);
-    REye.color.setHex(sc > .5 ? 0xff8a5c : 0xffc96b);
+    REye.color.setHex(sc > .5 ? ALERT : AMBER);
     robot.updateMatrixWorld();
     const bw = sm(.44, .52, rT) * (1 - sm(.72, .8, rT)) * (.55 + .45 * Math.sin(t * 25));
     beam.visible = bw > .02; beamMat.opacity = bw;
@@ -907,17 +860,16 @@ function tick(now) {
 
   renderer.render(scene, camera);
 
-  const ci = Math.min(N, Math.floor(s + .45));
+  // captions
+  const ci = Math.min(N, Math.floor(s + .25));
   if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 08`; }
   capWrap.style.opacity = pastEnd ? 0 : 1; hdr.style.opacity = sRaw > N + 2.1 ? 0 : 1;
   dragHint.style.opacity = pastEnd ? 0 : .9;
-  const oOn = sRaw > 1.7 && !pastEnd; outfitEl.style.opacity = oOn ? 1 : 0; outfitEl.style.pointerEvents = oOn ? "auto" : "none";
 
-  hud.style.opacity = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  let clar = 0, clarD = 0; K.forEach((k, i) => { clar += k.clar * w[i]; clarD += (k.clarD ?? k.clar) * w[i]; });
-  if (idx === 2 || (idx === 1 && b > 0)) { clar = lerp(1, .14, A); clarD = lerp(1, .45, A); }
-  clar = lerp(clar, clarD, OUTFITS.diy.vis);
-  clar = clamp(clar, 0, 1);
+  // radar readout + camera feed
+  const panelOp = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
+  hud.style.opacity = panelOp; camPanel.style.opacity = panelOp;
+  const clar = clamp(1 - grow * .97, 0, 1);
   if (frame % 2 === 0) {
     traces.forEach((tr, i) => {
       let clean;
@@ -935,6 +887,7 @@ function tick(now) {
       tr.st.textContent = clar > .6 ? "LOCKED" : clar > .25 ? "WEAK" : "NO PATTERN";
       tr.st.style.color = clar > .6 ? "#ff8a5c" : "#fff";
     });
+    if (panelOp > 0) drawFeed(grow, t);
   }
   matchShown += (Math.round(97 * clar) - matchShown) * .08;
   const m = Math.round(matchShown);
@@ -943,8 +896,9 @@ function tick(now) {
   statusEl.textContent = m > 60 ? "IDENTIFIED" : m > 20 ? "UNSURE" : "UNKNOWN";
   statusEl.style.color = m > 60 ? "#ff8a5c" : "#ffc96b";
 
+  // labels
   for (const l of LABELS) {
-    let op = 0; l.sc.forEach(i => op = Math.max(op, w[i])); op = op > .6 && !pastEnd && (!l.of || (l.of === outfit && OUTFITS[outfit].vis > .8)) ? 1 : 0;
+    let op = 0; l.sc.forEach(i => op = Math.max(op, w[i])); op = op > .6 && !pastEnd && (!l.gate || l.gate()) ? 1 : 0;
     if (op) {
       const v = l.at(); if (!l.world) v.applyMatrix4(model.matrixWorld);
       const [x, y, z] = proj(v);
@@ -969,66 +923,56 @@ const chain = () => { let s = ""; for (let i = 0; i <= 16; i++) { const x = 72 +
 const holes = () => { let s = ""; for (let y = 50; y < 88; y += 6) for (let x = 74; x < 136; x += 6) { const dx = (x - 104) / 34, dy = (y - 40) / 52; if (dx * dx + dy * dy * 0.9 < .85) s += `<circle cx="${x}" cy="${y}" r=".9"/>`; } return s; };
 
 const ITEMS = [
-  { name: "FOIL", num: "01", props: ["reflect"], line: "A mirror for signals.", wear: "LINING · CUFFS · CROWN", spots: [[0, -6], [-80, 336], [80, 336]],
+  { name: "FOIL", num: "01", props: ["reflect"], line: "A mirror for signals.", wear: "HEADBAND · CUFF", spots: [[0, -6], [80, 336]],
     art: `<g class="ln"><ellipse cx="80" cy="34" rx="6" ry="13"/><path d="M80 21 H132 M80 47 H132 M132 21 A6 13 0 0 1 132 47"/><path class="crinkle" d="M84 47 L132 47 L136 92 L128 88 L120 94 L110 89 L100 95 L90 90 L82 94 Z"/></g><path class="ls" d="M92 55 L97 63 L93 71 L100 79 M112 53 L108 64 L116 72 L111 84 M124 56 L128 66 L122 78"/><line class="shine" x1="86" y1="52" x2="92" y2="88"/>`,
     ray: ["reflect", [84, 70], [[10, 102]]] },
-  { name: "EMERGENCY BLANKET", num: "02", props: ["reflect"], line: "Foil you can wear. Covers a lot of you at once.", wear: "INSIDE YOUR COAT", spots: [[-44, 232]],
+  { name: "EMERGENCY BLANKET", num: "02", props: ["reflect"], line: "Foil you can wear. Thin, light and easy to cut.", wear: "SHRUG LINING", spots: [[-50, 150], [50, 150]],
     art: `<g class="ln"><rect x="72" y="22" width="70" height="66"/><path d="M72 44 H142 M72 66 H142 M95 22 V88 M118 22 V88"/><path d="M142 22 L128 22 L142 36 Z"/></g><path class="ls" d="M78 28 L86 35 M101 50 L111 58 M124 72 L134 80 M80 72 L89 80 M124 30 L130 38"/><line class="shine" x1="76" y1="26" x2="82" y2="84"/>`,
     ray: ["reflect", [72, 58], [[8, 104]]] },
-  { name: "TINSEL", num: "03", props: ["scatter"], line: "Every strand moves on its own.", wear: "ROWS ON YOUR COAT", spots: [[-62, 300], [62, 300], [0, 400]],
+  { name: "TINSEL", num: "03", props: ["scatter"], line: "Every strand moves on its own.", wear: "SHRUG HEM", spots: [[-60, 190], [60, 190]],
     art: `<path class="ln" d="M66 22 Q108 40 152 20"/><g class="sway"><path class="ls" style="stroke:rgba(255,255,255,.75)" d="${tinsel()}"/></g>`,
     ray: ["scatter", [96, 60], [[22, 30], [28, 104], [62, 108], [12, 70]]] },
-  { name: "SPOONS + FORKS", num: "04", props: ["reflect", "scatter"], line: "Curved metal throws echoes sideways.", wear: "CROWN · COLLAR", spots: [[0, -10], [0, 104]],
+  { name: "SPOONS + FORKS", num: "04", props: ["reflect", "scatter"], line: "Curved metal throws echoes sideways.", wear: "CROWN · SHRUG", spots: [[0, -10], [-40, 196]],
     art: `<g class="ln"><ellipse cx="92" cy="36" rx="11" ry="16"/><path d="M92 52 L92 100"/><path d="M118 100 L118 54 M110 22 L110 46 Q110 54 118 54 Q126 54 126 46 L126 22 M115 22 L115 44 M121 22 L121 44"/><path d="M142 100 L142 52 Q152 30 144 18 Q137 34 142 52"/></g><path class="ls" d="M86 30 Q88 24 94 24"/>`,
     ray: ["scatter", [82, 40], [[18, 6], [24, 96], [50, 108]]] },
-  { name: "TIN LIDS", num: "05", props: ["reflect"], line: "Stiff and shiny. Tape the sharp edges.", wear: "OVER YOUR CHEST", spots: [[0, 176]],
-    art: `<g class="ln"><ellipse cx="110" cy="28" rx="26" ry="7"/><path d="M84 28 V90 M136 28 V90 M84 90 A26 7 0 0 0 136 90"/></g><path class="ls" d="M84 46 A26 7 0 0 0 136 46 M84 64 A26 7 0 0 0 136 64 M84 78 A26 7 0 0 0 136 78"/><g class="ln"><ellipse cx="64" cy="96" rx="15" ry="5"/><ellipse cx="64" cy="96" rx="10" ry="3"/></g><line class="shine" x1="88" y1="30" x2="88" y2="88"/>`,
-    ray: ["reflect", [84, 58], [[8, 100]]] },
-  { name: "CHAINS + RINGS", num: "06", props: ["scatter"], line: "Loose links jingle and hide what your hands are doing.", wear: "WRISTS · FINGERS · SLEEVES", spots: [[-84, 372], [84, 372], [-78, 300]],
+  { name: "COPPER WIRE", num: "05", props: ["field"], line: "Wound into a coil, it sends out a field of its own.", wear: "INSIDE EVERY GADGET", spots: [[0, 30], [0, 140], [84, 340]],
+    art: `<path class="ln" d="M70 60 ${Array.from({ length: 14 }, (_, i) => `Q${74 + i * 5} ${i % 2 ? 40 : 80} ${78 + i * 5} 60`).join(" ")}"/><path class="ls" d="M70 60 L58 60 M148 60 L156 60"/>`,
+    ray: ["absorb", [70, 60]] },
+  { name: "CHAINS + RINGS", num: "06", props: ["scatter"], line: "Loose links jingle and hide what your hands are doing.", wear: "SHRUG · BRACELET", spots: [[84, 350], [-44, 200]],
     art: `<g class="swing"><g class="ln" style="stroke-width:1">${chain()}</g></g><g class="ln"><circle cx="92" cy="86" r="10"/><path d="M88 76 L92 70 L96 76"/><ellipse cx="132" cy="88" rx="18" ry="7"/><ellipse cx="132" cy="88" rx="13" ry="4.5"/></g>`,
     ray: ["scatter", [108, 46], [[30, 18], [20, 80], [56, 108]]] },
-  { name: "SIEVE", num: "07", props: ["reflect"], line: "Holes smaller than the signal. It can't get through.", wear: "OVER YOUR FACE", spots: [[0, 42]],
+  { name: "SIEVE", num: "07", props: ["reflect"], line: "Holes smaller than the signal. It can't get through.", wear: "INSIDE THE CROWN", spots: [[0, 10]],
     art: `<g class="ln"><ellipse cx="104" cy="40" rx="36" ry="9"/><path d="M68 40 Q72 92 104 94 Q136 92 140 40 M140 40 L156 33"/></g><g fill="rgba(255,255,255,.7)">${holes()}</g>`,
     ray: ["reflect", [72, 58], [[8, 104]]] },
-  { name: "CHIP BAGS", num: "08", props: ["reflect"], line: "Shiny inside. Free, and everywhere.", wear: "PATCH ANY GAP", spots: [[-30, 520], [30, 520]],
+  { name: "CHIP BAGS", num: "08", props: ["reflect"], line: "Shiny inside. Free, and everywhere.", wear: "PATCH ANY GADGET", spots: [[50, 170]],
     art: `<path class="ln" d="M80 24 L84 20 L88 24 L92 20 L96 24 L100 20 L104 24 L108 20 L112 24 L116 20 L120 24 L124 20 L128 24 L132 20 L136 24 Q144 56 136 92 L132 96 L128 92 L124 96 L120 92 L116 96 L112 92 L108 96 L104 92 L100 96 L96 92 L92 96 L88 92 L84 96 L80 92 Q72 56 80 24 Z"/><path class="ls" d="M90 36 Q86 58 92 80 M104 40 Q120 46 126 40"/><line class="shine" x1="84" y1="30" x2="84" y2="86"/>`,
     ray: ["reflect", [76, 58], [[8, 104]]] },
-  { name: "BLACK ELECTRONICS BAG", num: "09", props: ["absorb"], line: "The black bags that phone parts come in have carbon inside. Carbon soaks the signal up.", wear: "SECOND LINING", spots: [[40, 244]],
+  { name: "BLACK ELECTRONICS BAG", num: "09", props: ["absorb"], line: "The black bags that phone parts come in have carbon inside. Carbon soaks the signal up.", wear: "SHRUG · SECOND LAYER", spots: [[0, 170]],
     art: `<defs><pattern id="bh" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255,255,255,.35)"/></pattern></defs><rect x="80" y="20" width="56" height="76" fill="url(#bh)" class="ln"/><path class="ln" d="M80 30 H136 M84 26 H132"/><text x="104" y="66">C</text>`,
     ray: ["absorb", [80, 60]] },
-  { name: "CARDBOARD", num: "10", props: ["hold"], line: "A ring of it keeps the coat off your chest.", wear: "RING INSIDE YOUR COAT", spots: [[-26, 196], [26, 196]],
-    art: `<g class="breathe"><path class="ln" d="M66 18 Q76 58 66 98"/></g><g class="ln"><rect x="96" y="22" width="14" height="72"/><path d="M96 30 Q103 34 110 30 Q103 38 96 42 Q103 46 110 50 Q103 54 96 58 Q103 62 110 66 Q103 70 96 74 Q103 78 110 82 Q103 86 96 90" style="stroke-width:.8"/><path d="M114 16 V102"/></g><path class="ls" d="M114 24 L122 30 M114 40 L122 46 M114 56 L122 62 M114 72 L122 78 M114 88 L122 94"/><text x="56" y="110">YOU</text><text x="92" y="110">CARD</text><text x="118" y="110">COAT</text>` },
+  { name: "FELT OR CARDBOARD", num: "10", props: ["hold"], line: "A soft layer between the metal and your skin.", wear: "UNDER THE CROWN AND CUFF", spots: [[0, 20], [84, 330]],
+    art: `<g class="breathe"><path class="ln" d="M66 18 Q76 58 66 98"/></g><g class="ln"><rect x="96" y="22" width="14" height="72"/><path d="M96 30 Q103 34 110 30 Q103 38 96 42 Q103 46 110 50 Q103 54 96 58 Q103 62 110 66 Q103 70 96 74 Q103 78 110 82 Q103 86 96 90" style="stroke-width:.8"/><path d="M114 16 V102"/></g><path class="ls" d="M114 24 L122 30 M114 40 L122 46 M114 56 L122 62 M114 72 L122 78 M114 88 L122 94"/><text x="56" y="110">YOU</text><text x="92" y="110">FELT</text><text x="118" y="110">FOIL</text>` },
 ];
 
 const LEG = [
   { t: "REFLECT", p: "Metal bounces the signal away.", svg: `<path class="ln" d="M120 6 V54"/><path class="path" d="M4 12 L118 30 L4 50"/><circle class="dot" r="3"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 12 L118 30 L4 50"/></circle>` },
   { t: "SCATTER", p: "Loose pieces split it into noise.", svg: `<path class="ln" d="M120 6 L118 18 L122 30 L118 42 L121 54"/>${[[20, 6], [10, 30], [24, 54]].map(e => `<path class="path" d="M118 30 L${e[0]} ${e[1]}"/><circle class="dot" r="2.4"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 30 L118 30 L${e[0]} ${e[1]}"/></circle>`).join("")}<path class="path" d="M4 30 L118 30"/>` },
   { t: "ABSORB", p: "Carbon soaks it up.", svg: `<defs><pattern id="lh" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255,255,255,.35)"/></pattern></defs><rect x="108" y="6" width="26" height="48" fill="url(#lh)" class="ln"/><path class="path" d="M4 30 L108 30"/><circle class="dot" r="3"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 30 L108 30 L130 30"/><animate attributeName="r" dur="2.2s" repeatCount="indefinite" values="3;3;0;0" keyTimes="0;.5;.85;1"/></circle>` },
-  { t: "HOLD STILL", p: "A gap, so breathing never shows.", svg: `<g class="breathe"><path class="ln" d="M40 6 Q48 30 40 54"/></g><path class="ln" d="M100 4 V56"/><rect x="86" y="10" width="10" height="40" class="ls"/>` },
+  { t: "FIELD", p: "A coil sends out its own signal and covers you.", svg: `<path class="ln" d="M20 30 Q24 16 28 30 Q32 44 36 30 Q40 16 44 30 Q48 44 52 30"/>${[0, .8, 1.6].map(d => `<circle cx="36" cy="30" r="10" fill="none" stroke="#a8e6ff"><animate attributeName="r" dur="2.4s" begin="${d}s" repeatCount="indefinite" values="10;60"/><animate attributeName="opacity" dur="2.4s" begin="${d}s" repeatCount="indefinite" values=".9;0"/></circle>`).join("")}` },
 ];
 document.getElementById("legend").innerHTML = LEG.map(l => `<div class="lg"><svg viewBox="0 0 160 60">${l.svg}</svg><b>${l.t}</b><p>${l.p}</p></div>`).join("");
 
+const chipName = p => ({ hold: "SOFT LAYER", field: "FIELD" })[p] || p.toUpperCase();
 document.getElementById("cards").innerHTML = ITEMS.map((it, i) => {
   const ray = it.ray ? RAY[it.ray[0]](it.ray[1], it.ray[2]) : "";
-  const chips = it.props.map(p => `<span class="chip ${p === "hold" ? "hold" : ""}">${p === "hold" ? "HOLD STILL" : p.toUpperCase()}</span>`).join("");
+  const chips = it.props.map(p => `<span class="chip ${p === "hold" ? "hold" : ""}"${p === "field" ? ' style="border-color:#a8e6ff;color:#a8e6ff"' : ""}>${chipName(p)}</span>`).join("");
   return `<div class="card" data-i="${i}"><svg viewBox="0 0 160 112">${it.art}${ray}</svg>
     <div class="nm"><b>${it.name}</b><i>${it.num}</i></div><div class="chips">${chips}</div>
     <p>${it.line}</p><div class="wear"><span>WEAR →</span> ${it.wear}</div></div>`;
 }).join("");
 
-function spline(pts) {
-  const n = pts.length, P = i => pts[(i + n) % n];
-  let d = `M${pts[0][0]} ${pts[0][1]}`;
-  for (let i = 0; i < n; i++) {
-    const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2);
-    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0]} ${p2[1]}`;
-  }
-  return d + "Z";
-}
-const Rp = [[10,76],[12,96],[30,106],[58,113],[75,128],[81,158],[83,200],[85,248],[87,294],[85,332],[90,352],[89,378],[81,396],[73,390],[70,364],[70,336],[70,296],[66,250],[62,204],[57,172],[50,196],[44,232],[40,258],[47,288],[56,316],[58,350],[53,400],[45,442],[47,474],[42,520],[30,566],[35,590],[31,604],[13,604],[12,578],[14,540],[18,484],[16,444],[12,404],[6,356],[0,336]];
-const BODY = [...Rp, ...Rp.slice(0, -1).reverse().map(([x, y]) => [-x, y])];
 const mapsvg = document.getElementById("mapsvg");
-let mapHTML = `<path d="${spline(BODY)}" class="ln" style="fill:rgba(255,255,255,.04)"/><ellipse cx="0" cy="40" rx="29" ry="39" class="ln"/>
+let mapHTML = `<path d="${BODY_D}" class="ln" style="fill:rgba(255,255,255,.04)"/><ellipse cx="0" cy="40" rx="29" ry="39" class="ln"/>
   <path class="ls" d="M0 2 L0 78 M-29 42 L29 42 M0 96 L0 336" style="stroke-dasharray:2 3"/>`;
 ITEMS.forEach((it, i) => it.spots.forEach(([x, y]) => { mapHTML += `<circle class="spotring" data-i="${i}" cx="${x}" cy="${y}" r="6"/><circle class="spot" data-i="${i}" cx="${x}" cy="${y}" r="4.5"/>`; }));
 mapsvg.innerHTML = mapHTML;
