@@ -63,6 +63,12 @@
 
   #cam { position: fixed; right: 28px; bottom: 28px; width: 250px; z-index: 4; pointer-events: none; padding: 10px 12px 12px; opacity: 0; transition: opacity .4s; }
   #cam canvas { display: block; width: 100%; height: 150px; }
+  #cam button { all: unset; cursor: pointer; display: flex; justify-content: space-between; gap: 12px; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 9px; letter-spacing: 2px; color: var(--soft); margin-bottom: 6px; white-space: nowrap; }
+  #cam button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+  #cam.min { width: auto; padding: 8px 12px; }
+  #cam.min canvas, #cam.min .ptitle .lbl { display: none; }
+  #cam.min .ptitle { margin: 0; font-size: 10px; }
+  #cam .chev { margin-left: 10px; color: var(--soft); }
   .rec { color: var(--alert); }
   .rec::before { content: "● "; animation: blink 1s steps(2) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
@@ -197,7 +203,7 @@
 
 <header id="hdr">
   <div><b>UNREAD</b>&nbsp;&nbsp;·&nbsp;&nbsp;OPEN BLUEPRINT · REV 02</div>
-  <div id="counter">00 / 09</div>
+  <div id="counter">00 / 07</div>
 </header>
 
 <div id="captions">
@@ -228,26 +234,16 @@
     <p>Chains, a shiny blanket and a black electronics bag, worn as a short cape. The same field, from a different place.</p>
   </div>
   <div class="cap" data-i="5">
-    <div class="eyebrow">02 · SHRUG · INSIDE</div>
-    <h2>Scatter, reflect, absorb.</h2>
-    <p>Chains break the signal into noise. The blanket bounces what's left. The black bag soaks up the rest.</p>
-  </div>
-  <div class="cap" data-i="6">
     <div class="eyebrow">03 · BRACELET</div>
     <h2>Or just your wrist.</h2>
     <p>The smallest thing still covers all of you. A foil cuff, loose links, and a coil that never stops talking.</p>
   </div>
-  <div class="cap" data-i="7">
-    <div class="eyebrow">03 · BRACELET · INSIDE</div>
-    <h2>Drown it in noise.</h2>
-    <p>The coil sends out radar noise of its own. The sensors hear the bracelet, not your heartbeat.</p>
-  </div>
-  <div class="cap" data-i="8">
+  <div class="cap" data-i="6">
     <div class="eyebrow">THROUGH THE CAMERA</div>
     <h2>Through the lens.</h2>
     <p>The camera knows something is standing there. It can't find a face, a body or a pose. Only noise.</p>
   </div>
-  <div class="cap" data-i="9">
+  <div class="cap" data-i="7">
     <div class="eyebrow">WALK</div>
     <h2>A shape, not a person.</h2>
     <p>A street robot looks right at it. It knows something is there. It can't tell who.</p>
@@ -262,8 +258,8 @@
   <div class="hmatch"><span id="matchv">0%</span><div class="bar"><i id="matchb"></i></div><span id="status">—</span></div>
 </aside>
 
-<aside id="cam" class="panel">
-  <div class="ptitle"><span>WHAT THE CAMERA SEES</span><span class="rec">CAM 03</span></div>
+<aside id="cam" class="panel min">
+  <button type="button" class="ptitle" id="camtoggle" aria-expanded="false" aria-controls="camfeed"><span class="lbl">WHAT THE CAMERA SEES</span><span><span class="rec">CAM 03</span><span class="chev" id="camchev">+</span></span></button>
   <canvas id="camfeed"></canvas>
 </aside>
 
@@ -282,7 +278,7 @@
 
 <main>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
-  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
+  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
 </main>
 
 <section id="manual">
@@ -504,9 +500,9 @@ const braceLinks = [];
 const braceChains = new Strands(brace.inner, GM.soft, braceLinks);
 
 const GADGETS = [
-  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [1.4, 1.95, 3.55, 3.75], anchor: () => V(0, 1.78, 0) },
-  { p: shrug, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [3.6, 4.0, 5.55, 5.75], anchor: () => V(0, 1.34, 0) },
-  { p: brace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.6, 6.0, 99, 100], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))) },
+  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [2.0, 2.4, 4.0, 4.2], anchor: () => V(0, 1.78, 0) },
+  { p: shrug, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [4.2, 4.5, 5.0, 5.2], anchor: () => V(0, 1.34, 0) },
+  { p: brace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.2, 5.5, 99, 100], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))) },
 ];
 const GMATS = [GM.foil, GM.soft]; GMATS.forEach(m => m.userData.base = m.opacity);
 
@@ -532,7 +528,7 @@ const SHIELD = new THREE.ShaderMaterial({
       vec2 a = mod(p, r) - h, b = mod(p - h, r) - h;
       vec2 g = dot(a, a) < dot(b, b) ? a : b; g = abs(g);
       float d = max(dot(g, normalize(r)), g.x);
-      return smoothstep(0.42, 0.5, d);
+      return smoothstep(0.465, 0.5, d);
     }
     void main() {
       float d = distance(vRest, uAnchor);
@@ -542,7 +538,7 @@ const SHIELD = new THREE.ShaderMaterial({
       float pulse = exp(-pow((d - mod(uTime * 0.7, 2.6)) / 0.05, 2.0));
       float rip = 0.0;
       for (int i = 0; i < 9; i++) { float r = distance(vRest, uHits[i]); float a = uAge[i]; rip += exp(-pow((r - a * 0.22) / 0.014, 2.0)) * (1.0 - a) + exp(-r * r / 0.0016) * (1.0 - a) * 0.6; }
-      float alpha = (0.05 + hx * 0.32 + pow(vRim, 2.0) * 0.45 + pulse * 0.25 + rip * 0.9) * mask + front * 0.9;
+      float alpha = (0.012 + hx * 0.13 + pow(vRim, 3.0) * 0.1 + pulse * 0.14 + rip * 0.95) * mask + front * 0.85;
       gl_FragColor = vec4(uColor, alpha * uFade);
     }`,
 });
@@ -563,10 +559,10 @@ function shieldPart(parent, rows, off, seg) {
   const m = new THREE.Mesh(g, SHIELD); m.renderOrder = 2; parent.add(m);
 }
 {
-  const rows = []; for (let y = 0.8; y <= 1.751; y += .02) { const [rx, rz] = interp(torsoTab, Math.min(y, 1.72)); const k = y > 1.72 ? Math.max(.05, (1.752 - y) / .032) : 1; rows.push({ y, cx: 0, cz: 0, rx: (rx + .03) * k, rz: (rz + .03) * k }); }
+  const rows = []; for (let y = 0.8; y <= 1.751; y += .02) { const [rx, rz] = interp(torsoTab, Math.min(y, 1.72)); const k = y > 1.72 ? Math.max(.05, (1.752 - y) / .032) : 1; rows.push({ y, cx: 0, cz: 0, rx: (rx + .018) * k, rz: (rz + .018) * k }); }
   shieldPart(model, rows, V(0, 0, 0), 48);
-  legs.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .02; y <= .86; y += .025) { const [rx, rz] = interp(legTab, Math.min(y, .84)); r.push({ y: y - .84, cx: 0, cz: y < .08 ? .035 : 0, rx: rx + .024, rz: rz + .024 }); } shieldPart(g, r, V(s * .085, .84, 0), 28); });
-  arms.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .68; y <= 1.4; y += .025) { const [rx, rz] = interp(armTab, y); r.push({ y: y - 1.4, cx: s * .055 * (1.4 - y) / .7, cz: 0, rx: rx + .02, rz: rz + .02 }); } shieldPart(g, r, V(s * .2, 1.4, 0), 18); });
+  legs.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .02; y <= .86; y += .025) { const [rx, rz] = interp(legTab, Math.min(y, .84)); r.push({ y: y - .84, cx: 0, cz: y < .08 ? .035 : 0, rx: rx + .014, rz: rz + .014 }); } shieldPart(g, r, V(s * .085, .84, 0), 28); });
+  arms.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .68; y <= 1.4; y += .025) { const [rx, rz] = interp(armTab, y); r.push({ y: y - 1.4, cx: s * .055 * (1.4 - y) / .7, cz: 0, rx: rx + .012, rz: rz + .012 }); } shieldPart(g, r, V(s * .2, 1.4, 0), 18); });
 }
 const skinPt = (a, y) => {
   if (y >= .82) { const [rx, rz] = interp(torsoTab, y); return V(Math.cos(a) * (rx + .028), y, Math.sin(a) * (rz + .028)); }
@@ -621,12 +617,6 @@ const expo = (a0, z0, z1) => z => z > z1 ? a0 : 0;
 section(0, 1.72, [
   { z: [0, .07], style: "skin" }, { z: [.07, .09], style: "dots" }, { z: [.09, .13], style: "coil" }, { z: [.13, .17], style: "hatch" },
 ], { emit: .11, amp: z => z > .17 ? .045 : z > .13 ? lerp(.006, .045, (z - .13) / .04) : 0 });
-section(0, 1.3, [
-  { z: [.04, .1], style: "skin" }, { z: [.1, .14], style: "empty" }, { z: [.14, .18], style: "dots" }, { z: [.18, .192], style: "hatch" }, { z: [.192, .26], style: "links" },
-], { emit: .186, scatter: .23, amp: z => z > .26 ? .045 : z > .192 ? lerp(.025, .045, (z - .192) / .068) : z > .18 ? .015 : z > .14 ? .015 * Math.exp(-(.18 - z) / .009) : 0 });
-section(.36, .8, [
-  { z: [-.03, .03], style: "skin" }, { z: [.03, .045], style: "hatch" }, { z: [.045, .075], style: "coil" }, { z: [.075, .14], style: "links" },
-], { emit: .06, noise: .06, amp: z => z > .14 ? .045 : z > .075 ? lerp(.02, .045, (z - .075) / .065) : z > .045 ? .006 : 0 });
 
 // ---------- sensors: cameras and radar ----------
 const SENS = [V(-1.3, 2.05, 1.0), V(1.45, 1.75, 0.9), V(0.65, 2.3, -1.3), V(-1.0, 0.55, 1.4)];
@@ -745,35 +735,29 @@ const RMATS = [RM, RS]; RMATS.forEach(m => m.userData.base = m.opacity);
 // ---------- scenes ----------
 const CAM_DIR = LOOK.clone().sub(SENS[1]).normalize();
 const CAM_BEHIND = SENS[1].clone().addScaledVector(CAM_DIR, -1.05).add(V(0, .22, 0)), CAM_THROUGH = SENS[1].clone().addScaledVector(CAM_DIR, .5);
-// 0 hero · 1 read · 2 helmet · 3 inside · 4 shrug · 5 inside · 6 bracelet · 7 inside · 8 camera's view · 9 walk
+// 0 hero · 1 read · 2 helmet · 3 inside the helmet · 4 shrug · 5 bracelet · 6 camera's view · 7 walk
 const K = [
   { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35 },
   { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18 },
   { pos: [0.2, 1.3, 4.2], tgt: [-0.5, 1.05, 0], spin: .3 },
   { pos: [0.8, 1.72, 0.32], tgt: [0, 1.72, 0.32], spin: 0, lock: 0 },
   { pos: [-0.2, 1.3, 4.0], tgt: [-0.5, 1.05, 0], spin: .3 },
-  { pos: [0.8, 1.3, 0.38], tgt: [0, 1.3, 0.38], spin: 0, lock: 0 },
   { pos: [1.6, 1.1, 3.0], tgt: [-0.2, 0.95, 0], spin: .25 },
-  { pos: [1.16, 0.8, 0.28], tgt: [0.36, 0.8, 0.28], spin: 0, lock: 0 },
   { pos: CAM_BEHIND.toArray(), tgt: SENS[1].clone().addScaledVector(CAM_DIR, .7).toArray(), spin: 0, lock: 1.01 },
   { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, lock: Math.PI / 2 },
 ];
 const N = K.length - 1;
 
 const labelsEl = document.getElementById("labels");
-const L1 = (z, y, html, sc, cls = "mini") => ({ at: () => V(SECTS[sc].X, y, z), html, sc: [[3, 5, 7][sc]], cls });
+const L1 = (z, y, html, sc, cls = "mini") => ({ at: () => V(SECTS[sc].X, y, z), html, sc: [3], cls });
 const LABELS = [
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
   { at: () => V(.2, 2.1, -.1), html: "HELMET<small>METAL SHELL · FIELD COIL · PADDING</small>", sc: [2], gate: () => GADGETS[0].vis > .9 },
   { at: () => V(.3, 1.4, 0), html: "SHRUG<small>CHAINS · BLANKET · BLACK BAG</small>", sc: [4], gate: () => GADGETS[1].vis > .9 },
-  { at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET<small>FOIL CUFF · LINKS · A COIL</small>", sc: [6], gate: () => GADGETS[2].vis > .9 },
-  { at: () => skinPt(Math.PI, 1.05), html: "FIELD<small>FLOWS OVER THE WHOLE BODY</small>", sc: [2, 4, 6], left: true, cls: "field", gate: () => fieldGrow > .7 },
+  { at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET<small>FOIL CUFF · LINKS · A COIL</small>", sc: [5], gate: () => GADGETS[2].vis > .9 },
+  { at: () => skinPt(Math.PI, 1.05), html: "FIELD<small>FLOWS OVER THE WHOLE BODY</small>", sc: [2, 4, 5], left: true, cls: "field", gate: () => fieldGrow > .7 },
   L1(.035, 1.865, "HEAD", 0), L1(.08, 1.885, "PADDING", 0), L1(.11, 1.865, "COIL", 0), L1(.15, 1.885, "METAL SHELL", 0),
   L1(.46, 1.79, "SIGNAL IN →", 0, "mini amber"), L1(.42, 1.62, "← BOUNCED", 0, "mini amber"), L1(.36, 1.88, "FIELD OUT", 0, "mini field"), L1(.035, 1.905, "0 REACHES HEAD", 0, "mini field"),
-  L1(.07, 1.445, "SKIN", 1), L1(.12, 1.465, "GAP", 1), L1(.16, 1.445, "BLACK BAG", 1), L1(.186, 1.465, "BLANKET", 1), L1(.226, 1.445, "CHAINS", 1),
-  L1(.52, 1.37, "SIGNAL IN →", 1, "mini amber"), L1(.47, 1.2, "← BOUNCED", 1, "mini amber"), L1(.3, 1.4, "SCATTERED", 1, "mini amber"), L1(.07, 1.485, "0 REACHES SKIN", 1, "mini field"),
-  L1(0, .945, "WRIST", 2), L1(.037, .965, "FOIL", 2), L1(.06, .945, "COIL", 2), L1(.107, .965, "LINKS", 2),
-  L1(.4, .87, "SIGNAL IN →", 2, "mini amber"), L1(.36, .72, "← BOUNCED", 2, "mini amber"), L1(.36, .905, "NOISE OUT · JAMS THE RADAR", 2, "mini alert"), L1(0, .985, "0 REACHES SKIN", 2, "mini field"),
 ].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); d.innerHTML = `<span>${l.html}</span>`; labelsEl.appendChild(d); return { ...l, el: d }; });
 
 const hud = document.getElementById("hud"), camPanel = document.getElementById("cam");
@@ -842,7 +826,7 @@ function drawPov(t, sRaw) {
     c.fillStyle = rnd() > .85 ? `rgba(255,255,255,${rnd() * .35})` : `rgba(0,0,0,${.3 + rnd() * .5})`; c.fillRect(x, y, s, s);
   }
   for (let i = 0; i < 9; i++) { const y = y0 + rnd() * bh; c.fillStyle = rnd() > .5 ? "rgba(0,0,0,.45)" : "rgba(168,230,255,.12)"; c.fillRect(cx - bw * .9 + (rnd() - .5) * 40, y, bw * 1.8, 2 + rnd() * 7); }
-  const done = sRaw > 8.02;
+  const done = sRaw > 6.02;
   const wx = cx + Math.sin(t * 1.7) * bw * .35 + (done ? 0 : Math.sin(t * 7.3) * 10), wy = y0 + bh * (.35 + .25 * Math.sin(t * 1.1));
   const s = done ? 1.25 : .5 + .35 * Math.abs(Math.sin(t * 2.3));
   povBox.style.left = (done ? x0 - bw * .2 : wx - bw * s / 2) + "px"; povBox.style.top = (done ? y0 - 10 : wy - bh * s / 4) + "px";
@@ -857,6 +841,11 @@ const caps = [...document.querySelectorAll(".cap")];
 const counter = document.getElementById("counter"), dragHint = document.getElementById("draghint"), robotQ = document.getElementById("robotq");
 const capWrap = document.getElementById("captions"), hdr = document.getElementById("hdr");
 let capOn = 0, fieldGrow = 0;
+document.getElementById("camtoggle").addEventListener("click", e => {
+  const open = camPanel.classList.toggle("min") === false;
+  e.currentTarget.setAttribute("aria-expanded", open); document.getElementById("camchev").textContent = open ? "−" : "+";
+  if (open) requestAnimationFrame(sizeCanvases);
+});
 
 let userRot = 0, dragging = false, lastX = 0, vel = 0;
 canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; canvas.classList.add("drag"); canvas.setPointerCapture(e.pointerId); });
@@ -876,14 +865,14 @@ function tick(now) {
   const idx = Math.min(N - 1, Math.floor(s)), f = s - idx, b = sm(.5, 1, f);
   const sEff = idx + b;
   const w = K.map((_, k) => clamp(1 - Math.abs(sEff - k), 0, 1));
-  const zoomW = w[3] + w[5] + w[7];
-  const rT = clamp((sRaw - 8.7) / 1.5, 0, 1), pov = sm(8.14, 8.32, sRaw) * (1 - sm(8.62, 8.82, sRaw));
+  const zoomW = w[3];
+  const rT = clamp((sRaw - 6.7) / 1.5, 0, 1), pov = sm(6.14, 6.32, sRaw) * (1 - sm(6.62, 6.82, sRaw));
   const pastEnd = sRaw > N + 1.75;
 
   // camera
   const k0 = K[idx], k1 = K[Math.min(N, idx + 1)];
   const tp = V(...k0.pos).lerp(V(...k1.pos), b), tt = V(...k0.tgt).lerp(V(...k1.tgt), b);
-  const push = sm(8.0, 8.32, sRaw) * (1 - sm(8.5, 8.6, sRaw));
+  const push = sm(6.0, 6.32, sRaw) * (1 - sm(6.5, 6.6, sRaw));
   if (push > 0) { tp.lerp(CAM_THROUGH, push); tt.lerp(V(0, .95, 0), push); }
   if (innerWidth < 760) { tt.x *= .2; tp.multiplyScalar(1.1); }
   camPos.lerp(tp, ease); camTgt.lerp(tt, ease);
@@ -898,7 +887,7 @@ function tick(now) {
   model.rotation.y = rotY + userRot * (1 - zoomW);
 
   // walking + breathing
-  const walk = w[9] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
+  const walk = w[7] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
   legs[0].rotation.x = Math.sin(ph) * .42 * walk; legs[1].rotation.x = -Math.sin(ph) * .42 * walk;
   arms[0].rotation.x = -Math.sin(ph) * .25 * walk; arms[1].rotation.x = Math.sin(ph) * .25 * walk;
   model.position.y = Math.abs(Math.sin(ph)) * .018 * walk;
@@ -928,13 +917,13 @@ function tick(now) {
   SU.uAnchor.value.copy(anc); SU.uEdge.value = grow * 2.15; SU.uFront.value = grow > .01 && grow < .98 ? 1 : 0;
   SU.uFade.value = (1 - .9 * zoomW) * (1 - .95 * pov); SU.uTime.value = t;
 
-  SECTS.forEach((S, i) => S.update(t, w[[3, 5, 7][i]]));
+  SECTS.forEach(S => S.update(t, w[3]));
 
   scan.visible = w[0] > .01; M.scan.opacity = .9 * w[0];
   scan.position.y = .9 + .82 * Math.sin(t * .9);
 
-  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[6] + w[9] * .8) * grow };
-  const sW = clamp(w[1] + w[8], 0, 1) * (1 - zoomW) * (1 - pov);
+  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[5] + w[7] * .8) * grow };
+  const sW = clamp(w[1] + w[2] + w[4] + w[5] + w[6], 0, 1) * (1 - zoomW) * (1 - pov);
   sensorG.visible = sW > .01; sensorMat.opacity = .95 * sW; sensorSoft.opacity = .45 * sW; ledMat.opacity = sW * (.5 + .5 * Math.sin(t * 6));
   waves.forEach(wv => { const u = (t * .7 + wv.userData.k / 3) % 1; wv.scale.setScalar(.03 + u * .16); wv.position.z = .05 + u * .35; wv.material.opacity = (1 - u) * .7 * sW; });
   model.updateMatrixWorld();
@@ -973,13 +962,13 @@ function tick(now) {
 
   // captions
   const ci = Math.min(N, Math.floor(s + .25));
-  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 09`; }
+  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 07`; }
   capWrap.style.opacity = pastEnd ? 0 : 1; hdr.style.opacity = sRaw > N + 2.1 ? 0 : 1;
   dragHint.style.opacity = pastEnd ? 0 : .9;
 
   // radar readout + camera feed
   const panelOp = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  hud.style.opacity = panelOp * (1 - w[8]); camPanel.style.opacity = panelOp * (1 - w[8]);
+  hud.style.opacity = panelOp * (1 - w[6]); camPanel.style.opacity = panelOp * (1 - w[6]); camPanel.style.pointerEvents = panelOp * (1 - w[6]) > .5 ? "auto" : "none";
   povEl.style.opacity = pov > .05 && !pastEnd ? Math.min(1, pov * 1.5) : 0;
   if (pov > .05) drawPov(t, sRaw);
   const clar = clamp(1 - grow * .97, 0, 1);
@@ -1000,7 +989,7 @@ function tick(now) {
       tr.st.textContent = clar > .6 ? "LOCKED" : clar > .25 ? "WEAK" : "NO PATTERN";
       tr.st.style.color = clar > .6 ? "#ff8a5c" : "#fff";
     });
-    if (panelOp > 0) drawFeed(grow, t);
+    if (panelOp > 0 && !camPanel.classList.contains("min")) drawFeed(grow, t);
   }
   matchShown += (Math.round(97 * clar) - matchShown) * .08;
   const m = Math.round(matchShown);
