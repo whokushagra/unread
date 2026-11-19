@@ -90,6 +90,15 @@
   #robotq span { font-size: 10px; letter-spacing: 2px; font-weight: 700; }
   @keyframes wob { 50% { transform: rotate(-12deg) translateY(-4px); } }
 
+  #pov { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .35s; }
+  #povfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pv { position: absolute; font-size: 11px; letter-spacing: 2px; font-weight: 700; }
+  .pv.tl { top: 64px; left: 56px; } .pv.tr { top: 64px; right: 56px; } .pv.bl { bottom: 40px; left: 56px; color: var(--soft); } .pv.br { bottom: 40px; right: 56px; }
+  .pc { position: absolute; width: 44px; height: 44px; border: 0 solid rgba(255,255,255,.7); }
+  .pc.c1 { top: 44px; left: 36px; border-width: 2px 0 0 2px; } .pc.c2 { top: 44px; right: 36px; border-width: 2px 2px 0 0; }
+  .pc.c3 { bottom: 24px; left: 36px; border-width: 0 0 2px 2px; } .pc.c4 { bottom: 24px; right: 36px; border-width: 0 2px 2px 0; }
+  #povbox { position: absolute; border: 1.5px dashed var(--alert); }
+  #povbox span { position: absolute; left: -1px; top: -20px; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--alert); white-space: nowrap; }
   .drag-hint { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 4; font-size: 10px; letter-spacing: 2px; color: var(--soft); pointer-events: none; transition: opacity .4s; }
 
   main { position: relative; z-index: 2; pointer-events: none; }
@@ -169,7 +178,16 @@
     #manual { padding: 70px 16px 40px; }
     .kit { grid-template-columns: 1fr; }
     .map { position: relative; top: 0; max-width: 300px; }
-    .drag-hint { display: none; }
+    #pov { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .35s; }
+  #povfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pv { position: absolute; font-size: 11px; letter-spacing: 2px; font-weight: 700; }
+  .pv.tl { top: 64px; left: 56px; } .pv.tr { top: 64px; right: 56px; } .pv.bl { bottom: 40px; left: 56px; color: var(--soft); } .pv.br { bottom: 40px; right: 56px; }
+  .pc { position: absolute; width: 44px; height: 44px; border: 0 solid rgba(255,255,255,.7); }
+  .pc.c1 { top: 44px; left: 36px; border-width: 2px 0 0 2px; } .pc.c2 { top: 44px; right: 36px; border-width: 2px 2px 0 0; }
+  .pc.c3 { bottom: 24px; left: 36px; border-width: 0 0 2px 2px; } .pc.c4 { bottom: 24px; right: 36px; border-width: 0 2px 2px 0; }
+  #povbox { position: absolute; border: 1.5px dashed var(--alert); }
+  #povbox span { position: absolute; left: -1px; top: -20px; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--alert); white-space: nowrap; }
+  .drag-hint { display: none; }
   }
 </style>
 </head>
@@ -179,7 +197,7 @@
 
 <header id="hdr">
   <div><b>UNREAD</b>&nbsp;&nbsp;·&nbsp;&nbsp;OPEN BLUEPRINT · REV 02</div>
-  <div id="counter">00 / 08</div>
+  <div id="counter">00 / 09</div>
 </header>
 
 <div id="captions">
@@ -197,12 +215,12 @@
   <div class="cap" data-i="2">
     <div class="eyebrow">01 · HEADGEAR</div>
     <h2>One thing on your head.</h2>
-    <p>A crown of spoons and foil. A small coil inside throws a field around your whole body. Signals hit the field, not you.</p>
+    <p>A horned helmet with a field coil inside. The field flows down over your whole body, so signals hit the field, not you.</p>
   </div>
   <div class="cap" data-i="3">
     <div class="eyebrow">01 · HEADGEAR · INSIDE</div>
     <h2>Mirror, then field.</h2>
-    <p>The spoons bounce the signal away. Behind them, a coil sends out a field of its own, so nothing reaches your head.</p>
+    <p>The metal shell bounces the signal away. Under it, a coil sends out a field of its own, so nothing reaches your head.</p>
   </div>
   <div class="cap" data-i="4">
     <div class="eyebrow">02 · SHRUG</div>
@@ -225,6 +243,11 @@
     <p>The coil sends out radar noise of its own. The sensors hear the bracelet, not your heartbeat.</p>
   </div>
   <div class="cap" data-i="8">
+    <div class="eyebrow">THROUGH THE CAMERA</div>
+    <h2>Through the lens.</h2>
+    <p>The camera knows something is standing there. It can't find a face, a body or a pose. Only noise.</p>
+  </div>
+  <div class="cap" data-i="9">
     <div class="eyebrow">WALK</div>
     <h2>A shape, not a person.</h2>
     <p>A street robot looks right at it. It knows something is there. It can't tell who.</p>
@@ -247,10 +270,19 @@
 <div id="labels"></div>
 <div id="robotq"><b>?</b><span>NO MATCH</span></div>
 <div class="drag-hint" id="draghint">DRAG TO TURN THE FIGURE</div>
+<div id="pov" aria-hidden="true">
+  <canvas id="povfx"></canvas>
+  <div class="pc c1"></div><div class="pc c2"></div><div class="pc c3"></div><div class="pc c4"></div>
+  <div class="pv tl">CAM 02 · STREET · <span class="rec">REC</span></div>
+  <div class="pv tr" id="povtime">30.10.2062 · 08:14:22</div>
+  <div class="pv bl">FACE · NONE &nbsp;&nbsp; POSE · NONE &nbsp;&nbsp; GAIT · NONE</div>
+  <div class="pv br" id="povstat">SCANNING…</div>
+  <div id="povbox"><span id="povlab">PERSON? 12%</span></div>
+</div>
 
 <main>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
-  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
+  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
 </main>
 
 <section id="manual">
@@ -267,11 +299,6 @@
       <div class="now" id="mapnow">—</div>
     </div>
     <div class="cards" id="cards"></div>
-  </div>
-
-  <div class="check">
-    <svg viewBox="0 0 110 120"><rect x="6" y="4" width="98" height="112" class="ls"/><g class="spin"><path class="ln" d="M55 18 a9 11 0 1 0 0.1 0 M44 34 L66 34 L72 74 L64 74 L62 108 L48 108 L46 74 L38 74 Z"/><circle cx="60" cy="88" r="2.5" fill="#ff8a5c"/></g></svg>
-    <div><b>THE MIRROR CHECK</b><p>Turn slowly in front of a mirror. If you can see skin from any side, so can they.</p></div>
   </div>
 
   <footer><span>DRAWN BY: NOBODY · LICENSE: COPY IT, SHARE IT, MAKE IT</span><span>IF YOU ARE READING THIS, YOU ARE STILL READABLE.</span></footer>
@@ -319,7 +346,7 @@ addEventListener("resize", resize); resize();
 const FIELD = 0xa8e6ff, AMBER = 0xffc96b, ALERT = 0xff8a5c;
 const mat = (op, color = 0xffffff) => new THREE.LineBasicMaterial({ color, transparent: true, opacity: op, depthWrite: false });
 const dashed = (op, color, dash, gap) => new THREE.LineDashedMaterial({ color, transparent: true, opacity: op, dashSize: dash, gapSize: gap, depthWrite: false });
-const M = { body: mat(.78), bodySoft: mat(.22), hair: mat(.5), floor: mat(.12), scan: mat(.9, AMBER) };
+const M = { body: mat(.78), bodySoft: mat(.22), floor: mat(.12), scan: mat(.9, AMBER) };
 function ringPts(cx, y, cz, rx, rz, n = 40, jag = 0) {
   const p = [];
   for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, k = jag ? (i % 2 ? 1 : 1 - jag) : 1; p.push(V(cx + Math.cos(a) * rx * k, y, cz + Math.sin(a) * rz * k)); }
@@ -395,18 +422,6 @@ class Strands {
 }
 const strand = (a, pts) => ({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
 
-// long hair
-const hairList = [];
-for (let i = 0; i < 72; i++) {
-  const a = lerp(.92 * Math.PI, 2.08 * Math.PI, i / 71), yEnd = 1.3 + rnd() * .07, pts = [V(Math.cos(a) * .03, 1.722, Math.sin(a) * .03)];
-  for (let y = 1.70; y >= yEnd; y -= .035) {
-    const [hx, hz] = interp(torsoTab, Math.max(y, 1.55)), fl = Math.max(0, 1.62 - y) * .45 + .018;
-    const [tx, tz] = interp(torsoTab, y);
-    pts.push(V(Math.cos(a) * Math.max(hx + .012 + fl, tx + .03), y, Math.sin(a) * Math.max(hz + .012 + fl, tz + .03)));
-  }
-  hairList.push(strand(a, pts));
-}
-const hair = new Strands(model, M.hair, hairList);
 
 // ---------- gadgets ----------
 function piece(center) {
@@ -416,32 +431,42 @@ function piece(center) {
 }
 const GM = { foil: mat(.95), soft: mat(.45), led: new THREE.MeshBasicMaterial({ color: AMBER, transparent: true }) };
 const LEDG = new THREE.SphereGeometry(.009, 8, 6);
-function cutlery(parent, m, O, ang, L, tilt, kind) {
-  const r0 = .07, h = r0 + L * .6, g = new THREE.Group(); g.position.copy(O); g.rotation.set(tilt, 0, -ang); parent.add(g);
-  g.add(line([V(0, r0, 0), V(0, h, 0)], m));
-  if (kind === 0) g.add(loop(ringPts(0, 0, 0, .021, .036, 18).map(p => V(p.x, h + .036 + p.z, 0)), m));
-  if (kind === 1) { const t = [V(-.014, h, 0), V(.014, h, 0)]; for (let k = -.014; k <= .0141; k += .0093) t.push(V(k, h, 0), V(k, h + .05, 0)); g.add(segs(t, m)); }
-  if (kind === 2) g.add(loop([V(-.006, h, 0), V(-.011, h + .045, 0), V(-.004, h + .075, 0), V(.008, h + .06, 0), V(.008, h, 0)], m));
-  g.updateMatrix();
-  return V(0, r0 + L * .8, 0).applyMatrix4(g.matrix);
+// 01 helmet: a fitted shell with a brow peak, cheek guards and two swept-back horns; a field coil inside
+const head = piece(V(0, 1.7, 0)); model.add(head.outer);
+{
+  const H = head.inner;
+  const hr = y => { const [rx, rz] = interp(torsoTab, Math.min(y, 1.715)); return [rx + .016, rz + .016]; };
+  for (let y = 1.6; y <= 1.73; y += .018) { const [rx, rz] = hr(y); H.add(loop(ringPts(0, y, 0, rx, rz, 40), GM.foil)); }
+  for (let k = 0; k < 16; k++) {
+    const a = k / 16 * Math.PI * 2, pts = [];
+    for (let y = 1.6; y <= 1.735; y += .01) { const [rx, rz] = hr(y); pts.push(V(Math.cos(a) * rx, y, Math.sin(a) * rz)); }
+    pts.push(V(0, 1.742, 0)); H.add(line(pts, GM.soft));
+  }
+  const brow = [];
+  for (let a = .12 * Math.PI; a <= .881 * Math.PI; a += .025 * Math.PI) {
+    const [rx, rz] = hr(1.6), u = Math.abs(a - Math.PI / 2) / (.38 * Math.PI);
+    brow.push(V(Math.cos(a) * rx, 1.6 - .045 * Math.max(0, 1 - u * 2.6), Math.sin(a) * rz));
+  }
+  H.add(line(brow, GM.foil));
+  [-1, 1].forEach(s => {
+    H.add(loop([V(s * .1, 1.62, .0), V(s * .1, 1.535, .02), V(s * .085, 1.52, .065), V(s * .07, 1.585, .085)], GM.foil));
+    const C = new THREE.CubicBezierCurve3(V(s * .06, 1.72, .07), V(s * .13, 1.88, .17), V(s * .21, 2.08, .02), V(s * .15, 2.16, -.22));
+    const rails = [[], [], []], NS = 28;
+    for (let i = 0; i <= NS; i++) {
+      const u = i / NS, p = C.getPoint(u), tg = C.getTangent(u), r = lerp(.03, .003, Math.pow(u, .8));
+      const n1 = V(1, 0, 0).cross(tg).normalize(), n2 = tg.clone().cross(n1).normalize(), ring = [];
+      for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; ring.push(p.clone().addScaledVector(n1, Math.cos(a) * r).addScaledVector(n2, Math.sin(a) * r)); }
+      if (i % 2 === 0 && i < NS) H.add(loop(ring, GM.foil));
+      [0, 3, 7].forEach((k, j) => rails[j].push(ring[k]));
+    }
+    rails.forEach(r => H.add(line(r, GM.soft)));
+  });
+  const coil = [];
+  for (let u = 0; u <= 1; u += .004) { const a = lerp(1.2 * Math.PI, 1.8 * Math.PI, u), r = .104 + .008 * Math.cos(u * 70); coil.push(V(Math.cos(a) * r, 1.64 + .008 * Math.sin(u * 70), Math.sin(a) * r * 1.1)); }
+  H.add(line(coil, GM.soft));
+  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(0, 1.68, -.13); H.add(led);
 }
 
-// 01 headgear: foil band, a crown of cutlery, an emitter coil at the back
-const head = piece(V(0, 1.7, 0)); model.add(head.outer);
-const headTips = [];
-{
-  const H = head.inner, O = V(0, 1.68, 0);
-  H.add(loop(ringPts(0, 1.665, 0, .108, .12, 36, .3), GM.foil));
-  H.add(loop(ringPts(0, 1.69, 0, .1, .11, 36, .3), GM.soft));
-  for (let i = 0; i < 13; i++) {
-    const tip = cutlery(H, GM.foil, O, lerp(-1.45, 1.45, i / 12) + (rnd() - .5) * .12, .22 + rnd() * .08, -.1 + (rnd() - .5) * .16, (i * 7) % 3);
-    headTips.push({ p: tip, n: tip.clone().sub(O).normalize().add(V(0, 0, .5)).normalize() });
-  }
-  const coil = [];
-  for (let u = 0; u <= 1; u += .004) { const a = lerp(1.2 * Math.PI, 1.8 * Math.PI, u), r = .124 + .011 * Math.cos(u * 70); coil.push(V(Math.cos(a) * r, 1.678 + .011 * Math.sin(u * 70), Math.sin(a) * r * 1.1)); }
-  H.add(line(coil, GM.foil));
-  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(0, 1.7, -.14); H.add(led);
-}
 
 // 02 shrug: a short cape of foil, chains and spoons over the shoulders
 const shrugTab = [[1.2,.34],[1.3,.33],[1.38,.29],[1.43,.21],[1.46,.12]], SD = .8;
@@ -479,24 +504,22 @@ const braceLinks = [];
 const braceChains = new Strands(brace.inner, GM.soft, braceLinks);
 
 const GADGETS = [
-  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [1.4, 1.95, 3.55, 3.75], anchor: () => V(0, 1.7, 0) },
+  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [1.4, 1.95, 3.55, 3.75], anchor: () => V(0, 1.78, 0) },
   { p: shrug, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [3.6, 4.0, 5.55, 5.75], anchor: () => V(0, 1.34, 0) },
   { p: brace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.6, 6.0, 99, 100], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))) },
 ];
 const GMATS = [GM.foil, GM.soft]; GMATS.forEach(m => m.userData.base = m.opacity);
 
-// ---------- the field: a shell around the whole body ----------
-const shellTab = [[0,.27],[.25,.31],[.6,.37],[.95,.43],[1.3,.44],[1.55,.37],[1.75,.31],[1.9,.23],[2.0,.13],[2.05,.02]], FD = .78;
-const shellPt = (a, y, e = 0) => { const r = interp(shellTab, y)[0] + e; return V(Math.cos(a) * r, y, Math.sin(a) * r * FD); };
-const shell = new THREE.Group(); model.add(shell);
-const shellRings = [];
-for (let y = .03; y <= 2.03; y += .05) {
-  const r = interp(shellTab, y)[0], m = mat(0, FIELD);
-  const l = loop(ringPts(0, y, 0, r, r * FD, 72), m); shell.add(l); shellRings.push({ l, m, y });
-}
-const merMat = mat(0, FIELD), mer = [];
-for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; for (let y = .03; y < 2.0; y += .05) mer.push(shellPt(a, y), shellPt(a, y + .05)); }
-shell.add(segs(mer, merMat));
+// ---------- the field: a second skin that flows over the body from the gadget ----------
+const FM = [];
+const fieldRing = (parent, pts, c) => { const m = mat(0, FIELD); parent.add(loop(pts, m)); FM.push({ m, c }); };
+for (let y = 0.8; y <= 1.745; y += 0.03) { const [rx, rz] = interp(torsoTab, Math.min(y, 1.72)); fieldRing(model, ringPts(0, y, 0, rx + .028, rz + .028, 44), V(0, y, 0)); }
+legs.forEach((g, i) => { const s = i ? 1 : -1; for (let y = .03; y <= .84; y += .035) { const [rx, rz] = interp(legTab, y); fieldRing(g, ringPts(0, y - .84, y < .08 ? .035 : 0, rx + .022, rz + .022, 24), V(s * .085, y, 0)); } });
+arms.forEach((g, i) => { const s = i ? 1 : -1; for (let y = .7; y <= 1.4; y += .035) { const [rx, rz] = interp(armTab, y), dx = s * .055 * (1.4 - y) / .7; fieldRing(g, ringPts(dx, y - 1.4, 0, rx + .02, rz + .02, 16), V(s * .2 + dx, y, 0)); } });
+const skinPt = (a, y) => {
+  if (y >= .82) { const [rx, rz] = interp(torsoTab, y); return V(Math.cos(a) * (rx + .028), y, Math.sin(a) * (rz + .028)); }
+  const s = Math.cos(a) >= 0 ? 1 : -1, [rx, rz] = interp(legTab, y); return V(s * .085 + Math.cos(a) * (rx + .022), y, Math.sin(a) * (rz + .022));
+};
 
 // ---------- inside views: a cut through each gadget ----------
 const SECTS = [];
@@ -544,8 +567,8 @@ function section(X, Yc, layers, opt) {
 }
 const expo = (a0, z0, z1) => z => z > z1 ? a0 : 0;
 section(0, 1.72, [
-  { z: [0, .07], style: "skin" }, { z: [.07, .09], style: "empty" }, { z: [.09, .13], style: "coil" }, { z: [.13, .145], style: "hatch" }, { z: [.145, .2], style: "bowls" },
-], { emit: .11, amp: z => z > .2 ? .045 : z > .145 ? lerp(.012, .045, (z - .145) / .055) : z > .13 ? .004 : 0 });
+  { z: [0, .07], style: "skin" }, { z: [.07, .09], style: "dots" }, { z: [.09, .13], style: "coil" }, { z: [.13, .17], style: "hatch" },
+], { emit: .11, amp: z => z > .17 ? .045 : z > .13 ? lerp(.006, .045, (z - .13) / .04) : 0 });
 section(0, 1.3, [
   { z: [.04, .1], style: "skin" }, { z: [.1, .14], style: "empty" }, { z: [.14, .18], style: "dots" }, { z: [.18, .192], style: "hatch" }, { z: [.192, .26], style: "links" },
 ], { emit: .186, scatter: .23, amp: z => z > .26 ? .045 : z > .192 ? lerp(.025, .045, (z - .192) / .068) : z > .18 ? .015 : z > .14 ? .015 * Math.exp(-(.18 - z) / .009) : 0 });
@@ -611,8 +634,8 @@ function addRay(G, si, get, kind) {
 }
 const R = { read: rayGroup(), field: rayGroup() };
 [[0, V(0, 1.6, .1)], [1, V(.05, 1.25, .1)], [3, V(.085, .5, .055)], [1, V(-.255, .8, .02)], [2, V(0, 1.2, -.1)]].forEach(([si, p]) => addRay(R.read, si, () => ({ p, n: V(0, 0, 1) }), "return"));
-[[.4, 1.6], [1.2, 1.1], [2.0, .6], [2.8, 1.3], [3.6, .9], [4.4, 1.5], [5.2, .4], [1.6, 1.8], [.8, .3]].forEach(([a, y], i) =>
-  addRay(R.field, i % 4, () => ({ p: shellPt(a, y), n: V(Math.cos(a), .15, Math.sin(a) * FD).normalize() }), "reflect"));
+[[.4, 1.6], [1.2, 1.1], [2.0, .6], [2.8, 1.3], [3.6, .9], [4.4, 1.5], [5.2, .4], [1.6, 1.2], [.8, .3]].forEach(([a, y], i) =>
+  addRay(R.field, i % 4, () => ({ p: skinPt(a, y), n: V(Math.cos(a), .1, Math.sin(a)).normalize() }), "reflect"));
 function updateRays(G, w, t) {
   G.g.visible = w > .01; if (!G.g.visible) return;
   G.mIn.opacity = .85 * w; G.mOut.opacity = .8 * w; G.mDot.opacity = w;
@@ -667,7 +690,7 @@ const BEAM_PTS = [V(0, 1.62, .12), V(0, 1.2, .3), V(.2, 0.9, .3), V(-.2, 0.9, .3
 const RMATS = [RM, RS]; RMATS.forEach(m => m.userData.base = m.opacity);
 
 // ---------- scenes ----------
-// 0 hero · 1 read · 2 headgear · 3 inside · 4 shrug · 5 inside · 6 bracelet · 7 inside · 8 walk
+// 0 hero · 1 read · 2 helmet · 3 inside · 4 shrug · 5 inside · 6 bracelet · 7 inside · 8 camera's view · 9 walk
 const K = [
   { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35 },
   { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18 },
@@ -677,6 +700,7 @@ const K = [
   { pos: [0.8, 1.3, 0.38], tgt: [0, 1.3, 0.38], spin: 0, lock: 0 },
   { pos: [1.6, 1.1, 3.0], tgt: [-0.2, 0.95, 0], spin: .25 },
   { pos: [1.16, 0.8, 0.28], tgt: [0.36, 0.8, 0.28], spin: 0, lock: 0 },
+  { pos: [2.3, 2.05, 1.45], tgt: [0, 0.92, 0], spin: 0, lock: 1.01 },
   { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, lock: Math.PI / 2 },
 ];
 const N = K.length - 1;
@@ -685,11 +709,11 @@ const labelsEl = document.getElementById("labels");
 const L1 = (z, y, html, sc, cls = "mini") => ({ at: () => V(SECTS[sc].X, y, z), html, sc: [[3, 5, 7][sc]], cls });
 const LABELS = [
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
-  { at: () => V(.22, 1.98, 0), html: "HEADGEAR<small>SPOONS · FOIL · A COIL</small>", sc: [2], gate: () => GADGETS[0].vis > .9 },
+  { at: () => V(.2, 2.1, -.1), html: "HELMET<small>METAL SHELL · FIELD COIL · PADDING</small>", sc: [2], gate: () => GADGETS[0].vis > .9 },
   { at: () => V(.3, 1.4, 0), html: "SHRUG<small>CHAINS · BLANKET · BLACK BAG</small>", sc: [4], gate: () => GADGETS[1].vis > .9 },
   { at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET<small>FOIL CUFF · LINKS · A COIL</small>", sc: [6], gate: () => GADGETS[2].vis > .9 },
-  { at: () => shellPt(Math.PI * 1.1, 1.0), html: "FIELD<small>AROUND THE WHOLE BODY</small>", sc: [2, 4, 6], left: true, cls: "field", gate: () => fieldGrow > .7 },
-  L1(.035, 1.865, "HEAD", 0), L1(.08, 1.885, "FELT", 0), L1(.11, 1.865, "COIL", 0), L1(.138, 1.885, "FOIL", 0), L1(.172, 1.865, "SPOONS", 0),
+  { at: () => skinPt(Math.PI, 1.05), html: "FIELD<small>FLOWS OVER THE WHOLE BODY</small>", sc: [2, 4, 6], left: true, cls: "field", gate: () => fieldGrow > .7 },
+  L1(.035, 1.865, "HEAD", 0), L1(.08, 1.885, "PADDING", 0), L1(.11, 1.865, "COIL", 0), L1(.15, 1.885, "METAL SHELL", 0),
   L1(.46, 1.79, "SIGNAL IN →", 0, "mini amber"), L1(.42, 1.62, "← BOUNCED", 0, "mini amber"), L1(.36, 1.88, "FIELD OUT", 0, "mini field"), L1(.035, 1.905, "0 REACHES HEAD", 0, "mini field"),
   L1(.07, 1.445, "SKIN", 1), L1(.12, 1.465, "GAP", 1), L1(.16, 1.445, "BLACK BAG", 1), L1(.186, 1.465, "BLANKET", 1), L1(.226, 1.445, "CHAINS", 1),
   L1(.52, 1.37, "SIGNAL IN →", 1, "mini amber"), L1(.47, 1.2, "← BOUNCED", 1, "mini amber"), L1(.3, 1.4, "SCATTERED", 1, "mini amber"), L1(.07, 1.485, "0 REACHES SKIN", 1, "mini field"),
@@ -740,6 +764,38 @@ function drawFeed(prot, t) {
   c.fillStyle = prot > .5 ? "#fff" : "#ff8a5c";
   c.fillText(prot > .5 ? "UNKNOWN · NO FACE · NO POSE" : "PERSON · 96%", W * .04, Hh * .94);
 }
+const povEl = document.getElementById("pov"), povfx = document.getElementById("povfx"), px = povfx.getContext("2d");
+const povBox = document.getElementById("povbox"), povLab = document.getElementById("povlab"), povStat = document.getElementById("povstat"), povTime = document.getElementById("povtime");
+function sizePov() { povfx.width = innerWidth; povfx.height = innerHeight; }
+addEventListener("resize", sizePov); sizePov();
+const POV_PTS = [V(0, 1.8, 0), V(-.12, 0, 0), V(.12, 0, 0), V(-.27, 1.4, 0), V(.27, 1.4, 0), V(-.3, .75, 0), V(.3, .75, 0)];
+function drawPov(t, sRaw) {
+  const c = px, W = povfx.width, Hh = povfx.height;
+  c.clearRect(0, 0, W, Hh);
+  c.fillStyle = "rgba(4,8,24,.55)"; c.fillRect(0, 0, W, Hh);
+  c.fillStyle = "rgba(255,255,255,.035)"; for (let y = 0; y < Hh; y += 3) c.fillRect(0, y, W, 1);
+  const g = c.createRadialGradient(W / 2, Hh / 2, Hh * .3, W / 2, Hh / 2, Hh * .9); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,.55)"); c.fillStyle = g; c.fillRect(0, 0, W, Hh);
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  POV_PTS.forEach(p => { const [x, y] = proj(p.clone().applyMatrix4(model.matrixWorld)); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); });
+  const bw = x1 - x0, bh = y1 - y0, cx = (x0 + x1) / 2;
+  for (let i = 0; i < 70; i++) {
+    const v = i / 70, y = y0 + v * bh + (rnd() - .5) * bh * .06, wid = bw * (v < .12 ? .18 : v < .2 ? .3 : v < .55 ? .45 : .3) * (.7 + rnd() * .6);
+    c.fillStyle = `rgba(2,4,14,${.12 + rnd() * .14})`; c.beginPath(); c.ellipse(cx + (rnd() - .5) * bw * .3, y, wid, bh * (.04 + rnd() * .05), 0, 0, Math.PI * 2); c.fill();
+  }
+  for (let i = 0; i < 700; i++) {
+    const u = (rnd() + rnd() + rnd()) / 3 - .5, x = cx + u * bw * 1.6, y = y0 + rnd() * bh, s = 1 + rnd() * 4;
+    c.fillStyle = rnd() > .85 ? `rgba(255,255,255,${rnd() * .35})` : `rgba(0,0,0,${.3 + rnd() * .5})`; c.fillRect(x, y, s, s);
+  }
+  for (let i = 0; i < 9; i++) { const y = y0 + rnd() * bh; c.fillStyle = rnd() > .5 ? "rgba(0,0,0,.45)" : "rgba(168,230,255,.12)"; c.fillRect(cx - bw * .9 + (rnd() - .5) * 40, y, bw * 1.8, 2 + rnd() * 7); }
+  const done = sRaw > 8.02;
+  const wx = cx + Math.sin(t * 1.7) * bw * .35 + (done ? 0 : Math.sin(t * 7.3) * 10), wy = y0 + bh * (.35 + .25 * Math.sin(t * 1.1));
+  const s = done ? 1.25 : .5 + .35 * Math.abs(Math.sin(t * 2.3));
+  povBox.style.left = (done ? x0 - bw * .2 : wx - bw * s / 2) + "px"; povBox.style.top = (done ? y0 - 10 : wy - bh * s / 4) + "px";
+  povBox.style.width = (done ? bw * 1.4 : bw * s) + "px"; povBox.style.height = (done ? bh + 20 : bh * s / 2) + "px";
+  povLab.textContent = done ? "NO MATCH" : `PERSON? ${Math.round(6 + rnd() * 14)}%`;
+  povStat.textContent = done ? "NO PERSON DETECTED" : "SCANNING…"; povStat.style.color = done ? "#ff8a5c" : "#fff";
+  const sec = 22 + Math.floor(t) % 38; povTime.textContent = `30.10.2062 · 08:14:${String(sec).padStart(2, "0")}`;
+}
 const matchv = document.getElementById("matchv"), matchb = document.getElementById("matchb"), statusEl = document.getElementById("status");
 let matchShown = 0;
 const caps = [...document.querySelectorAll(".cap")];
@@ -766,7 +822,7 @@ function tick(now) {
   const sEff = idx + b;
   const w = K.map((_, k) => clamp(1 - Math.abs(sEff - k), 0, 1));
   const zoomW = w[3] + w[5] + w[7];
-  const rT = clamp((sRaw - 7.7) / 1.5, 0, 1);
+  const rT = clamp((sRaw - 8.7) / 1.5, 0, 1), pov = w[8];
   const pastEnd = sRaw > N + 1.75;
 
   // camera
@@ -783,7 +839,7 @@ function tick(now) {
   model.rotation.y = rotY + userRot * (1 - zoomW);
 
   // walking + breathing
-  const walk = w[8] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
+  const walk = w[9] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
   legs[0].rotation.x = Math.sin(ph) * .42 * walk; legs[1].rotation.x = -Math.sin(ph) * .42 * walk;
   arms[0].rotation.x = -Math.sin(ph) * .25 * walk; arms[1].rotation.x = Math.sin(ph) * .25 * walk;
   model.position.y = Math.abs(Math.sin(ph)) * .018 * walk;
@@ -792,38 +848,36 @@ function tick(now) {
   breathRings.forEach(r => { r.scale.z = 1 + br; r.scale.x = 1 + br * .3; });
 
   // gadgets fly on and off; the field grows out of whichever one is worn
-  let grow = 0, ay = 1, aw = 0;
+  let grow = 0, aw = 0; const anc = V(0, 0, 0);
   GADGETS.forEach(G => {
     const [a0, a1, b0, b1] = G.on, on = sm(a0, a1, s) * (1 - sm(b0, b1, s)), e = 1 - on;
     G.p.outer.position.copy(G.p.center).addScaledVector(G.off, e * e);
     G.p.outer.rotation.set(G.rot.x * e, G.rot.y * e, G.rot.z * e);
     G.p.outer.visible = on > .01;
     G.vis = on;
-    if (on > .01) { const fo = sm(.55, 1, on); grow = Math.max(grow, fo); ay = lerp(ay, G.anchor().y, on / (aw + on)); aw += on; }
+    if (on > .01) { grow = Math.max(grow, sm(.55, 1, on)); anc.addScaledVector(G.anchor(), on); aw += on; }
   });
-  const fadeZ = 1 - .85 * zoomW;
+  const fadeZ = (1 - .85 * zoomW) * (1 - .92 * pov);
   GMATS.forEach(m => m.opacity = m.userData.base * fadeZ);
   GM.led.opacity = (.5 + .5 * Math.sin(t * 8)) * fadeZ;
-  M.body.opacity = .78 * fadeZ; M.bodySoft.opacity = .22 * fadeZ; M.hair.opacity = .5 * fadeZ;
-  hair.update(t * .8, .006 + .02 * walk);
+  M.body.opacity = .78 * fadeZ; M.bodySoft.opacity = .22 * fadeZ;
   chainLines.update(t * 1.4, .008 + .02 * walk); braceChains.update(t * 1.6, .01 + .03 * walk);
 
   fieldGrow = grow;
-  const fieldVis = grow * (1 - .9 * zoomW);
-  shellRings.forEach(R2 => {
-    const d = Math.abs(R2.y - ay), rev = clamp((grow * 2.3 - d) / .25, 0, 1);
-    R2.m.opacity = rev * (.28 + .22 * Math.sin(t * 3 - R2.y * 7)) * (1 - .9 * zoomW);
-    R2.l.scale.setScalar(.92 + .08 * rev + Math.sin(t * 2 + R2.y * 3) * .006);
+  if (aw > 0) anc.multiplyScalar(1 / aw);
+  const fv = (1 - .9 * zoomW) * (1 - .9 * pov), edge = grow * 2.1;
+  FM.forEach(F => {
+    const d = F.c.distanceTo(anc), rev = clamp((edge - d) / .12, 0, 1), front = grow < .98 ? Math.max(0, 1 - Math.abs(d - edge) / .07) : 0;
+    F.m.opacity = (rev * (.3 + .2 * Math.sin(t * 4 - d * 12)) + front * .7) * fv;
   });
-  merMat.opacity = fieldVis * fieldVis * .16;
 
   SECTS.forEach((S, i) => S.update(t, w[[3, 5, 7][i]]));
 
   scan.visible = w[0] > .01; M.scan.opacity = .9 * w[0];
   scan.position.y = .9 + .82 * Math.sin(t * .9);
 
-  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[6] + w[8] * .8) * grow };
-  const sW = clamp(rayW.read + rayW.field + w[1], 0, 1) * (1 - zoomW);
+  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[6] + w[9] * .8) * grow };
+  const sW = clamp(rayW.read + rayW.field + w[1], 0, 1) * (1 - zoomW) * (1 - pov);
   sensorG.visible = sW > .01; sensorMat.opacity = .95 * sW; sensorSoft.opacity = .45 * sW; ledMat.opacity = sW * (.5 + .5 * Math.sin(t * 6));
   waves.forEach(wv => { const u = (t * .7 + wv.userData.k / 3) % 1; wv.scale.setScalar(.03 + u * .16); wv.position.z = .05 + u * .35; wv.material.opacity = (1 - u) * .7 * sW; });
   model.updateMatrixWorld();
@@ -862,13 +916,15 @@ function tick(now) {
 
   // captions
   const ci = Math.min(N, Math.floor(s + .25));
-  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 08`; }
+  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 09`; }
   capWrap.style.opacity = pastEnd ? 0 : 1; hdr.style.opacity = sRaw > N + 2.1 ? 0 : 1;
   dragHint.style.opacity = pastEnd ? 0 : .9;
 
   // radar readout + camera feed
   const panelOp = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  hud.style.opacity = panelOp; camPanel.style.opacity = panelOp;
+  hud.style.opacity = panelOp * (1 - pov); camPanel.style.opacity = panelOp * (1 - pov);
+  povEl.style.opacity = pov > .05 && !pastEnd ? Math.min(1, pov * 1.5) : 0;
+  if (pov > .05) drawPov(t, sRaw);
   const clar = clamp(1 - grow * .97, 0, 1);
   if (frame % 2 === 0) {
     traces.forEach((tr, i) => {
