@@ -510,12 +510,64 @@ const GADGETS = [
 ];
 const GMATS = [GM.foil, GM.soft]; GMATS.forEach(m => m.userData.base = m.opacity);
 
-// ---------- the field: a second skin that flows over the body from the gadget ----------
-const FM = [];
-const fieldRing = (parent, pts, c) => { const m = mat(0, FIELD); parent.add(loop(pts, m)); FM.push({ m, c }); };
-for (let y = 0.8; y <= 1.745; y += 0.03) { const [rx, rz] = interp(torsoTab, Math.min(y, 1.72)); fieldRing(model, ringPts(0, y, 0, rx + .028, rz + .028, 44), V(0, y, 0)); }
-legs.forEach((g, i) => { const s = i ? 1 : -1; for (let y = .03; y <= .84; y += .035) { const [rx, rz] = interp(legTab, y); fieldRing(g, ringPts(0, y - .84, y < .08 ? .035 : 0, rx + .022, rz + .022, 24), V(s * .085, y, 0)); } });
-arms.forEach((g, i) => { const s = i ? 1 : -1; for (let y = .7; y <= 1.4; y += .035) { const [rx, rz] = interp(armTab, y), dx = s * .055 * (1.4 - y) / .7; fieldRing(g, ringPts(dx, y - 1.4, 0, rx + .02, rz + .02, 16), V(s * .2 + dx, y, 0)); } });
+// ---------- the shield: a glowing hex skin that closes over the body from the gadget ----------
+const SHIELD = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+  uniforms: { uAnchor: { value: V(0, 1.78, 0) }, uEdge: { value: 0 }, uFront: { value: 0 }, uFade: { value: 1 }, uTime: { value: 0 },
+    uHits: { value: Array.from({ length: 9 }, () => V(0, -9, 0)) }, uAge: { value: new Array(9).fill(1) }, uColor: { value: new THREE.Color(FIELD) } },
+  vertexShader: `
+    attribute vec3 rest; varying vec3 vRest; varying vec2 vUv; varying float vRim;
+    void main() {
+      vRest = rest; vUv = uv;
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vec3 n = normalize(normalMatrix * normal);
+      vRim = 1.0 - abs(dot(n, normalize(-mv.xyz)));
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: `
+    uniform vec3 uAnchor, uColor; uniform float uEdge, uFront, uFade, uTime; uniform vec3 uHits[9]; uniform float uAge[9];
+    varying vec3 vRest; varying vec2 vUv; varying float vRim;
+    float hexLine(vec2 p) {
+      vec2 r = vec2(1.0, 1.732), h = r * 0.5;
+      vec2 a = mod(p, r) - h, b = mod(p - h, r) - h;
+      vec2 g = dot(a, a) < dot(b, b) ? a : b; g = abs(g);
+      float d = max(dot(g, normalize(r)), g.x);
+      return smoothstep(0.42, 0.5, d);
+    }
+    void main() {
+      float d = distance(vRest, uAnchor);
+      float mask = smoothstep(uEdge, uEdge - 0.08, d);
+      float front = uFront * exp(-pow((d - uEdge) / 0.035, 2.0));
+      float hx = hexLine(vUv * 34.0);
+      float pulse = exp(-pow((d - mod(uTime * 0.7, 2.6)) / 0.05, 2.0));
+      float rip = 0.0;
+      for (int i = 0; i < 9; i++) { float r = distance(vRest, uHits[i]); float a = uAge[i]; rip += exp(-pow((r - a * 0.22) / 0.014, 2.0)) * (1.0 - a) + exp(-r * r / 0.0016) * (1.0 - a) * 0.6; }
+      float alpha = (0.05 + hx * 0.32 + pow(vRim, 2.0) * 0.45 + pulse * 0.25 + rip * 0.9) * mask + front * 0.9;
+      gl_FragColor = vec4(uColor, alpha * uFade);
+    }`,
+});
+function shieldPart(parent, rows, off, seg) {
+  const pos = [], rest = [], uv = [], idx = [];
+  rows.forEach(({ y, cx, cz, rx, rz }) => {
+    for (let k = 0; k <= seg; k++) {
+      const a = k / seg * Math.PI * 2, x = cx + Math.cos(a) * rx, z = cz + Math.sin(a) * rz;
+      pos.push(x, y, z); rest.push(x + off.x, y + off.y, z + off.z); uv.push(a * (rx + rz) / 2, y + off.y);
+    }
+  });
+  for (let r = 0; r < rows.length - 1; r++) for (let k = 0; k < seg; k++) {
+    const i = r * (seg + 1) + k, j = i + seg + 1; idx.push(i, j, i + 1, i + 1, j, j + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("rest", new THREE.Float32BufferAttribute(rest, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, SHIELD); m.renderOrder = 2; parent.add(m);
+}
+{
+  const rows = []; for (let y = 0.8; y <= 1.751; y += .02) { const [rx, rz] = interp(torsoTab, Math.min(y, 1.72)); const k = y > 1.72 ? Math.max(.05, (1.752 - y) / .032) : 1; rows.push({ y, cx: 0, cz: 0, rx: (rx + .03) * k, rz: (rz + .03) * k }); }
+  shieldPart(model, rows, V(0, 0, 0), 48);
+  legs.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .02; y <= .86; y += .025) { const [rx, rz] = interp(legTab, Math.min(y, .84)); r.push({ y: y - .84, cx: 0, cz: y < .08 ? .035 : 0, rx: rx + .024, rz: rz + .024 }); } shieldPart(g, r, V(s * .085, .84, 0), 28); });
+  arms.forEach((g, i) => { const s = i ? 1 : -1, r = []; for (let y = .68; y <= 1.4; y += .025) { const [rx, rz] = interp(armTab, y); r.push({ y: y - 1.4, cx: s * .055 * (1.4 - y) / .7, cz: 0, rx: rx + .02, rz: rz + .02 }); } shieldPart(g, r, V(s * .2, 1.4, 0), 18); });
+}
 const skinPt = (a, y) => {
   if (y >= .82) { const [rx, rz] = interp(torsoTab, y); return V(Math.cos(a) * (rx + .028), y, Math.sin(a) * (rz + .028)); }
   const s = Math.cos(a) >= 0 ? 1 : -1, [rx, rz] = interp(legTab, y); return V(s * .085 + Math.cos(a) * (rx + .022), y, Math.sin(a) * (rz + .022));
@@ -614,7 +666,7 @@ function buildSensor(type) {
   return g;
 }
 ["dome", "box", "radar", "small"].forEach((type, i) => {
-  const g = buildSensor(type); g.position.copy(SENS[i]); g.scale.setScalar(1.35); g.lookAt(LOOK); sensorG.add(g);
+  const g = buildSensor(type); g.position.copy(SENS[i]); g.scale.setScalar(i === 1 ? 2.6 : 1.35); g.lookAt(LOOK); sensorG.add(g);
   const p = SENS[i];
   sensorG.add(line(i === 0 ? [V(p.x, p.y, p.z), V(p.x, 3.2, p.z)] : [V(p.x, p.y - .06, p.z), V(p.x, 0, p.z)], sensorSoft));
 });
@@ -646,6 +698,7 @@ function updateRays(G, w, t) {
     const end = r.kind === "return" ? r.s.clone().lerp(hit, .02) : hit.clone().addScaledVector(d.clone().sub(n.clone().multiplyScalar(2 * d.dot(n))), .9);
     const po = r.outL.geometry.attributes.position; po.setXYZ(0, hit.x, hit.y, hit.z); po.setXYZ(1, end.x, end.y, end.z); po.needsUpdate = true; r.outL.computeLineDistances();
     const u = (t * .55 + r.phase) % 1;
+    if (G === R.field) { const k = G.rays.indexOf(r); SHIELD.uniforms.uHits.value[k].copy(L.p); SHIELD.uniforms.uAge.value[k] = u < .5 || w < .3 ? 1 : (u - .5) * 2; }
     if (u < .5) { r.dot.position.copy(r.s).lerp(hit, u / .5); r.dot.scale.setScalar(1); }
     else { r.dot.position.copy(hit).lerp(end, (u - .5) / .5); r.dot.scale.setScalar(r.kind === "return" ? 1.2 : .7); }
   }
@@ -690,6 +743,8 @@ const BEAM_PTS = [V(0, 1.62, .12), V(0, 1.2, .3), V(.2, 0.9, .3), V(-.2, 0.9, .3
 const RMATS = [RM, RS]; RMATS.forEach(m => m.userData.base = m.opacity);
 
 // ---------- scenes ----------
+const CAM_DIR = LOOK.clone().sub(SENS[1]).normalize();
+const CAM_BEHIND = SENS[1].clone().addScaledVector(CAM_DIR, -1.05).add(V(0, .22, 0)), CAM_THROUGH = SENS[1].clone().addScaledVector(CAM_DIR, .5);
 // 0 hero · 1 read · 2 helmet · 3 inside · 4 shrug · 5 inside · 6 bracelet · 7 inside · 8 camera's view · 9 walk
 const K = [
   { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35 },
@@ -700,7 +755,7 @@ const K = [
   { pos: [0.8, 1.3, 0.38], tgt: [0, 1.3, 0.38], spin: 0, lock: 0 },
   { pos: [1.6, 1.1, 3.0], tgt: [-0.2, 0.95, 0], spin: .25 },
   { pos: [1.16, 0.8, 0.28], tgt: [0.36, 0.8, 0.28], spin: 0, lock: 0 },
-  { pos: [2.3, 2.05, 1.45], tgt: [0, 0.92, 0], spin: 0, lock: 1.01 },
+  { pos: CAM_BEHIND.toArray(), tgt: SENS[1].clone().addScaledVector(CAM_DIR, .7).toArray(), spin: 0, lock: 1.01 },
   { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, lock: Math.PI / 2 },
 ];
 const N = K.length - 1;
@@ -822,15 +877,19 @@ function tick(now) {
   const sEff = idx + b;
   const w = K.map((_, k) => clamp(1 - Math.abs(sEff - k), 0, 1));
   const zoomW = w[3] + w[5] + w[7];
-  const rT = clamp((sRaw - 8.7) / 1.5, 0, 1), pov = w[8];
+  const rT = clamp((sRaw - 8.7) / 1.5, 0, 1), pov = sm(8.14, 8.32, sRaw) * (1 - sm(8.62, 8.82, sRaw));
   const pastEnd = sRaw > N + 1.75;
 
   // camera
   const k0 = K[idx], k1 = K[Math.min(N, idx + 1)];
   const tp = V(...k0.pos).lerp(V(...k1.pos), b), tt = V(...k0.tgt).lerp(V(...k1.tgt), b);
+  const push = sm(8.0, 8.32, sRaw) * (1 - sm(8.5, 8.6, sRaw));
+  if (push > 0) { tp.lerp(CAM_THROUGH, push); tt.lerp(V(0, .95, 0), push); }
   if (innerWidth < 760) { tt.x *= .2; tp.multiplyScalar(1.1); }
   camPos.lerp(tp, ease); camTgt.lerp(tt, ease);
+  if (push > .3) camPos.lerp(tp, ease * 1.6);
   camera.position.copy(camPos); camera.lookAt(camTgt);
+  const fov = lerp(38, 58, pov); if (Math.abs(camera.fov - fov) > .01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 
   // figure rotation: spins while showing, holds still for the inside views and the walk
   rotY += lerp(k0.spin, k1.spin, b) * dt;
@@ -865,11 +924,9 @@ function tick(now) {
 
   fieldGrow = grow;
   if (aw > 0) anc.multiplyScalar(1 / aw);
-  const fv = (1 - .9 * zoomW) * (1 - .9 * pov), edge = grow * 2.1;
-  FM.forEach(F => {
-    const d = F.c.distanceTo(anc), rev = clamp((edge - d) / .12, 0, 1), front = grow < .98 ? Math.max(0, 1 - Math.abs(d - edge) / .07) : 0;
-    F.m.opacity = (rev * (.3 + .2 * Math.sin(t * 4 - d * 12)) + front * .7) * fv;
-  });
+  const SU = SHIELD.uniforms;
+  SU.uAnchor.value.copy(anc); SU.uEdge.value = grow * 2.15; SU.uFront.value = grow > .01 && grow < .98 ? 1 : 0;
+  SU.uFade.value = (1 - .9 * zoomW) * (1 - .95 * pov); SU.uTime.value = t;
 
   SECTS.forEach((S, i) => S.update(t, w[[3, 5, 7][i]]));
 
@@ -877,7 +934,7 @@ function tick(now) {
   scan.position.y = .9 + .82 * Math.sin(t * .9);
 
   const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[6] + w[9] * .8) * grow };
-  const sW = clamp(rayW.read + rayW.field + w[1], 0, 1) * (1 - zoomW) * (1 - pov);
+  const sW = clamp(w[1] + w[8], 0, 1) * (1 - zoomW) * (1 - pov);
   sensorG.visible = sW > .01; sensorMat.opacity = .95 * sW; sensorSoft.opacity = .45 * sW; ledMat.opacity = sW * (.5 + .5 * Math.sin(t * 6));
   waves.forEach(wv => { const u = (t * .7 + wv.userData.k / 3) % 1; wv.scale.setScalar(.03 + u * .16); wv.position.z = .05 + u * .35; wv.material.opacity = (1 - u) * .7 * sW; });
   model.updateMatrixWorld();
@@ -922,7 +979,7 @@ function tick(now) {
 
   // radar readout + camera feed
   const panelOp = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  hud.style.opacity = panelOp * (1 - pov); camPanel.style.opacity = panelOp * (1 - pov);
+  hud.style.opacity = panelOp * (1 - w[8]); camPanel.style.opacity = panelOp * (1 - w[8]);
   povEl.style.opacity = pov > .05 && !pastEnd ? Math.min(1, pov * 1.5) : 0;
   if (pov > .05) drawPov(t, sRaw);
   const clar = clamp(1 - grow * .97, 0, 1);
