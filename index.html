@@ -133,12 +133,12 @@
   .bsl em { font-style: normal; color: var(--field); }
   .bslot.off .bsl em { color: var(--soft); }
   .bchips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
-  #build .bchip { border: 1px solid var(--faint); padding: 5px 3px 4px; text-align: center; font-size: 8.5px; letter-spacing: .6px; color: var(--soft); line-height: 1.2; transition: border-color .2s, background .2s, color .2s; }
+  :is(#build, #check) .bchip { border: 1px solid var(--faint); padding: 5px 3px 4px; text-align: center; font-size: 8.5px; letter-spacing: .6px; color: var(--soft); line-height: 1.2; transition: border-color .2s, background .2s, color .2s; }
   .bchip svg { display: block; margin: 0 auto 3px; width: 40px; height: 24px; fill: none; stroke: rgba(255,255,255,.75); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
-  #build .bchip:hover { border-color: rgba(255,255,255,.5); color: #fff; }
-  #build .bchip.on { border-color: var(--ray); color: #fff; background: rgba(255,201,107,.08); }
+  :is(#build, #check) .bchip:hover { border-color: rgba(255,255,255,.5); color: #fff; }
+  :is(#build, #check) .bchip.on { border-color: var(--ray); color: #fff; background: rgba(255,201,107,.08); }
   .bchip.on svg { stroke: var(--ray); }
-  #build .bchip:disabled { opacity: .3; cursor: default; }
+  :is(#build, #check) .bchip:disabled { opacity: .3; cursor: default; }
   .bmeter { padding-top: 12px; border-top: 1px solid var(--faint); }
   #bslots { margin-bottom: 16px; }
   .bbar { display: grid; grid-template-columns: 72px 1fr 30px; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 1.6px; color: var(--soft); margin: 5px 0; }
@@ -158,6 +158,56 @@
   .bhint { font-size: 9px; letter-spacing: 1.6px; color: var(--soft); text-align: center; margin-top: 9px; }
 
   main { position: relative; z-index: 2; pointer-events: none; }
+
+  #check { position: relative; z-index: 6; background: var(--bp); border-top: 1px solid var(--faint); padding: 90px 56px 40px;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 20px 20px; }
+  #check h2 { font-size: 40px; margin: 12px 0 10px; letter-spacing: 1px; }
+  #check .lead { color: var(--soft); max-width: 600px; line-height: 1.6; font-size: 14px; margin: 0; }
+  #check button { all: unset; box-sizing: border-box; cursor: pointer; font-family: inherit; }
+  #check button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .cwrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; margin-top: 28px; align-items: start; max-width: 1240px; }
+  .cstage { position: relative; aspect-ratio: 4 / 3; background: #0b1636; border: 1px solid rgba(255,255,255,.3); overflow: hidden; }
+  .cmir { position: absolute; inset: 0; transform: scaleX(-1); }
+  .cmir video, .cmir canvas, #cfx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .cmir video { object-fit: cover; filter: grayscale(.75) contrast(1.1) brightness(.9); }
+  .ctint { position: absolute; inset: 0; background: rgba(34,64,143,.5); mix-blend-mode: multiply; }
+  .cstage[data-mode="sample"] .ctint, .cstage[data-mode="off"] .ctint { background: transparent; }
+  #cfx { pointer-events: none; }
+  .ck { position: absolute; width: 30px; height: 30px; border: 0 solid rgba(255,255,255,.7); pointer-events: none; }
+  .ck.k1 { top: 12px; left: 12px; border-width: 2px 0 0 2px; } .ck.k2 { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+  .ck.k3 { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; } .ck.k4 { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+  .ckt { position: absolute; font-size: 10px; letter-spacing: 1.8px; font-weight: 700; pointer-events: none; }
+  .ckt.tl { top: 22px; left: 26px; } .ckt.tr { top: 22px; right: 26px; color: var(--soft); } .ckt.br { bottom: 22px; right: 26px; }
+  .ckt.br.rec { color: var(--alert); }
+  .cbig { position: absolute; left: 26px; bottom: 40px; font-size: 18px; font-weight: 700; letter-spacing: 2px; pointer-events: none; }
+  .cbig.bad { color: var(--alert); } .cbig.mid { color: #fff; } .cbig.ok { color: var(--ray); }
+  .cstart { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; padding: 20px;
+    background: radial-gradient(ellipse at center, rgba(34,64,143,.35), rgba(11,22,54,.95)); }
+  .cstart[hidden] { display: none; }
+  .csil { width: 130px; height: auto; fill: none; stroke: rgba(255,255,255,.6); stroke-width: 1.4; }
+  .csil .scanbox { stroke: var(--alert); stroke-dasharray: 5 4; animation: blink 1.4s steps(2) infinite; }
+  #check #cgo { border: 1px solid var(--ray); color: var(--ray); padding: 12px 20px; font-size: 12px; letter-spacing: 2.4px; font-weight: 700; box-shadow: 0 0 0 6px rgba(255,201,107,.08); }
+  #check #cgo:hover { background: rgba(255,201,107,.12); }
+  #check #csample { color: var(--soft); font-size: 11px; letter-spacing: 1.4px; text-decoration: underline; text-underline-offset: 3px; }
+  #check #csample:hover { color: #fff; }
+  .cmsg { margin: 0; min-height: 16px; font-size: 12px; color: #fff; }
+  .cpriv { margin: 0; font-size: 10px; letter-spacing: 1.6px; color: var(--field); }
+  .cside { border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 14px 16px; }
+  .ctitle { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 2px; color: var(--soft); padding-bottom: 6px; border-bottom: 1px solid var(--faint); }
+  .ctitle span { color: var(--field); }
+  .lrow { display: flex; justify-content: space-between; gap: 10px; font-size: 10px; letter-spacing: 1.4px; color: var(--soft); padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .lrow b { color: #fff; text-align: right; white-space: nowrap; }
+  .lrow b.bad { color: var(--alert); } .lrow b.ok { color: var(--ray); }
+  #check #ctest { display: block; width: 100%; text-align: center; margin-top: 14px; border: 1px solid var(--ray); color: var(--ray); padding: 11px 0; font-size: 11px; letter-spacing: 2.2px; font-weight: 700; }
+  #check #ctest:hover:not(:disabled) { background: rgba(255,201,107,.12); }
+  #check #ctest:disabled { opacity: .35; cursor: default; }
+  #check #coff { display: block; width: 100%; text-align: center; margin-top: 8px; border: 1px solid var(--faint); color: var(--soft); padding: 9px 0; font-size: 10px; letter-spacing: 2px; }
+  #check #coff[hidden] { display: none; }
+  #check #coff:hover { color: #fff; }
+  #tryp { margin-top: 4px; }
+  .tgroup { margin-top: 16px; font-size: 10px; letter-spacing: 2.4px; color: var(--ray); font-weight: 700; }
+  #tread b { color: var(--ray); } #tread b.mid { color: #fff; } #tread b.bad { color: var(--alert); }
+  .cnote { margin: 12px 0 0; font-size: 10px; line-height: 1.6; color: var(--soft); letter-spacing: .6px; }
   .spacer { height: 100vh; }
 
   #manual { position: relative; z-index: 6; background: var(--bp); border-top: 1px solid var(--faint); padding: 90px 56px 60px;
@@ -271,6 +321,8 @@
     #manual { padding: 70px 16px 40px; }
     .kit { grid-template-columns: 1fr; }
     .map { position: relative; top: 0; max-width: 300px; }
+    #check { padding: 70px 16px 30px; }
+    .cwrap { grid-template-columns: 1fr; }
     .msh p { margin: 0; text-align: left; }
     .dd { grid-template-columns: 1fr; }
     #pov { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .35s; }
@@ -389,6 +441,38 @@
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
 </main>
+
+<section id="check" aria-labelledby="checkh">
+  <div class="eyebrow">CHECK YOURSELF</div>
+  <h2 id="checkh">Check yourself.</h2>
+  <p class="lead">This is what the street records right now. Turn on your camera to see what it takes from you, then try the gadgets on.</p>
+  <div class="cwrap">
+    <div class="cstage" id="cstage" data-mode="off">
+      <div class="cmir"><video id="cvid" playsinline muted></video><div class="ctint"></div><canvas id="cgl"></canvas></div>
+      <canvas id="cfx"></canvas>
+      <div class="ck k1"></div><div class="ck k2"></div><div class="ck k3"></div><div class="ck k4"></div>
+      <div class="ckt tl">CAM 01 · STREET · <span class="rec">REC</span></div>
+      <div class="ckt tr" id="ctime">30.10.2062 · 08:14:22</div>
+      <div class="ckt br" id="cstat">CAMERA OFF</div>
+      <div class="cbig" id="cbig"></div>
+      <div class="cstart" id="cstart">
+        <svg class="csil" viewBox="-70 -14 140 156" aria-hidden="true"><ellipse cx="0" cy="40" rx="30" ry="40"/><path d="M-62 142 Q-60 96 -18 90 L-12 76 M62 142 Q60 96 18 90 L12 76"/><rect class="scanbox" x="-40" y="-6" width="80" height="96"/></svg>
+        <button type="button" id="cgo">● TURN ON MY CAMERA</button>
+        <button type="button" id="csample">or watch a sample instead</button>
+        <p class="cmsg" id="cmsg" aria-live="polite"></p>
+        <p class="cpriv">Runs only in your browser. Nothing is saved or sent.</p>
+      </div>
+    </div>
+    <aside class="cside">
+      <div class="ctitle">WHAT IT RECORDS <span>SIMULATED</span></div>
+      <div id="clog"></div>
+      <button type="button" id="ctest" aria-expanded="false" aria-controls="tryp" disabled>▶ TEST IT · TRY THE GADGETS ON</button>
+      <div id="tryp" hidden><div id="tslots"></div><div class="bres" id="tread"></div></div>
+      <button type="button" id="coff" hidden>■ TURN CAMERA OFF</button>
+      <p class="cnote">The readings are made up for the story. Only the face tracking is real, and it never leaves your browser.</p>
+    </aside>
+  </div>
+</section>
 
 <section id="manual">
   <div class="eyebrow">THE MANUAL</div>
@@ -696,10 +780,11 @@ function buildHelmet(H, s) {
   if (s.outer === "mesh") { for (let k = 0; k < 30; k++) meridian(H, k / 30 * TAU, .026, GM.soft, false); ys.forEach(y => { const [rx, rz] = hr(y, .026); H.add(loop(ringPts(0, y, 0, rx, rz, 44), GM.soft)); }); }
 
   if (s.horns === "horns") [-1, 1].forEach(sd => {
-    const C = new THREE.CubicBezierCurve3(V(sd * .06, 1.72, .07), V(sd * .13, 1.88, .17), V(sd * .21, 2.08, .02), V(sd * .15, 2.16, -.22));
+    const hk = s.hornK || 1, P0 = V(sd * .06, 1.72, .07), hp = (x, y, z) => P0.clone().add(V(x, y, z).sub(P0).multiplyScalar(hk));
+    const C = new THREE.CubicBezierCurve3(P0.clone(), hp(sd * .13, 1.88, .17), hp(sd * .21, 2.08, .02), hp(sd * .15, 2.16, -.22));
     const rails = [[], [], []], NS = 28, hornRings = [];
     for (let i = 0; i <= NS; i++) {
-      const u = i / NS, p = C.getPoint(u), tg = C.getTangent(u), r = lerp(.03, .003, Math.pow(u, .8));
+      const u = i / NS, p = C.getPoint(u), tg = C.getTangent(u), r = lerp(.03, .003, Math.pow(u, .8)) * Math.sqrt(hk);
       const n1 = V(1, 0, 0).cross(tg).normalize(), n2 = tg.clone().cross(n1).normalize(), ring = [];
       for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; ring.push(p.clone().addScaledVector(n1, Math.cos(a) * r).addScaledVector(n2, Math.sin(a) * r)); }
       hornRings.push(ring);
@@ -1584,6 +1669,278 @@ function tick(now) {
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
+
+// ================= CHECK YOURSELF: your camera, face tracking and the try-on =================
+{
+const MP_URL = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18";
+const cStage = document.getElementById("cstage"), cVid = document.getElementById("cvid"), cGl = document.getElementById("cgl"), cFx = document.getElementById("cfx"), fxc = cFx.getContext("2d");
+const cStart = document.getElementById("cstart"), cMsg = document.getElementById("cmsg"), cStat = document.getElementById("cstat"), cBig = document.getElementById("cbig"), cTime = document.getElementById("ctime");
+const cLog = document.getElementById("clog"), cTest = document.getElementById("ctest"), cOff = document.getElementById("coff"), tryP = document.getElementById("tryp"), tSlots = document.getElementById("tslots"), tRead = document.getElementById("tread");
+const LOG = ["FACE ID", "HEAD", "BLINKS", "BREATH", "HEARTBEAT", "STORED"].map(n => { const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span>${n}</span><b>—</b>`; cLog.appendChild(r); return r.querySelector("b"); });
+
+// three.js layer drawn over the video, in screen pixels
+const r2 = new THREE.WebGLRenderer({ canvas: cGl, antialias: true, alpha: true });
+r2.setPixelRatio(Math.min(devicePixelRatio, 2));
+const s2 = new THREE.Scene(), cam2 = new THREE.OrthographicCamera(-1, 1, 1, -1, -6000, 6000);
+const anchor = new THREE.Group(); anchor.matrixAutoUpdate = false; s2.add(anchor);
+// an invisible head that hides whatever sits behind it (back of the helmet, the far earring)
+const occ = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 24), new THREE.MeshBasicMaterial({ colorWrite: false }));
+occ.scale.set(.56, .9, .64); occ.position.set(0, .1, -.47); occ.renderOrder = -1; anchor.add(occ);
+const neckOcc = new THREE.Mesh(new THREE.CylinderGeometry(.3, .34, 1.2, 24), occ.material); neckOcc.position.set(0, -1.1, -.45); neckOcc.renderOrder = -1; anchor.add(neckOcc);
+// sample head, shown when there is no camera
+const sampleHead = new THREE.Group(); anchor.add(sampleHead);
+{ const m = mat(.55), ms = mat(.2); m.depthTest = ms.depthTest = false;
+  for (let k = -8; k <= 9; k++) { const y = k / 10, r = Math.sqrt(Math.max(0, 1 - y * y)); if (r > .02) sampleHead.add(loop(ringPts(0, .1 + y * .9, -.47, r * .56, r * .64, 40), k % 3 ? ms : m)); }
+  for (let k = 0; k < 12; k++) { const a = k / 12 * TAU, p = []; for (let i = 0; i <= 24; i++) { const u = -Math.PI / 2 + i / 24 * Math.PI; p.push(V(Math.cos(u) * Math.cos(a) * .56, .1 + Math.sin(u) * .9, -.47 + Math.cos(u) * Math.sin(a) * .64)); } sampleHead.add(line(p, ms)); }
+  sampleHead.add(line([V(0, .12, .19), V(0, -.22, .36), V(-.06, -.26, .3), V(0, -.27, .31)], m));
+  [-1, 1].forEach(sd => { sampleHead.add(loop(ringPts(0, 0, 0, 1, 1, 18).map(q => V(sd * .22 + q.x * .09, .1 + q.z * .035, .17)), m)); sampleHead.add(loop(ringPts(0, 0, 0, 1, 1, 18).map(q => V(sd * .56, -.05 + q.x * .16, -.4 + q.z * .08)), ms)); });
+  sampleHead.add(line(arcPts(0, -.42, 0, .16, .05, .15 * Math.PI, .85 * Math.PI, 12).map(p => V(p.x, p.y, p.z + .2)), m));
+  for (let y = -.8; y >= -1.6; y -= .12) sampleHead.add(loop(ringPts(0, y, -.45, .3 + (-.8 - y) * .25, .3, 32), ms));
+}
+// gadgets, in head units (1 = cheek-to-cheek face width; y up, z toward the camera)
+const helmetHold = new THREE.Group(), helmetIn = new THREE.Group(); helmetHold.add(helmetIn); helmetIn.position.set(0, -1.6, 0); helmetHold.scale.set(5.3, 3.8, 5.3); anchor.add(helmetHold);
+const eyeG = new THREE.Group(), earG = new THREE.Group(); anchor.add(eyeG, earG);
+let tryStrands = [];
+
+const TRY = {
+  eyes: { t: "EYEWEAR", k: "SCATTER", opts: [["none", "none", 0], ["foilglasses", "foil glasses", 14], ["shades", "mirror shades", 18], ["chainglasses", "chain glasses", 16]] },
+  ears: { t: "EAR GEAR", k: "FIELD", opts: [["none", "none", 0], ["chainrings", "chain earrings", 10], ["cuffs", "foil ear cuffs", 12], ["earcoils", "ear coils", 18]] },
+};
+const tsel = { helmet: "on", eyes: "none", ears: "none" };
+Object.assign(ICON, {
+  foilglasses: '<circle cx="12" cy="13" r="6"/><circle cx="28" cy="13" r="6"/><path d="M18 13 H22 M6 12 L2 9 M34 12 L38 9"/>',
+  shades: '<path d="M3 9 Q20 5 37 9 L35 17 Q20 20 5 17 Z"/><path d="M8 13 H32"/>',
+  chainglasses: '<circle cx="12" cy="10" r="5"/><circle cx="28" cy="10" r="5"/><path d="M17 10 H23"/><path d="M7 11 Q5 20 12 24 M33 11 Q35 20 28 24" stroke-dasharray="2 2"/>',
+  chainrings: '<path d="M14 3 Q10 6 14 9 M26 3 Q30 6 26 9"/><path d="M14 9 V19 M26 9 V19" stroke-dasharray="2 2"/><circle cx="14" cy="22" r="2.5"/><circle cx="26" cy="22" r="2.5"/>',
+  cuffs: '<path d="M10 4 Q4 13 10 22 Q16 22 15 14 Q16 6 10 4 Z"/><path d="M26 4 Q32 13 26 22 Q20 22 21 14 Q20 6 26 4 Z"/>',
+  earcoils: '<path d="M8 6 C14 4 14 10 8 9 C14 8 14 14 8 13 C14 12 14 18 8 17 C14 16 14 22 8 21"/><path d="M32 6 C26 4 26 10 32 9 C26 8 26 14 32 13 C26 12 26 18 32 17 C26 16 26 22 32 21"/>',
+});
+
+function buildEyes() {
+  clearGroup(eyeG); const st = [];
+  const lens = (cx, r) => ringPts(0, 0, 0, 1, 1, 28).map(q => V(cx + q.x * r, .1 + q.z * r * .85, .26 - Math.abs(cx) * .12));
+  if (tsel.eyes === "foilglasses" || tsel.eyes === "chainglasses") {
+    const r = tsel.eyes === "foilglasses" ? .15 : .13;
+    [-1, 1].forEach(sd => {
+      const L = lens(sd * .22, r); eyeG.add(loop(L, GM.foil));
+      if (tsel.eyes === "foilglasses") eyeG.add(loop(L.map((p, i) => p.clone().lerp(V(sd * .22, .1, p.z), i % 2 ? .08 : .14)), GM.soft));
+      skinMesh(eyeG, (() => { const g = new THREE.CircleGeometry(r, 28); g.scale(1, .85, 1); g.translate(sd * .22, .1, .26 - .22 * .12); return g; })());
+      eyeG.add(line([V(sd * (.22 + r), .12, .23), V(sd * .52, .14, .05), V(sd * .54, .1, -.35)], GM.soft));
+      if (tsel.eyes === "chainglasses") { const pts = []; for (let j = 0; j <= 10; j++) { const u = j / 10; pts.push(V(sd * lerp(.5, .32, u), .1 - u * .75 - Math.sin(u * Math.PI) * .12, lerp(.0, .1, u))); } st.push(strand(Math.PI / 2, pts)); }
+    });
+    eyeG.add(line(arcPts(0, .12, .27, .07, .03, Math.PI * .15, Math.PI * .85, 8), GM.foil));
+  }
+  if (tsel.eyes === "shades") {
+    const rows = [.21, .16, .1, .04, -.01];
+    rows.forEach((y, i) => eyeG.add(line(arcPts(0, y, -.3, .56 - Math.abs(y - .1) * .3, .6, Math.PI * .1, Math.PI * .9, 30), i === 0 || i === rows.length - 1 ? GM.foil : GM.soft)));
+    surf(eyeG, rows.map(y => ({ y, cz: -.3, rx: .56 - Math.abs(y - .1) * .3, rz: .6, a0: Math.PI * .1, a1: Math.PI * .9 })), 30);
+  }
+  if (st.length) tryStrands.push(new Strands(eyeG, GM.foil, st));
+}
+function buildEars() {
+  clearGroup(earG); const st = [];
+  [-1, 1].forEach(sd => {
+    const ex = sd * .55, ey = -.08, ez = -.22;
+    if (tsel.ears === "chainrings") {
+      earG.add(loop(ringPts(0, 0, 0, 1, 1, 14).map(q => V(ex + sd * .01, ey - .17 + q.z * .035, ez + q.x * .035)), GM.foil));
+      const pts = []; for (let j = 0; j <= 6; j++) pts.push(V(ex + sd * .012, ey - .2 - j * .05, ez));
+      const s = strand(sd > 0 ? 0 : Math.PI, pts), c = CHARM.cap(5); c.rotation.y = Math.PI / 2; earG.add(c); s.tail = c; st.push(s);
+    }
+    if (tsel.ears === "cuffs") {
+      const ear = ringPts(0, 0, 0, 1, 1, 28).map(q => V(ex + sd * .02, ey + q.x * .2, ez + q.z * .11 - Math.max(0, q.x) * .03));
+      earG.add(loop(ear, GM.foil)); earG.add(loop(ear.map((p, i) => V(p.x + sd * .015, ey + (p.y - ey) * .78 + (i % 2 ? .01 : -.01), ez + (p.z - ez) * .78)), GM.soft));
+      const g = new THREE.CircleGeometry(1, 28); g.scale(.11, .2, 1); g.rotateY(Math.PI / 2); g.translate(ex + sd * .02, ey, ez); skinMesh(earG, g);
+    }
+    if (tsel.ears === "earcoils") {
+      const c = []; for (let u = 0; u <= 1; u += .004) { const a = u * TAU * 9, y = ey + .16 - u * .32, r = .085 * Math.sqrt(Math.max(.15, 1 - Math.pow((y - ey) / .17, 2))); c.push(V(ex + sd * .03 + Math.cos(a) * r * .35, y, ez + Math.sin(a) * r)); }
+      earG.add(line(c, GM.foil)); const led = new THREE.Mesh(LEDG, GM.led); led.scale.setScalar(4); led.position.set(ex + sd * .05, ey + .18, ez); earG.add(led);
+    }
+  });
+  if (st.length) tryStrands.push(new Strands(earG, GM.soft, st));
+}
+function buildHelmetTry() { clearGroup(helmetIn); if (tsel.helmet === "on") tryStrands.push(...buildHelmet(helmetIn, { ...BUILD.helmet.sel, hornK: .45 })); }
+function rebuildTry() { tryStrands = []; buildHelmetTry(); buildEyes(); buildEars(); }
+
+function tryRead() {
+  let r = tsel.helmet === "on" ? score("helmet").read : 95;
+  r -= TRY.eyes.opts.find(o => o[0] === tsel.eyes)[2] + TRY.ears.opts.find(o => o[0] === tsel.ears)[2];
+  return Math.round(clamp(r, 3, 95));
+}
+function chip(slot, id, nm, on, off) { return `<button type="button" class="bchip${on ? " on" : ""}" data-s="${slot}" data-o="${id}" aria-pressed="${on}"${off ? " disabled" : ""}><svg viewBox="0 0 40 26" aria-hidden="true">${ICON[id] || ICON.none}</svg>${nm}</button>`; }
+function renderTry() {
+  const H = BUILD.helmet, on = tsel.helmet === "on";
+  let h = `<div class="tgroup">HEADGEAR</div><div class="bslot"><div class="bsl"><span>HORNED HELMET</span><em></em></div><div class="bchips">${chip("helmet", "on", "wear it", on)}${chip("helmet", "off", "none", !on)}</div></div>`;
+  H.slots.filter(sl => sl.id !== "lining").forEach(sl => { h += `<div class="bslot${on ? "" : " off"}"><div class="bsl"><span>${sl.t}</span><em>${sl.k}</em></div><div class="bchips">${sl.opts.map(([id, nm]) => chip("h:" + sl.id, id, nm, H.sel[sl.id] === id, !on)).join("")}</div></div>`; });
+  ["eyes", "ears"].forEach(k => { const T = TRY[k]; h += `<div class="tgroup">${T.t}</div><div class="bslot"><div class="bchips">${T.opts.map(([id, nm]) => chip(k, id, nm, tsel[k] === id)).join("")}</div></div>`; });
+  tSlots.innerHTML = h;
+  const r = tryRead(), v = verdict(r);
+  tRead.innerHTML = `<span>WHAT THE STREET GETS</span><b class="${v === "PERSON" ? "bad" : v === "UNSURE" ? "mid" : ""}">${r}% · ${v}</b>`;
+}
+tSlots.addEventListener("click", e => {
+  const b = e.target.closest(".bchip"); if (!b || b.disabled) return;
+  const s = b.dataset.s, o = b.dataset.o;
+  if (s.startsWith("h:")) { BUILD.helmet.sel[s.slice(2)] = o; changed("helmet"); } else tsel[s] = o;
+  rebuildTry(); renderTry();
+  const nb = tSlots.querySelector(`.bchip[data-s="${s}"][data-o="${o}"]`); if (nb) nb.focus({ preventScroll: true });
+});
+let trying = false;
+cTest.addEventListener("click", () => {
+  trying = !trying; tryP.hidden = !trying; cTest.textContent = trying ? "✕ TAKE IT ALL OFF" : "▶ TEST IT · TRY THE GADGETS ON";
+  cTest.setAttribute("aria-expanded", trying);
+  if (trying) { rebuildTry(); renderTry(); } else { tryStrands = []; clearGroup(helmetIn); clearGroup(eyeG); clearGroup(earG); }
+});
+
+// ---------- camera + face landmarks ----------
+let mode = "off", stream = null, landmarker = null, loopOn = false, lastVT = -1, lms = null, faceSeen = 0;
+async function getLandmarker() {
+  if (landmarker) return landmarker;
+  const { FaceLandmarker, FilesetResolver } = await import(MP_URL + "/vision_bundle.mjs");
+  const files = await FilesetResolver.forVisionTasks(MP_URL + "/wasm");
+  const opts = d => ({ baseOptions: { modelAssetPath: "models/face_landmarker.task", delegate: d }, runningMode: "VIDEO", numFaces: 1 });
+  try { landmarker = await FaceLandmarker.createFromOptions(files, opts("GPU")); } catch (e) { landmarker = await FaceLandmarker.createFromOptions(files, opts("CPU")); }
+  return landmarker;
+}
+function setMode(m) {
+  mode = m; cStage.dataset.mode = m;
+  cStart.hidden = m !== "off"; cTest.disabled = m === "off"; cOff.hidden = m === "off";
+  cOff.textContent = m === "cam" ? "■ TURN CAMERA OFF" : "■ STOP THE SAMPLE";
+  sampleHead.visible = m === "sample";
+  if (m === "off") { lms = null; fxc.clearRect(0, 0, cFx.width, cFx.height); r2.clear(); LOG.forEach(b => { b.textContent = "—"; b.className = ""; }); cBig.textContent = ""; cStat.textContent = "CAMERA OFF"; }
+  if (m !== "off" && !loopOn) { loopOn = true; requestAnimationFrame(cLoop); }
+}
+document.getElementById("cgo").addEventListener("click", async () => {
+  cMsg.textContent = "Asking for your camera…";
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    cVid.srcObject = stream; await cVid.play();
+    cStage.style.aspectRatio = `${cVid.videoWidth} / ${cVid.videoHeight}`;
+    cMsg.textContent = "Loading face tracking…"; setMode("cam"); cStat.textContent = "LOADING FACE TRACKING…";
+    await getLandmarker(); cMsg.textContent = "";
+  } catch (e) {
+    stopCam(); cMsg.textContent = e && e.name === "NotAllowedError" ? "Camera blocked. You can allow it in your browser, or watch the sample." : "No camera found here. Watch the sample instead.";
+  }
+});
+document.getElementById("csample").addEventListener("click", () => { stopCam(); cStage.style.aspectRatio = "4 / 3"; cMsg.textContent = ""; setMode("sample"); });
+function stopCam() { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; cVid.srcObject = null; }
+cOff.addEventListener("click", () => { stopCam(); if (trying) cTest.click(); setMode("off"); });
+
+// synthetic landmarks for the sample: a head that looks around and blinks
+const KEY = { 234: [-.5, 0, -.05], 454: [.5, 0, -.05], 10: [0, .64, .12], 152: [0, -.8, .05], 168: [0, .12, .2], 1: [0, -.22, .36], 33: [-.34, .1, .1], 263: [.34, .1, .1], 133: [-.12, .1, .15], 362: [.12, .1, .15], 159: [-.23, .15, .16], 145: [-.23, .06, .16], 386: [.23, .15, .16], 374: [.23, .06, .16], 13: [0, -.42, .26], 14: [0, -.46, .25] };
+const FILL = Array.from({ length: 478 }, (_, i) => { const a = (i * 2.399) % TAU, rr = Math.sqrt((i % 97) / 97), x = Math.cos(a) * rr * .46, y = Math.sin(a) * rr * .74 - .08; return [x, y, .3 * Math.sqrt(Math.max(0, 1 - (x / .5) ** 2 - ((y + .08) / .8) ** 2)) - .02]; });
+function sampleLms(t, W, H) {
+  const yaw = Math.sin(t * .6) * .45, pitch = Math.sin(t * .43) * .16, F = W * .2, cx = W / 2 + Math.sin(t * .3) * W * .05, cy = H * .56;
+  const blink = (t % 4) < .14 ? .9 : 0;
+  const rot = new THREE.Euler(pitch, yaw, Math.sin(t * .5) * .05), q = V(0, 0, 0);
+  return FILL.map((d, i) => {
+    let p = KEY[i] || d; if ((i === 159 || i === 386) && blink) p = [p[0], p[1] - .085 * blink, p[2]];
+    q.set(p[0], p[1], p[2]).applyEuler(rot).multiplyScalar(F);
+    return { x: (cx + q.x) / W, y: (cy - q.y) / H, z: -q.z / W };
+  });
+}
+
+// ---------- the head frame, from landmarks ----------
+const hf = { o: V(0, 0, 0), x: V(1, 0, 0), y: V(0, 1, 0), s: 1, ok: false }, l10 = V(0, .64, .12);
+const lp = (l, W, H) => V((l.x - .5) * W, (.5 - l.y) * H, -l.z * W);
+function updateFrame(L, W, H) {
+  const a = lp(L[234], W, H), b = lp(L[454], W, H), top = lp(L[10], W, H), bot = lp(L[152], W, H);
+  const x = b.clone().sub(a), s = x.length(); x.normalize();
+  const z = x.clone().cross(top.clone().sub(bot)).normalize(), y = z.clone().cross(x).normalize(), o = a.add(b).multiplyScalar(.5);
+  const k = hf.ok ? .5 : 1;
+  hf.o.lerp(o, k); hf.x.lerp(x, k).normalize(); hf.y.lerp(y, k).normalize(); hf.s = lerp(hf.s, s, k); hf.ok = true;
+  const zz = hf.x.clone().cross(hf.y).normalize(); hf.y.copy(zz.clone().cross(hf.x)).normalize();
+  anchor.matrix.makeBasis(hf.x.clone().multiplyScalar(hf.s), hf.y.clone().multiplyScalar(hf.s), zz.multiplyScalar(hf.s)).setPosition(hf.o);
+  anchor.matrixWorldNeedsUpdate = true;
+  const lt = top.sub(hf.o); l10.lerp(V(lt.dot(hf.x), lt.dot(hf.y), lt.dot(zz.normalize())).multiplyScalar(1 / hf.s), k);
+  helmetHold.position.set(0, l10.y - .3, l10.z - .5);
+  eyeG.position.set(0, 0, 0);
+  return { yaw: Math.atan2(zz.x, zz.z) * 57.3, pitch: Math.asin(clamp(zz.y, -1, 1)) * 57.3 };
+}
+
+// ---------- the recording, and the loop ----------
+let blinks = 0, eyeShut = false, stored = 0, logT = 0, readShown = 95, seenT = 0;
+function sizeStage() {
+  const r = cStage.getBoundingClientRect(), W = Math.max(10, r.width), H = Math.max(10, r.height);
+  if (cFx.width !== Math.round(W * 2)) { cFx.width = Math.round(W * 2); cFx.height = Math.round(H * 2); }
+  r2.setSize(W, H, false); cam2.left = -W / 2; cam2.right = W / 2; cam2.top = H / 2; cam2.bottom = -H / 2; cam2.updateProjectionMatrix();
+  return [W, H];
+}
+function cLoop(now) {
+  if (mode === "off") { loopOn = false; return; }
+  requestAnimationFrame(cLoop);
+  const t = now / 1000, [W, H] = sizeStage();
+  if (mode === "cam" && landmarker && cVid.readyState >= 2 && cVid.currentTime !== lastVT) {
+    lastVT = cVid.currentTime;
+    const res = landmarker.detectForVideo(cVid, now);
+    lms = res.faceLandmarks && res.faceLandmarks[0] || null; if (lms) seenT = t;
+  }
+  if (mode === "sample") { lms = sampleLms(t, W, H); seenT = t; }
+  const face = lms && t - seenT < .5;
+  const read = trying ? tryRead() : 95;
+  readShown += (read - readShown) * .08;
+  const prot = clamp((80 - readShown) / 60, 0, 1);
+  let pose = null;
+  if (face) {
+    pose = updateFrame(lms, W, H);
+    const open = lms[159] && lms[145] ? Math.hypot(lms[159].x - lms[145].x, lms[159].y - lms[145].y) / Math.max(1e-4, Math.hypot(lms[33].x - lms[133].x, lms[33].y - lms[133].y)) : 1;
+    if (open < .2 && !eyeShut) { eyeShut = true; blinks++; } else if (open > .26) eyeShut = false;
+    if (prot < .5) stored++;
+  }
+  anchor.visible = !!face;
+  tryStrands.forEach(S => S.update(t * 1.5, .01));
+  SKIN.uniforms.uOp.value = 1;
+  r2.render(s2, cam2);
+
+  // overlay (not mirrored: the picture is shown as a mirror, so x flips)
+  const c = fxc, k2 = 2; c.setTransform(k2, 0, 0, k2, 0, 0); c.clearRect(0, 0, W, H);
+  c.fillStyle = "rgba(255,255,255,.04)"; for (let y = 0; y < H; y += 3) c.fillRect(0, y, W, 1);
+  if (face) {
+    const X = l => (1 - l.x) * W, Y = l => l.y * H;
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    lms.forEach(l => { const x = X(l), y = Y(l); if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; });
+    const bw = x1 - x0, bh = y1 - y0, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    // the street's read: points and a box, breaking apart as protection rises
+    for (let i = 0; i < lms.length; i += 3) {
+      const j = prot * (14 + 30 * rnd()), x = X(lms[i]) + (rnd() - .5) * j, y = Y(lms[i]) + (rnd() - .5) * j;
+      c.fillStyle = prot > .5 ? `rgba(168,230,255,${.5 - prot * .35})` : `rgba(255,201,107,${.85 - prot * .5})`; c.fillRect(x - 1, y - 1, 2, 2);
+    }
+    if (prot > .02) for (let i = 0; i < 40 * prot; i++) { c.fillStyle = rnd() > .5 ? "rgba(255,255,255,.12)" : "rgba(4,8,24,.4)"; c.fillRect(cx + (rnd() - .5) * bw * 1.4, cy + (rnd() - .5) * bh * 1.3, 4 + rnd() * 30, 2 + rnd() * 5); }
+    const jb = prot * 30;
+    c.setLineDash([7, 5]); c.lineWidth = 1.5; c.strokeStyle = prot > .5 ? "rgba(255,201,107,.8)" : "#ff8a5c";
+    c.strokeRect(x0 - 14 + (rnd() - .5) * jb, y0 - 22 + (rnd() - .5) * jb, bw + 28 + (rnd() - .5) * jb, bh + 36 + (rnd() - .5) * jb); c.setLineDash([]);
+    c.font = '700 11px "IBM Plex Mono", Menlo, monospace'; c.fillStyle = c.strokeStyle;
+    const pct = Math.round(readShown);
+    c.fillText(prot > .5 ? `NO MATCH · ${pct}%` : prot > .2 ? `PERSON? ${pct}%` : `PERSON ${pct}% · MATCHED`, x0 - 14, y0 - 30);
+    // the shield: a barely-there outline around head and shoulders, only while wearing something
+    if (trying && (tsel.helmet === "on" || tsel.eyes !== "none" || tsel.ears !== "none")) {
+      c.save(); c.strokeStyle = "rgba(168,230,255,.35)"; c.lineWidth = 1; c.shadowColor = "rgba(168,230,255,.8)"; c.shadowBlur = 10;
+      c.beginPath(); c.ellipse(cx, cy - bh * .12, bw * .78, bh * .78, 0, Math.PI * .78, Math.PI * 2.22); c.stroke();
+      c.beginPath(); c.moveTo(cx - bw * .55, cy + bh * .52); c.quadraticCurveTo(cx - bw * .6, cy + bh * .85, cx - bw * 1.45, cy + bh * 1.05);
+      c.moveTo(cx + bw * .55, cy + bh * .52); c.quadraticCurveTo(cx + bw * .6, cy + bh * .85, cx + bw * 1.45, cy + bh * 1.05); c.stroke(); c.restore();
+    }
+  }
+  cTime.textContent = `30.10.2062 · 08:14:${String(22 + Math.floor(t) % 38).padStart(2, "0")}`;
+  const v = verdict(Math.round(readShown));
+  cStat.textContent = !face ? (mode === "cam" && !landmarker ? "LOADING FACE TRACKING…" : "LOOKING FOR A FACE…") : v === "NO MATCH" ? "NO PERSON STORED" : v === "UNSURE" ? "UNSURE · RETRYING" : "RECORDING YOU";
+  cStat.className = "pv br " + (face && v === "PERSON" ? "rec" : "");
+  cBig.textContent = face ? (v === "PERSON" ? "YOU ARE BEING RECORDED" : v === "UNSURE" ? "IT CAN'T QUITE TELL" : "IT CAN'T SEE YOU") : "";
+  cBig.className = "cbig " + (v === "PERSON" ? "bad" : v === "UNSURE" ? "mid" : "ok");
+  if (t - logT > .2) {
+    logT = t;
+    const set = (i, txt, cls) => { LOG[i].textContent = txt; LOG[i].className = cls || ""; };
+    if (!face) LOG.forEach(b => { b.textContent = "—"; b.className = ""; });
+    else if (v === "PERSON") {
+      set(0, `MATCHED · ${Math.round(readShown)}%`, "bad"); set(1, `YAW ${Math.round(pose.yaw)}° · PITCH ${Math.round(pose.pitch)}°`, "bad");
+      set(2, `${blinks} SO FAR`, "bad"); set(3, `${(13.5 + Math.sin(t * .2) * 1.5).toFixed(1)} / MIN`, "bad"); set(4, `${Math.round(71 + Math.sin(t * .37) * 4)} BPM`, "bad");
+      set(5, `${stored.toLocaleString()} FRAMES → REGISTER`, "bad");
+    } else {
+      const nz = () => Array.from({ length: 6 }, () => "█▓▒░#%"[Math.floor(rnd() * 6)]).join("");
+      set(0, v === "UNSURE" ? `UNSURE · ${Math.round(readShown)}%` : "NO MATCH", v === "UNSURE" ? "mid" : "ok");
+      set(1, v === "UNSURE" ? "PARTIAL" : "NO POSE", "ok"); set(2, nz(), "ok"); set(3, "NO PATTERN", "ok"); set(4, "NO PATTERN", "ok"); set(5, v === "UNSURE" ? "FEW USABLE" : "0 USABLE · STOPPED", "ok");
+    }
+  }
+}
+setMode("off");
+}
 })();
 
 // ================= MANUAL: material kit =================
