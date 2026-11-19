@@ -107,6 +107,56 @@
   #povbox span { position: absolute; left: -1px; top: -20px; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--alert); white-space: nowrap; }
   .drag-hint { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 4; font-size: 10px; letter-spacing: 2px; color: var(--soft); pointer-events: none; transition: opacity .4s; }
 
+  #btab { all: unset; box-sizing: border-box; position: fixed; right: 28px; top: 50%; transform: translateY(-50%); z-index: 7; cursor: pointer; display: flex; gap: 10px; align-items: center;
+    border: 1px solid var(--ray); background: rgba(27,52,120,.92); padding: 12px 16px; box-shadow: 0 0 0 6px rgba(255,201,107,.08);
+    font-family: "IBM Plex Mono", Menlo, monospace; color: var(--ray); opacity: 0; pointer-events: none; transition: opacity .35s, box-shadow .2s; }
+  #btab.show { opacity: 1; pointer-events: auto; }
+  #btab:hover { box-shadow: 0 0 0 6px rgba(255,201,107,.2); }
+  #btab:focus-visible, #build button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  #btab b { display: block; font-size: 11px; letter-spacing: 2.4px; }
+  #btab small { display: block; font-size: 9px; letter-spacing: 1.6px; color: var(--soft); margin-top: 4px; }
+  #btab .d { width: 7px; height: 7px; border-radius: 50%; background: var(--ray); box-shadow: 0 0 10px var(--ray); animation: blink 1.6s ease-in-out infinite; flex: none; }
+  #bnote { position: fixed; left: 56px; top: 50%; transform: translateY(-50%); z-index: 4; font-size: 10px; letter-spacing: 2px; line-height: 1.8; color: var(--soft); opacity: 0; pointer-events: none; transition: opacity .4s; }
+  #bnote b { display: block; color: #fff; font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; }
+  #build { position: fixed; right: 28px; top: 62px; max-height: calc(100vh - 134px); width: 372px; z-index: 8; background: rgba(24,46,110,.96); border: 1px solid rgba(255,255,255,.28);
+    padding: 16px 18px; display: flex; flex-direction: column; overflow-y: auto; transform: translateX(calc(100% + 40px)); opacity: 0; visibility: hidden;
+    transition: transform .45s ease, opacity .3s, visibility 0s .45s; }
+  body.building #build { transform: none; opacity: 1; visibility: visible; transition: transform .45s ease, opacity .3s; }
+  body.building #captions, body.building #labels, body.building .drag-hint { opacity: 0 !important; }
+  body.building #bnote { opacity: 1; }
+  #build button { all: unset; box-sizing: border-box; cursor: pointer; font-family: inherit; }
+  .bh { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--faint); padding-bottom: 10px; }
+  .bh b { font-size: 12px; letter-spacing: 2.6px; } .bh b span { color: var(--ray); }
+  #build #bclose { color: var(--soft); font-size: 15px; padding: 2px 6px; } #build #bclose:hover { color: #fff; }
+  .bslot { margin-top: 11px; }
+  .bsl { font-size: 9px; letter-spacing: 2px; color: var(--soft); display: flex; justify-content: space-between; }
+  .bsl em { font-style: normal; color: var(--field); }
+  .bslot.off .bsl em { color: var(--soft); }
+  .bchips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+  #build .bchip { border: 1px solid var(--faint); padding: 5px 3px 4px; text-align: center; font-size: 8.5px; letter-spacing: .6px; color: var(--soft); line-height: 1.2; transition: border-color .2s, background .2s, color .2s; }
+  .bchip svg { display: block; margin: 0 auto 3px; width: 40px; height: 24px; fill: none; stroke: rgba(255,255,255,.75); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+  #build .bchip:hover { border-color: rgba(255,255,255,.5); color: #fff; }
+  #build .bchip.on { border-color: var(--ray); color: #fff; background: rgba(255,201,107,.08); }
+  .bchip.on svg { stroke: var(--ray); }
+  #build .bchip:disabled { opacity: .3; cursor: default; }
+  .bmeter { padding-top: 12px; border-top: 1px solid var(--faint); }
+  #bslots { margin-bottom: 16px; }
+  .bbar { display: grid; grid-template-columns: 72px 1fr 30px; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 1.6px; color: var(--soft); margin: 5px 0; }
+  .bbar .bt { height: 5px; border: 1px solid var(--faint); position: relative; }
+  .bbar .bt i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--field); transition: width .4s; }
+  .bbar b { font-weight: 400; text-align: right; color: #fff; }
+  .bres { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; padding: 9px 10px; border: 1px solid var(--faint); font-size: 10px; letter-spacing: 1.4px; }
+  #bread s { color: var(--alert); text-decoration: none; } #bread b { color: var(--ray); } #bread b.mid { color: #fff; } #bread b.bad { color: var(--alert); }
+  #bread .testing { color: var(--field); }
+  #bread.flash { animation: flash .6s ease-out; }
+  @keyframes flash { from { background: rgba(255,201,107,.35); } to { background: transparent; } }
+  .bbtns { display: flex; gap: 8px; margin-top: 10px; }
+  #build #btest { flex: 1; text-align: center; border: 1px solid var(--ray); color: var(--ray); padding: 9px 0; font-size: 10px; letter-spacing: 2.2px; font-weight: 700; }
+  #build #btest:hover { background: rgba(255,201,107,.12); }
+  #build #breset { flex: .6; text-align: center; border: 1px solid var(--faint); color: var(--soft); padding: 9px 0; font-size: 10px; letter-spacing: 2.2px; }
+  #build #breset:hover { color: #fff; }
+  .bhint { font-size: 9px; letter-spacing: 1.6px; color: var(--soft); text-align: center; margin-top: 9px; }
+
   main { position: relative; z-index: 2; pointer-events: none; }
   .spacer { height: 100vh; }
 
@@ -117,13 +167,50 @@
   #manual h2 { font-size: 40px; margin: 12px 0 10px; letter-spacing: 1px; }
   #manual .lead { color: var(--soft); max-width: 560px; line-height: 1.6; font-size: 14px; margin: 0; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
-  .lg { border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 10px 14px 12px; width: 190px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+  .toc a { border: 1px solid var(--faint); padding: 8px 14px; font-size: 10px; letter-spacing: 2px; color: var(--soft); text-decoration: none; transition: border-color .2s, color .2s; }
+  .toc a b { color: var(--ray); margin-right: 8px; }
+  .toc a:hover, .toc a:focus-visible { border-color: var(--ray); color: #fff; outline: none; }
+  .msec { margin-top: 70px; border-top: 1px solid var(--faint); padding-top: 26px; scroll-margin-top: 16px; }
+  .msh { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+  .msh .n { color: var(--ray); font-size: 12px; font-weight: 700; letter-spacing: 2px; }
+  .msh h3 { margin: 0; font-size: 26px; letter-spacing: .5px; }
+  .msh p { margin: 0 0 0 auto; color: var(--soft); font-size: 12px; max-width: 420px; line-height: 1.5; text-align: right; }
+  .legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; margin-top: 22px; }
+  .lg { border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 10px 14px 12px; }
+  .ptitle2 { margin-top: 40px; font-size: 10px; letter-spacing: 2px; color: var(--soft); }
+  .parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 12px; }
+  .part { border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 14px; }
+  .part h4 { margin: 0 0 8px; font-size: 11px; letter-spacing: 2.4px; color: var(--ray); }
+  .part ul { list-style: none; margin: 0; padding: 0; }
+  .part li { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .tag { flex: none; font-size: 9px; letter-spacing: 1.4px; padding: 2px 6px; border: 1px solid; }
+  .tag.R { color: #fff; border-color: rgba(255,255,255,.6); } .tag.S { color: var(--ray); border-color: var(--ray); } .tag.A { color: var(--alert); border-color: var(--alert); } .tag.F { color: var(--field); border-color: var(--field); }
+  .mtabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
+  .mtabs button { all: unset; cursor: pointer; padding: 8px 16px; border: 1px solid var(--faint); font-family: inherit; font-size: 10px; letter-spacing: 2px; color: var(--soft); }
+  .mtabs button[aria-selected="true"] { border-color: var(--ray); color: var(--ray); }
+  .mtabs button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+  .step { border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 14px; }
+  .step .k { font-size: 28px; font-weight: 700; color: var(--ray); }
+  .step svg { display: block; width: 100%; height: auto; margin-top: 4px; }
+  .step b { display: block; font-size: 12px; letter-spacing: 1.8px; margin-top: 10px; }
+  .step p { margin: 6px 0 0; font-size: 12px; color: var(--soft); line-height: 1.5; }
+  svg .am { fill: none; stroke: var(--ray); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+  svg .fd { fill: none; stroke: var(--field); stroke-width: 1.3; }
+  .dd { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 22px; }
+  .col { border: 1px solid var(--faint); padding: 18px 20px; }
+  .col.do { border-color: rgba(155,231,180,.5); } .col.dont { border-color: rgba(255,138,92,.55); }
+  .col h4 { margin: 0 0 10px; font-size: 13px; letter-spacing: 2.4px; } .col.do h4 { color: #9be7b4; } .col.dont h4 { color: var(--alert); }
+  .col ul { margin: 0; padding: 0; list-style: none; }
+  .col li { display: grid; grid-template-columns: 22px 1fr; font-size: 13px; line-height: 1.5; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .col.do li::before { content: "✓"; color: #9be7b4; font-weight: 700; } .col.dont li::before { content: "✕"; color: var(--alert); font-weight: 700; }
+  .mnote { margin-top: 16px; font-size: 11px; color: var(--soft); letter-spacing: 1px; line-height: 1.6; }
   .lg svg { display: block; width: 100%; height: 56px; }
   .lg b { font-size: 11px; letter-spacing: 2px; }
   .lg p { margin: 4px 0 0; font-size: 11px; color: var(--soft); line-height: 1.45; }
 
-  .kit { display: grid; grid-template-columns: 300px 1fr; gap: 36px; margin-top: 44px; align-items: start; }
+  .kit { display: grid; grid-template-columns: 300px 1fr; gap: 36px; margin-top: 22px; align-items: start; }
   .map { position: sticky; top: 70px; border: 1px solid var(--faint); background: rgba(27,52,120,.6); padding: 14px; }
   .map svg { display: block; width: 100%; height: auto; }
   .map .now { font-size: 11px; letter-spacing: 2px; font-weight: 700; min-height: 16px; color: var(--ray); }
@@ -184,6 +271,8 @@
     #manual { padding: 70px 16px 40px; }
     .kit { grid-template-columns: 1fr; }
     .map { position: relative; top: 0; max-width: 300px; }
+    .msh p { margin: 0; text-align: left; }
+    .dd { grid-template-columns: 1fr; }
     #pov { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .35s; }
   #povfx { position: absolute; inset: 0; width: 100%; height: 100%; }
   .pv { position: absolute; font-size: 11px; letter-spacing: 2px; font-weight: 700; }
@@ -193,7 +282,10 @@
   .pc.c3 { bottom: 24px; left: 36px; border-width: 0 0 2px 2px; } .pc.c4 { bottom: 24px; right: 36px; border-width: 0 2px 2px 0; }
   #povbox { position: absolute; border: 1.5px dashed var(--alert); }
   #povbox span { position: absolute; left: -1px; top: -20px; font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--alert); white-space: nowrap; }
-  .drag-hint { display: none; }
+    .drag-hint { display: none; }
+    #btab { top: 168px; right: 12px; transform: none; padding: 9px 12px; }
+    #bnote { display: none; }
+    #build { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 60vh; padding: 14px 14px 18px; transform: translateY(105%); }
   }
 </style>
 </head>
@@ -203,7 +295,7 @@
 
 <header id="hdr">
   <div><b>UNREAD</b>&nbsp;&nbsp;·&nbsp;&nbsp;OPEN BLUEPRINT · REV 02</div>
-  <div id="counter">00 / 07</div>
+  <div id="counter">00 / 08</div>
 </header>
 
 <div id="captions">
@@ -239,11 +331,16 @@
     <p>The smallest thing still covers all of you. A foil cuff, loose links, and a coil that never stops talking.</p>
   </div>
   <div class="cap" data-i="6">
+    <div class="eyebrow">04 · ANKLET</div>
+    <h2>Or around your ankle.</h2>
+    <p>Foil bands, a ring of bottle caps that clink as you walk, and a coil. The shield climbs from the ground up.</p>
+  </div>
+  <div class="cap" data-i="7">
     <div class="eyebrow">THROUGH THE CAMERA</div>
     <h2>Through the lens.</h2>
     <p>The camera knows something is standing there. It can't find a face, a body or a pose. Only noise.</p>
   </div>
-  <div class="cap" data-i="7">
+  <div class="cap" data-i="8">
     <div class="eyebrow">WALK</div>
     <h2>A shape, not a person.</h2>
     <p>A street robot looks right at it. It knows something is there. It can't tell who.</p>
@@ -264,6 +361,18 @@
 </aside>
 
 <div id="labels"></div>
+<button type="button" id="btab" aria-controls="build" aria-expanded="false"><span class="d"></span><span><b id="btabname">+ BUILD YOUR OWN HELMET</b><small>PICK THE PARTS · TEST IT</small></span></button>
+<div id="bnote"><b>Building.</b>THE STORY WAITS.<br>CLOSE THE PANEL TO KEEP SCROLLING.</div>
+<aside id="build" aria-label="Build your own" aria-hidden="true">
+  <div class="bh"><b>BUILD YOUR OWN <span id="bname">HELMET</span></b><button type="button" id="bclose" aria-label="Close the build panel">✕</button></div>
+  <div id="bslots"></div>
+  <div class="bmeter">
+    <div id="bbars"></div>
+    <div class="bres"><span>RADAR READ</span><span id="bread">—</span></div>
+    <div class="bbtns"><button type="button" id="btest">▶ TEST IT</button><button type="button" id="breset">↺ RESET</button></div>
+    <div class="bhint">DRAG THE FIGURE TO TURN IT</div>
+  </div>
+</aside>
 <div id="robotq"><b>?</b><span>NO MATCH</span></div>
 <div class="drag-hint" id="draghint">DRAG TO TURN THE FIGURE</div>
 <div id="pov" aria-hidden="true">
@@ -278,23 +387,61 @@
 
 <main>
   <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
-  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
+  <div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div><div class="spacer"></div>
 </main>
 
 <section id="manual">
   <div class="eyebrow">THE MANUAL</div>
-  <h2>Make your own.</h2>
-  <p class="lead">Each gadget is built from things you already own. Here's what to look for, what each one does, and where it goes.</p>
+  <h2>How to make it at home.</h2>
+  <p class="lead">An add-on to the blueprint. How the sensors read you, what each material does, how to put each piece together, and how to wear it safely.</p>
+  <nav class="toc" aria-label="Manual sections"><a href="#m-how"><b>01</b>HOW IT WORKS</a><a href="#m-mat"><b>02</b>MATERIALS</a><a href="#m-make"><b>03</b>HOW TO MAKE IT</a><a href="#m-safe"><b>04</b>DO'S AND DON'TS</a></nav>
 
-  <div class="legend" id="legend"></div>
+  <div class="msec" id="m-how">
+    <div class="msh"><span class="n">01</span><h3>How it works.</h3><p>Radar sends out a signal and listens for the echo. Every gadget changes that echo in one of four ways.</p></div>
+    <div class="legend" id="legend"></div>
+  </div>
 
-  <div class="kit">
-    <div class="map">
-      <div class="mt">WHERE IT GOES</div>
-      <svg id="mapsvg" viewBox="-130 -60 260 700"></svg>
-      <div class="now" id="mapnow">—</div>
+  <div class="msec" id="m-mat">
+    <div class="msh"><span class="n">02</span><h3>Materials.</h3><p>Everything here is already in a kitchen, a drawer or a bin. Each tag says what it does.</p></div>
+    <div class="kit">
+      <div class="map">
+        <div class="mt">WHERE IT GOES</div>
+        <svg id="mapsvg" viewBox="-130 -60 260 700"></svg>
+        <div class="now" id="mapnow">—</div>
+      </div>
+      <div class="cards" id="cards"></div>
     </div>
-    <div class="cards" id="cards"></div>
+    <div class="ptitle2">EVERYTHING, BY BODY PART</div>
+    <div class="parts" id="parts"></div>
+  </div>
+
+  <div class="msec" id="m-make">
+    <div class="msh"><span class="n">03</span><h3>How to make it.</h3><p>Five steps for each piece. Pick one to see its steps.</p></div>
+    <div class="mtabs" id="mtabs" role="tablist" aria-label="Pieces"></div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <div class="msec" id="m-safe">
+    <div class="msh"><span class="n">04</span><h3>Do's and don'ts.</h3><p>Read this before you wear any of it.</p></div>
+    <div class="dd">
+      <div class="col do"><h4>DO</h4><ul>
+        <li>Keep a soft layer between metal and bare skin.</li>
+        <li>Leave gaps so air can move. Foil and plastic get hot.</li>
+        <li>Check you can still see, hear and turn your head.</li>
+        <li>Tape down sharp ends of wire, forks and caps.</li>
+        <li>Take it off if you feel dizzy, hot or short of breath.</li>
+        <li>Share what worked. Copy it, change it, pass it on.</li>
+      </ul></div>
+      <div class="col dont"><h4>DON'T</h4><ul>
+        <li>Cover your nose or mouth with foil or plastic.</li>
+        <li>Wrap wire tight around your neck, wrist or ankle.</li>
+        <li>Wear it while driving, cycling or near traffic.</li>
+        <li>Go near open flames, heaters or power lines.</li>
+        <li>Plug the coil into the wall. Small batteries only.</li>
+        <li>Let it stop you from getting help in an emergency.</li>
+      </ul></div>
+    </div>
+    <div class="mnote">THIS IS A STORY SET IN 2062. THE NUMBERS ARE IMAGINED. THE SAFETY ADVICE IS REAL.</div>
   </div>
 
   <footer><span>DRAWN BY: NOBODY · LICENSE: COPY IT, SHARE IT, MAKE IT</span><span>IF YOU ARE READING THIS, YOU ARE STILL READABLE.</span></footer>
@@ -412,6 +559,7 @@ class Strands {
         return [p.x + s.tx * sw + s.rx * sr, p.y, p.z + s.tz * sw + s.rz * sr];
       });
       for (let j = 0; j < L - 1; j++) { P.set(q[j], o); P.set(q[j + 1], o + 3); o += 6; }
+      if (s.tail) s.tail.position.set(...q[L - 1]);
     }
     this.geo.attributes.position.needsUpdate = true;
   }
@@ -419,92 +567,338 @@ class Strands {
 const strand = (a, pts) => ({ pts, phase: rnd() * 6.28, tx: -Math.sin(a), tz: Math.cos(a), rx: Math.cos(a), rz: Math.sin(a) });
 
 
-// ---------- gadgets ----------
+// ---------- gadgets: each one is built from the parts picked in the build panel ----------
 function piece(center) {
   const outer = new THREE.Group(), inner = new THREE.Group();
   outer.position.copy(center); inner.position.copy(center).multiplyScalar(-1);
   outer.add(inner); return { outer, inner, center: center.clone() };
 }
-const GM = { foil: mat(.95), soft: mat(.45), led: new THREE.MeshBasicMaterial({ color: AMBER, transparent: true }) };
+const GM = { foil: mat(.95), soft: mat(.45), dots: new THREE.PointsMaterial({ color: 0xffffff, size: 2, sizeAttenuation: false, transparent: true, opacity: .7, depthWrite: false }), led: new THREE.MeshBasicMaterial({ color: AMBER, transparent: true }) };
 const LEDG = new THREE.SphereGeometry(.009, 8, 6);
-// 01 helmet: a fitted shell with a brow peak, cheek guards and two swept-back horns; a field coil inside
+const TAU = Math.PI * 2;
+const ledAt = (G, p) => { const l = new THREE.Mesh(LEDG, GM.led); l.position.copy(p); G.add(l); };
+const arcPts = (cx, y, cz, rx, rz, a0, a1, n, wob = 0) => { const p = []; for (let i = 0; i <= n; i++) { const a = lerp(a0, a1, i / n); p.push(V(cx + Math.cos(a) * rx, y + (wob ? Math.sin(i * 2.7 + y * 40) * wob : 0), cz + Math.sin(a) * rz)); } return p; };
+function clearGroup(g) { [...g.children].forEach(c => { g.remove(c); c.traverse(o => { if (o.geometry && o.geometry !== LEDG) o.geometry.dispose(); }); }); }
+// one ring in a surface style: wobbly blanket, crinkled foil, chip-bag patches or plain soft
+function styledRing(G, cx, y, cz, rx, rz, style, row = 0, a0 = 0, a1 = TAU, n = 48) {
+  const closed = a1 - a0 >= TAU - 1e-6;
+  if (style === "patch") {
+    for (let i = 0; i < 8; i++) if ((i + row) % 2 === 0) { const e = row % 2 ? .004 : 0; G.add(line(arcPts(cx, y, cz, rx + e, rz + e, lerp(a0, a1, i / 8), lerp(a0, a1, (i + 1) / 8), 8), GM.foil)); }
+    return;
+  }
+  let pts;
+  if (style === "crinkle") { pts = []; for (let i = 0; i <= n; i++) { const a = lerp(a0, a1, i / n), k = i % 2 ? 1 : .93; pts.push(V(cx + Math.cos(a) * rx * k, y + (i % 3 - 1) * .003, cz + Math.sin(a) * rz * k)); } }
+  else pts = arcPts(cx, y, cz, rx, rz, a0, a1, n, style === "wobble" ? .007 : 0);
+  const m = style === "soft" ? GM.soft : GM.foil;
+  G.add(closed ? loop(pts.slice(0, -1), m) : line(pts, m));
+}
+// small hanging charms, drawn flat, hanging down from their top point
+const flatLoop = (cx, cy, rx, ry, n = 14, jag = 0) => loop(ringPts(0, 0, 0, rx, ry, n, jag).map(q => V(cx + q.x, cy + q.z, 0)), GM.foil);
+const CHARM = {
+  spoon: k => { const g = new THREE.Group(); g.add(line([V(0, 0, 0), V(0, -.05 * k, 0)], GM.foil)); g.add(flatLoop(0, -.068 * k, .012 * k, .019 * k)); return g; },
+  key: k => { const g = new THREE.Group(); g.add(flatLoop(0, -.011 * k, .011 * k, .011 * k, 12)); g.add(segs([V(0, -.022 * k, 0), V(0, -.062 * k, 0), V(0, -.05 * k, 0), V(.009 * k, -.05 * k, 0), V(0, -.058 * k, 0), V(.011 * k, -.058 * k, 0)], GM.foil)); return g; },
+  cap: k => { const g = new THREE.Group(); g.add(flatLoop(0, -.014 * k, .014 * k, .014 * k, 18, .16)); g.add(flatLoop(0, -.014 * k, .008 * k, .008 * k, 12)); return g; },
+  washer: k => { const g = new THREE.Group(); g.add(flatLoop(0, -.012 * k, .012 * k, .012 * k, 16)); g.add(flatLoop(0, -.012 * k, .005 * k, .005 * k, 10)); return g; },
+  bell: k => { const g = new THREE.Group(), P = [[-.003, 0], [-.006, -.006], [-.007, -.016], [-.013, -.025], [.013, -.025], [.007, -.016], [.006, -.006], [.003, 0]]; g.add(line(P.map(([x, y]) => V(x * k, y * k, 0)), GM.foil)); g.add(flatLoop(0, -.029 * k, .003 * k, .003 * k, 8)); return g; },
+  pin: k => { const g = new THREE.Group(); g.add(loop([V(0, 0, 0), V(.005 * k, -.005 * k, 0), V(.005 * k, -.045 * k, 0), V(0, -.05 * k, 0), V(-.005 * k, -.045 * k, 0), V(-.005 * k, -.008 * k, 0)], GM.foil)); return g; },
+};
+function hangers(G, list, kind, k) {
+  return new Strands(G, GM.soft, list.map(({ p, a, len }) => {
+    const pts = []; for (let j = 0; j <= 4; j++) pts.push(p.clone().add(V(0, -len * j / 4, 0)));
+    const s = strand(a, pts);
+    if (kind && CHARM[kind]) { const c = CHARM[kind](k); c.rotation.y = -a + Math.PI / 2; G.add(c); s.tail = c; }
+    return s;
+  }));
+}
+function swags(G, ptAt, a0, a1, n, sag) {
+  const list = [];
+  for (let i = 0; i < n; i++) {
+    const b0 = lerp(a0, a1, i / n), b1 = lerp(a0, a1, (i + 1) / n), pts = [];
+    for (let u = 0; u <= 1.001; u += .1) { const p = ptAt(lerp(b0, b1, u)); p.y -= Math.sin(u * Math.PI) * sag; pts.push(p); }
+    list.push(strand((b0 + b1) / 2, pts));
+  }
+  return new Strands(G, GM.soft, list);
+}
+
+// 01 helmet
 const head = piece(V(0, 1.7, 0)); model.add(head.outer);
-{
-  const H = head.inner;
-  const hr = y => { const [rx, rz] = interp(torsoTab, Math.min(y, 1.715)); return [rx + .016, rz + .016]; };
-  for (let y = 1.6; y <= 1.73; y += .018) { const [rx, rz] = hr(y); H.add(loop(ringPts(0, y, 0, rx, rz, 40), GM.foil)); }
-  for (let k = 0; k < 16; k++) {
-    const a = k / 16 * Math.PI * 2, pts = [];
-    for (let y = 1.6; y <= 1.735; y += .01) { const [rx, rz] = hr(y); pts.push(V(Math.cos(a) * rx, y, Math.sin(a) * rz)); }
-    pts.push(V(0, 1.742, 0)); H.add(line(pts, GM.soft));
+const hr = (y, e = .016) => { const [rx, rz] = interp(torsoTab, Math.min(y, 1.715)); return [rx + e, rz + e]; };
+const meridian = (H, a, e, m, top = true) => { const pts = []; for (let y = 1.6; y <= 1.735; y += .01) { const [rx, rz] = hr(y, e); pts.push(V(Math.cos(a) * rx, y, Math.sin(a) * rz)); } if (top) pts.push(V(0, 1.742, 0)); H.add(line(pts, m)); };
+function buildHelmet(H, s) {
+  const out = [];
+  if (s.base === "bike") {
+    for (let y = 1.6; y <= 1.73; y += .018) { const [rx, rz] = hr(y); H.add(loop(ringPts(0, y, 0, rx, rz, 40), GM.foil)); }
+    for (let k = 0; k < 16; k++) meridian(H, k / 16 * TAU, .016, GM.soft);
+    const brow = [];
+    for (let a = .12 * Math.PI; a <= .881 * Math.PI; a += .025 * Math.PI) {
+      const [rx, rz] = hr(1.6), u = Math.abs(a - Math.PI / 2) / (.38 * Math.PI);
+      brow.push(V(Math.cos(a) * rx, 1.6 - .045 * Math.max(0, 1 - u * 2.6), Math.sin(a) * rz));
+    }
+    H.add(line(brow, GM.foil));
+    [-1, 1].forEach(sd => H.add(loop([V(sd * .1, 1.62, .0), V(sd * .1, 1.535, .02), V(sd * .085, 1.52, .065), V(sd * .07, 1.585, .085)], GM.foil)));
+  } else if (s.base === "colander") {
+    for (let y = 1.6; y <= 1.731; y += .026) { const [rx, rz] = hr(y, .02); H.add(loop(ringPts(0, y, 0, rx, rz, 40), GM.foil)); }
+    const [rx0, rz0] = hr(1.6, .02);
+    H.add(loop(ringPts(0, 1.598, 0, rx0 + .024, rz0 + .024, 48), GM.foil));
+    const holes = [];
+    for (let y = 1.612; y < 1.728; y += .012) { const [a, b] = hr(y, .021), n = Math.max(5, Math.round(a * 150)); for (let i = 0; i < n; i++) { const th = i / n * TAU + y * 37; holes.push(V(Math.cos(th) * a, y, Math.sin(th) * b)); } }
+    H.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(holes), GM.dots));
+    [-1, 1].forEach(sd => H.add(loop(ringPts(0, 0, 0, 1, 1, 14).map(q => V(sd * (rx0 + .045) + q.x * .022, 1.6 + q.z * .012, 0)), GM.foil)));
+  } else if (s.base === "bowl") {
+    [1.6, 1.648, 1.688, 1.716].forEach(y => { const [rx, rz] = hr(y, .02); H.add(loop(ringPts(0, y, 0, rx, rz, 44), GM.foil)); });
+    for (let k = 0; k < 24; k++) meridian(H, k / 24 * TAU, .02, GM.soft);
+    const [rx0, rz0] = hr(1.6, .02);
+    H.add(loop(ringPts(0, 1.597, 0, rx0 + .032, rz0 + .032, 48), GM.foil)); H.add(loop(ringPts(0, 1.603, 0, rx0 + .026, rz0 + .026, 48), GM.soft));
+  } else {
+    const ring = y => { const [rx, rz] = hr(y, .026); return Array.from({ length: 8 }, (_, i) => { const a = (i + .5) / 8 * TAU; return V(Math.cos(a) * rx, y, Math.sin(a) * rz); }); };
+    const R = [1.598, 1.634, 1.667, 1.697, 1.722].map(ring);
+    R.forEach(r => H.add(loop(r, GM.foil)));
+    for (let i = 0; i < 8; i++) H.add(line([...R.map(r => r[i]), V(0, 1.74, 0)], GM.soft));
+    H.add(segs([R[4][0], R[4][4], R[4][2], R[4][6]], GM.soft));
   }
-  const brow = [];
-  for (let a = .12 * Math.PI; a <= .881 * Math.PI; a += .025 * Math.PI) {
-    const [rx, rz] = hr(1.6), u = Math.abs(a - Math.PI / 2) / (.38 * Math.PI);
-    brow.push(V(Math.cos(a) * rx, 1.6 - .045 * Math.max(0, 1 - u * 2.6), Math.sin(a) * rz));
-  }
-  H.add(line(brow, GM.foil));
-  [-1, 1].forEach(s => {
-    H.add(loop([V(s * .1, 1.62, .0), V(s * .1, 1.535, .02), V(s * .085, 1.52, .065), V(s * .07, 1.585, .085)], GM.foil));
-    const C = new THREE.CubicBezierCurve3(V(s * .06, 1.72, .07), V(s * .13, 1.88, .17), V(s * .21, 2.08, .02), V(s * .15, 2.16, -.22));
+  const ys = [1.622, 1.652, 1.682, 1.708];
+  if (s.outer === "foil") ys.slice(0, 3).forEach((y, i) => { const [rx, rz] = hr(y, .026); styledRing(H, 0, y, 0, rx, rz, "crinkle", i, 0, TAU, 44); });
+  if (s.outer === "blanket") ys.forEach((y, i) => { const [rx, rz] = hr(y, .026); styledRing(H, 0, y, 0, rx, rz, "wobble", i, 0, TAU, 44); });
+  if (s.outer === "chips") ys.forEach((y, i) => { const [rx, rz] = hr(y, .028); styledRing(H, 0, y, 0, rx, rz, "patch", i); });
+  if (s.outer === "mesh") { for (let k = 0; k < 30; k++) meridian(H, k / 30 * TAU, .026, GM.soft, false); ys.forEach(y => { const [rx, rz] = hr(y, .026); H.add(loop(ringPts(0, y, 0, rx, rz, 44), GM.soft)); }); }
+
+  if (s.horns === "horns") [-1, 1].forEach(sd => {
+    const C = new THREE.CubicBezierCurve3(V(sd * .06, 1.72, .07), V(sd * .13, 1.88, .17), V(sd * .21, 2.08, .02), V(sd * .15, 2.16, -.22));
     const rails = [[], [], []], NS = 28;
     for (let i = 0; i <= NS; i++) {
       const u = i / NS, p = C.getPoint(u), tg = C.getTangent(u), r = lerp(.03, .003, Math.pow(u, .8));
       const n1 = V(1, 0, 0).cross(tg).normalize(), n2 = tg.clone().cross(n1).normalize(), ring = [];
-      for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2; ring.push(p.clone().addScaledVector(n1, Math.cos(a) * r).addScaledVector(n2, Math.sin(a) * r)); }
+      for (let k = 0; k < 10; k++) { const a = k / 10 * TAU; ring.push(p.clone().addScaledVector(n1, Math.cos(a) * r).addScaledVector(n2, Math.sin(a) * r)); }
       if (i % 2 === 0 && i < NS) H.add(loop(ring, GM.foil));
       [0, 3, 7].forEach((k, j) => rails[j].push(ring[k]));
     }
     rails.forEach(r => H.add(line(r, GM.soft)));
   });
-  const coil = [];
-  for (let u = 0; u <= 1; u += .004) { const a = lerp(1.2 * Math.PI, 1.8 * Math.PI, u), r = .104 + .008 * Math.cos(u * 70); coil.push(V(Math.cos(a) * r, 1.64 + .008 * Math.sin(u * 70), Math.sin(a) * r * 1.1)); }
-  H.add(line(coil, GM.soft));
-  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(0, 1.68, -.13); H.add(led);
+  if (s.horns === "forks") for (let k = 0; k < 5; k++) {
+    const a = k / 5 * TAU + .6, [rx, rz] = hr(1.7), base = V(Math.cos(a) * rx, 1.7, Math.sin(a) * rz);
+    const d = V(Math.cos(a) * .55, 1, Math.sin(a) * .55).normalize(), tip = base.clone().addScaledVector(d, .1), pp = V(-Math.sin(a), 0, Math.cos(a)), sg = [base, tip];
+    [-1.5, -.5, .5, 1.5].forEach(j => sg.push(tip.clone().addScaledVector(pp, j * .005), tip.clone().addScaledVector(pp, j * .006).addScaledVector(d, .045)));
+    sg.push(tip.clone().addScaledVector(pp, -.008), tip.clone().addScaledVector(pp, .008));
+    H.add(segs(sg, GM.foil));
+  }
+  if (s.horns === "tinsel") {
+    const list = [];
+    for (let i = 0; i <= 26; i++) {
+      const u = i / 26 * 2 - 1, y = 1.738 - .1 * u * u, rz = hr(y)[1], z = (u < 0 ? 1 : -1) * rz * Math.min(1, Math.abs(u) * 1.6);
+      const base = V((rnd() - .5) * .01, y, z), d = V((rnd() - .5) * .3, 1, z * 7).normalize(), L = .07 + rnd() * .05, pts = [];
+      for (let j = 0; j <= 4; j++) pts.push(base.clone().addScaledVector(d, L * j / 4));
+      list.push(strand(Math.PI / 2, pts));
+    }
+    out.push(new Strands(H, GM.foil, list));
+  }
+
+  if (s.face === "veil" || s.face === "fringe") {
+    const veil = s.face === "veil", list = [], n = veil ? 14 : 32, [rx, rz] = hr(1.6, .02);
+    for (let i = 0; i <= n; i++) {
+      const a = lerp(veil ? .2 : .06, veil ? .8 : .94, i / n) * Math.PI, p = V(Math.cos(a) * rx, 1.594, Math.sin(a) * rz), pts = [], L = veil ? 6 : 3;
+      for (let j = 0; j <= L; j++) pts.push(p.clone().add(V(0, -(veil ? .028 : .016 + rnd() * .006) * j, Math.sin(a) * .006 * j)));
+      list.push(strand(a, pts));
+    }
+    out.push(new Strands(H, veil ? GM.foil : GM.soft, list));
+  }
+  if (s.face === "visor") {
+    for (let y = 1.49; y <= 1.601; y += .022) H.add(line(arcPts(0, y, 0, .1, .13, .2 * Math.PI, .8 * Math.PI, 18), GM.soft));
+    for (let i = 0; i <= 8; i++) { const a = lerp(.2, .8, i / 8) * Math.PI; H.add(line([V(Math.cos(a) * .1, 1.49, Math.sin(a) * .13), V(Math.cos(a) * .1, 1.6, Math.sin(a) * .13)], GM.soft)); }
+    H.add(line(arcPts(0, 1.6, 0, .1, .13, .2 * Math.PI, .8 * Math.PI, 18), GM.foil));
+  }
+  if (s.coil === "on") {
+    const coil = [];
+    for (let u = 0; u <= 1; u += .004) { const a = lerp(1.2 * Math.PI, 1.8 * Math.PI, u), r = .104 + .008 * Math.cos(u * 70); coil.push(V(Math.cos(a) * r, 1.64 + .008 * Math.sin(u * 70), Math.sin(a) * r * 1.1)); }
+    H.add(line(coil, GM.soft)); ledAt(H, V(0, 1.68, -.13));
+  }
+  return out;
 }
 
-
-// 02 shrug: a short cape of foil, chains and spoons over the shoulders
+// 02 body piece: shrug, cape, vest or long coat
 const shrugTab = [[1.2,.34],[1.3,.33],[1.38,.29],[1.43,.21],[1.46,.12]], SD = .8;
-const shrugPt = (a, y, e = 0) => { const r = interp(shrugTab, y)[0] + e; return V(Math.cos(a) * r, y, Math.sin(a) * r * SD); };
 const shrug = piece(V(0, 1.34, 0)); model.add(shrug.outer);
-const shrugChains = [];
-{
-  const S = shrug.inner;
-  for (let y = 1.45; y >= 1.215; y -= .03) S.add(loop(ringPts(0, 0, 0, 1, 1, 56).map((p, i) => { const q = shrugPt(Math.atan2(p.z, p.x), y); q.y += Math.sin(i * 2.7 + y * 40) * .007; return q; }), GM.foil));
-  for (let k = 0; k < 14; k++) {
-    const a1 = k / 14 * Math.PI * 2, a2 = (k + 1) / 14 * Math.PI * 2, pts = [];
-    for (let u = 0; u <= 1.001; u += .1) { const p = shrugPt(lerp(a1, a2, u), 1.2 - Math.sin(u * Math.PI) * .07, .012); pts.push(p); }
-    shrugChains.push(strand((a1 + a2) / 2, pts));
+function buildBody(S, s) {
+  const out = [], style = { blanket: "wobble", foil: "crinkle", chips: "patch", tinsel: "soft" }[s.outer];
+  const shrugR = y => interp(shrugTab, Math.min(y, 1.46))[0];
+  const prof = y => {
+    if (s.shape === "shrug") { const r = shrugR(y); return [r, r * SD, 0, TAU]; }
+    if (s.shape === "cape") { const r = y >= 1.2 ? shrugR(y) : .34 + (1.2 - y) * .1; return [r, r * SD, Math.PI - .5, TAU + .5]; }
+    if (s.shape === "vest") { const [rx, rz] = y >= .84 ? interp(torsoTab, Math.min(y, 1.41)) : [.165 + (.84 - y) * .12, .11 + (.84 - y) * .08]; return [rx + .035, rz + .035, Math.PI / 2 + .17, Math.PI / 2 + TAU - .17]; }
+    const r = y >= 1.24 ? shrugR(y) : .32 + Math.max(0, .84 - y) * .1;
+    return [r, y >= 1.24 ? r * SD : .21 + Math.max(0, .84 - y) * .07, Math.PI / 2 + .07, Math.PI / 2 + TAU - .07];
+  };
+  const top = { shrug: 1.45, cape: 1.46, vest: 1.4, coat: 1.46 }[s.shape];
+  const bottom = s.shape === "shrug" ? 1.215 : { waist: .95, knee: .5, ankle: .14 }[s.length];
+  const step = s.shape === "shrug" ? .03 : .034, rows = [];
+  for (let y = top; y >= bottom - 1e-6; y -= step) rows.push(y);
+  rows.forEach((y, i) => { const [rx, rz, a0, a1] = prof(y); styledRing(S, 0, y, 0, rx, rz, style, i, a0, a1, 56); });
+  if (s.shape !== "shrug") for (let k = 0; k <= 10; k++) {
+    const u = k / 10, pts = [];
+    for (let y = top; y >= rows[rows.length - 1] - 1e-6; y -= .02) { const [rx, rz, a0, a1] = prof(y), a = lerp(a0, a1, u); pts.push(V(Math.cos(a) * rx, y, Math.sin(a) * rz)); }
+    S.add(line(pts, k === 0 || k === 10 ? GM.foil : GM.soft));
   }
-  for (let k = 0; k < 9; k++) {
-    const a = k / 9 * Math.PI * 2 + .3, p = shrugPt(a, 1.2, .015), g = new THREE.Group(); g.position.copy(p); g.rotation.y = -a + Math.PI / 2; S.add(g);
-    g.add(line([V(0, 0, 0), V(0, -.07, 0)], GM.foil));
-    g.add(loop(ringPts(0, 0, 0, .016, .026, 14).map(q => V(q.x, -.095 + q.z, 0)), GM.foil));
+  if (s.shape === "coat") for (let y = 1.47; y <= 1.531; y += .02) S.add(loop(ringPts(0, y, 0, .075, .07, 28), GM.foil));
+  if (s.outer === "tinsel") {
+    const list = [];
+    rows.forEach((y, i) => {
+      if (i % 3 !== 2 && i !== rows.length - 1) return;
+      const [rx, rz, a0, a1] = prof(y), n = Math.round((a1 - a0) / TAU * 64);
+      for (let j = 0; j < n; j++) {
+        const a = lerp(a0, a1, (j + rnd() * .5) / n), p = V(Math.cos(a) * (rx + .006), y, Math.sin(a) * (rz + .006)), L = .05 + rnd() * .05, pts = [];
+        for (let q = 0; q <= 3; q++) pts.push(p.clone().add(V(Math.cos(a) * .006 * q, -L * q / 3, Math.sin(a) * .006 * q)));
+        list.push(strand(a, pts));
+      }
+    });
+    out.push(new Strands(S, GM.foil, list));
   }
+  const hemY = rows[rows.length - 1], [hx, hz, h0, h1] = prof(hemY), closed = h1 - h0 > TAU - .01;
+  const hemPt = a => V(Math.cos(a) * (hx + .012), hemY, Math.sin(a) * (hz + .012));
+  if (s.bits === "chains") out.push(swags(S, hemPt, h0, h1, closed ? 14 : 10, .07));
+  else {
+    const n = closed ? 9 : 7, list = [];
+    for (let i = 0; i < n; i++) { const a = closed ? i / n * TAU + .3 : lerp(h0 + .2, h1 - .2, i / (n - 1)); list.push({ p: hemPt(a), a, len: .045 }); }
+    out.push(hangers(S, list, { spoons: "spoon", keys: "key", caps: "cap" }[s.bits], 1.25));
+  }
+  if (s.coil === "on") {
+    const y = top - .012, [rx, rz] = prof(y), c = [];
+    for (let u = 0; u <= 1; u += .003) { const a = u * TAU, r = 1 + .05 * Math.cos(u * 140); c.push(V(Math.cos(a) * (rx + .012) * r, y + .006 * Math.sin(u * 140), Math.sin(a) * (rz + .012) * r)); }
+    S.add(line(c, GM.soft)); ledAt(S, V(0, y, rz + .02));
+  }
+  return out;
 }
-const chainLines = new Strands(shrug.inner, GM.soft, shrugChains);
 
-// 03 bracelet: stacked foil cuff, loose links and a coil, on the right wrist
+// 03 bracelet, on the right wrist
 const brace = piece(V(.046, -.55, 0)); arms[1].add(brace.outer);
-const braceLinks = [];
-{
-  const B = brace.inner, cx = .046;
-  for (let k = 0; k < 4; k++) B.add(loop(ringPts(cx, -.5 - k * .02, 0, .045, .048, 18, .28), GM.foil));
-  const coil = [];
-  for (let u = 0; u <= 1; u += .005) { const a = u * Math.PI * 2 * 1.0, r = .052 + .007 * Math.cos(u * 90); coil.push(V(cx + Math.cos(a) * r, -.535 + .007 * Math.sin(u * 90), Math.sin(a) * r * 1.05)); }
-  B.add(line(coil, GM.foil));
-  for (let c = 0; c < 6; c++) { const a = c / 6 * Math.PI * 2 + .3, pts = []; for (let j = 0; j <= 5; j++) pts.push(V(cx + Math.cos(a) * .056, -.55 - j * .014, Math.sin(a) * .058)); braceLinks.push(strand(a, pts)); }
-  const led = new THREE.Mesh(LEDG, GM.led); led.position.set(cx + .05, -.5, .02); B.add(led);
+const armAt = (yl, e) => { const [rx, rz] = interp(armTab, yl + 1.4); return [.055 * -yl / .7, rx + e, rz + e]; };
+function buildBrace(B, s) {
+  const out = [], cx = .046;
+  if (s.base === "bracelet") for (let k = 0; k < 4; k++) B.add(loop(ringPts(cx, -.5 - k * .02, 0, .045, .048, 18, .28), GM.foil));
+  if (s.base === "strap") {
+    [-.515, -.55].forEach(y => { const [c, rx, rz] = armAt(y, .012); B.add(loop(ringPts(c, y, 0, rx, rz, 24), GM.foil)); });
+    const [c, rx] = armAt(-.532, .012), face = edges(new THREE.BoxGeometry(.012, .042, .042), GM.foil);
+    face.position.set(c + rx + .006, -.532, 0); B.add(face);
+    B.add(loop(ringPts(0, 0, 0, 1, 1, 16).map(q => V(c + rx + .013, -.532 + q.x * .014, q.z * .014)), GM.soft));
+  }
+  if (s.base === "rings") [-.43, -.47, -.51, -.55, -.59].forEach(y => { const [c, rx, rz] = armAt(y, .007); B.add(loop(ringPts(c, y, 0, rx, rz, 20), GM.foil)); B.add(loop(ringPts(c, y - .005, 0, rx, rz, 20), GM.soft)); });
+  if (s.base === "glove") {
+    for (let y = -.57; y >= -.701; y -= .016) { const [c, rx, rz] = armAt(y, .01); B.add(loop(ringPts(c, y, 0, rx, rz, 20), GM.foil)); }
+    const [c] = armAt(-.7, 0);
+    [-.022, -.008, .008, .022].forEach((z, i) => B.add(line([V(c, -.7, z), V(c + .004, -.765 + Math.abs(i - 1.5) * .008, z * 1.1)], GM.foil)));
+    B.add(line([V(c + .01, -.62, .03), V(c + .02, -.67, .048)], GM.foil));
+  }
+  if (s.wrap === "copper") { const c = []; for (let u = 0; u <= 1; u += .004) { const y = lerp(-.47, -.6, u), [cc, rx, rz] = armAt(y, .016), a = u * TAU * 7; c.push(V(cc + Math.cos(a) * rx, y, Math.sin(a) * rz)); } B.add(line(c, GM.soft)); }
+  if (s.wrap === "tape") [-.49, -.585].forEach(y0 => {
+    [y0, y0 - .007, y0 - .014].forEach(y => { const [c, rx, rz] = armAt(y, .014); B.add(loop(ringPts(c, y, 0, rx, rz, 24), GM.foil)); });
+    const h = [], [c, rx, rz] = armAt(y0, .015);
+    for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; h.push(V(c + Math.cos(a) * rx, y0, Math.sin(a) * rz), V(c + Math.cos(a + .25) * rx, y0 - .014, Math.sin(a + .25) * rz)); }
+    B.add(segs(h, GM.soft));
+  });
+  if (s.wrap === "chain") {
+    const y = -.535, [c, rx, rz] = armAt(y, .022);
+    for (let i = 0; i < 12; i++) {
+      const a = i / 12 * TAU, ctr = V(c + Math.cos(a) * rx, y, Math.sin(a) * rz), tg = V(-Math.sin(a), 0, Math.cos(a)), up = i % 2 ? V(0, 1, 0) : V(Math.cos(a), 0, Math.sin(a));
+      B.add(loop(Array.from({ length: 10 }, (_, j) => { const t = j / 10 * TAU; return ctr.clone().addScaledVector(tg, Math.cos(t) * .009).addScaledVector(up, Math.sin(t) * .005); }), GM.foil));
+    }
+  }
+  const list = [];
+  for (let k = 0; k < 6; k++) { const a = k / 6 * TAU + .3; list.push({ p: V(cx + Math.cos(a) * .056, -.55, Math.sin(a) * .058), a, len: s.charms === "links" ? .07 : .04 }); }
+  out.push(hangers(B, list, { spoons: "spoon", washers: "washer", bells: "bell", pins: "pin" }[s.charms], .6));
+  if (s.coil === "on") {
+    const coil = [];
+    for (let u = 0; u <= 1; u += .005) { const a = u * TAU, r = .052 + .007 * Math.cos(u * 90); coil.push(V(cx + Math.cos(a) * r, -.535 + .007 * Math.sin(u * 90), Math.sin(a) * r * 1.05)); }
+    B.add(line(coil, GM.foil)); ledAt(B, V(cx + .05, -.5, .02));
+  }
+  return out;
 }
-const braceChains = new Strands(brace.inner, GM.soft, braceLinks);
+
+// 04 anklet, on the left leg: an anklet, knee wraps, a leg warmer or a shoe cover
+const ank = piece(V(0, -.74, 0)); legs[0].add(ank.outer);
+let ankMark = new THREE.Object3D();
+const legAt = (yl, e) => { const y = yl + .84, [rx, rz] = interp(legTab, Math.max(.02, y)); return [rx + e, rz + e, y < .08 ? .035 : 0]; };
+const ANK_RANGE = { anklet: [-.77, -.69], kneewrap: [-.4, -.29], warmers: [-.76, -.4], shoe: [-.83, -.73] };
+function buildAnk(A, s) {
+  const out = [], [y0, y1] = ANK_RANGE[s.piece], style = { foil: "crinkle", chips: "patch", tinsel: "soft" }[s.outer];
+  const e = s.piece === "shoe" ? .016 : s.piece === "warmers" ? .014 : .012, step = s.piece === "warmers" ? .022 : .016;
+  let row = 0;
+  for (let y = y0; y <= y1 + 1e-6; y += step) { const [rx, rz, cz] = legAt(y, e); styledRing(A, 0, y, cz, rx, rz, style, row++, 0, TAU, 26); }
+  if (s.piece === "warmers" || s.piece === "shoe") for (let k = 0; k < 12; k++) {
+    const a = k / 12 * TAU, pts = [];
+    for (let y = y0; y <= y1 + 1e-6; y += .01) { const [rx, rz, cz] = legAt(y, e); pts.push(V(Math.cos(a) * rx, y, cz + Math.sin(a) * rz)); }
+    A.add(line(pts, GM.soft));
+  }
+  if (s.outer === "tinsel") {
+    const list = [], [rx, rz, cz] = legAt(y1, e + .004);
+    for (let j = 0; j < 26; j++) {
+      const a = j / 26 * TAU, p = V(Math.cos(a) * rx, y1, cz + Math.sin(a) * rz), L = .06 + rnd() * .04, pts = [];
+      for (let q = 0; q <= 3; q++) pts.push(p.clone().add(V(Math.cos(a) * .008 * q, -L * q / 3, Math.sin(a) * .008 * q)));
+      list.push(strand(a, pts));
+    }
+    out.push(new Strands(A, GM.foil, list));
+  }
+  if (s.charms !== "none") {
+    const yh = s.piece === "shoe" ? y1 : y0, [rx, rz, cz] = legAt(yh, e + .004), list = [];
+    for (let i = 0; i < 9; i++) { const a = i / 9 * TAU; list.push({ p: V(Math.cos(a) * rx, yh, cz + Math.sin(a) * rz), a, len: .035 }); }
+    out.push(hangers(A, list, { caps: "cap", keys: "key", bells: "bell" }[s.charms], .75));
+  }
+  if (s.coil === "on") {
+    const c = [];
+    for (let u = 0; u <= 1; u += .004) { const y = lerp(y0, y1, u), [rx, rz, cz] = legAt(y, e + .008), a = u * TAU * 3; c.push(V(Math.cos(a) * rx, y, cz + Math.sin(a) * rz)); }
+    A.add(line(c, GM.soft));
+    const [rx, rz, cz] = legAt(y1, e + .006); ledAt(A, V(rx * .3, y1, cz + rz));
+  }
+  ankMark = new THREE.Object3D(); ankMark.position.set(0, (y0 + y1) / 2, 0); A.add(ankMark);
+  return out;
+}
+
+// what each part does: [reflect, scatter, absorb, field]
+const BUILD = {
+  helmet: { name: "HELMET", lab: ["base", "outer", "horns"], slots: [
+    { id: "base", t: "BASE", k: "", opts: [["bike", "bike helmet", [20, 5, 5, 0]], ["colander", "colander", [30, 5, 0, 0]], ["bowl", "mixing bowl", [28, 0, 0, 0]], ["cardboard", "cardboard", [0, 0, 10, 0]]] },
+    { id: "outer", t: "OUTER LAYER", k: "REFLECT", opts: [["foil", "foil", [45, 5, 0, 0]], ["blanket", "emergency blanket", [40, 0, 0, 0]], ["chips", "chip bag", [30, 8, 0, 0]], ["mesh", "copper mesh", [38, 0, 0, 10]]] },
+    { id: "horns", t: "HORNS / SPIKES", k: "SCATTER", opts: [["horns", "wire horns", [5, 30, 0, 10]], ["forks", "fork spikes", [8, 32, 0, 0]], ["tinsel", "tinsel", [0, 36, 0, 0]], ["none", "none", [0, 0, 0, 0]]] },
+    { id: "lining", t: "LINING", k: "ABSORB", opts: [["felt", "felt", [0, 0, 30, 0]], ["sponge", "sponge", [0, 5, 40, 0]], ["bag", "black bag", [0, 0, 48, 0]]] },
+    { id: "face", t: "FACE", k: "SCATTER", opts: [["veil", "chain veil", [5, 22, 0, 0]], ["fringe", "tinsel fringe", [0, 24, 0, 0]], ["visor", "mesh visor", [15, 6, 0, 0]], ["open", "open", [0, 0, 0, 0]]] },
+    { id: "coil", t: "FIELD COIL", k: "FIELD", opts: [["on", "copper coil", [0, 0, 0, 80]], ["off", "none", [0, 0, 0, 0]]] },
+  ], sel: { base: "bike", outer: "foil", horns: "horns", lining: "sponge", face: "open", coil: "on" } },
+  body: { name: "BODY PIECE", lab: ["outer", "bits"], title: s => ({ shrug: "SHRUG", cape: "CAPE", vest: "VEST", coat: "LONG COAT" })[s.shape], slots: [
+    { id: "shape", t: "SHAPE", k: "", opts: [["shrug", "shrug", [10, 5, 0, 0]], ["cape", "cape", [18, 5, 0, 0]], ["vest", "vest", [16, 0, 8, 0]], ["coat", "long coat", [24, 0, 12, 0]]] },
+    { id: "outer", t: "OUTER LAYER", k: "REFLECT", opts: [["blanket", "emergency blanket", [45, 0, 0, 0]], ["foil", "foil", [42, 8, 0, 0]], ["chips", "chip bags", [30, 10, 0, 0]], ["tinsel", "tinsel", [10, 40, 0, 0]]] },
+    { id: "bits", t: "HANGING BITS", k: "SCATTER", opts: [["chains", "chains", [5, 35, 0, 0]], ["spoons", "spoons", [10, 30, 0, 0]], ["keys", "keys", [6, 28, 0, 0]], ["caps", "bottle caps", [6, 26, 0, 0]]] },
+    { id: "lining", t: "STIFF LINING", k: "HIDES BREATH", opts: [["cardboard", "cardboard", [0, 0, 25, 0]], ["yoga", "yoga mat", [0, 0, 35, 0]], ["felt", "felt", [0, 0, 20, 0]]] },
+    { id: "length", t: "LENGTH", k: "", note: "FOR CAPE, VEST OR COAT", when: s => s.shape !== "shrug", opts: [["waist", "waist", [0, 0, 0, 0]], ["knee", "knee", [8, 4, 4, 0]], ["ankle", "ankle", [14, 6, 8, 0]]] },
+    { id: "coil", t: "FIELD COIL", k: "FIELD", opts: [["on", "copper coil", [0, 0, 0, 80]], ["off", "none", [0, 0, 0, 0]]] },
+  ], sel: { shape: "shrug", outer: "blanket", bits: "chains", lining: "yoga", length: "waist", coil: "on" } },
+  bracelet: { name: "BRACELET", lab: ["base", "wrap", "charms"], slots: [
+    { id: "base", t: "BASE", k: "", opts: [["bracelet", "foil cuff", [30, 12, 24, 0]], ["strap", "watch strap", [20, 6, 20, 0]], ["rings", "rings", [18, 16, 10, 0]], ["glove", "glove", [30, 0, 28, 0]]] },
+    { id: "wrap", t: "WRAP", k: "REFLECT", opts: [["copper", "copper wire", [10, 0, 0, 30]], ["tape", "foil tape", [35, 0, 0, 0]], ["chain", "chain", [5, 25, 0, 0]]] },
+    { id: "charms", t: "CHARMS", k: "SCATTER", opts: [["links", "links", [0, 25, 0, 0]], ["spoons", "spoons", [8, 24, 0, 0]], ["washers", "washers", [6, 22, 0, 0]], ["bells", "bells", [4, 28, 0, 0]], ["pins", "safety pins", [4, 18, 0, 0]]] },
+    { id: "coil", t: "FIELD COIL + LIGHT", k: "FIELD", opts: [["on", "on", [0, 0, 0, 90]], ["off", "off", [0, 0, 0, 0]]] },
+  ], sel: { base: "bracelet", wrap: "copper", charms: "links", coil: "on" } },
+  anklet: { name: "ANKLET", lab: ["outer", "charms"], title: s => ({ anklet: "ANKLET", kneewrap: "KNEE WRAPS", warmers: "LEG WARMER", shoe: "SHOE COVER" })[s.piece], slots: [
+    { id: "piece", t: "PIECE", k: "", opts: [["anklet", "anklet", [20, 10, 10, 0]], ["kneewrap", "knee wraps", [15, 8, 8, 0]], ["warmers", "leg warmer", [25, 5, 20, 0]], ["shoe", "shoe cover", [18, 5, 12, 0]]] },
+    { id: "outer", t: "OUTER", k: "REFLECT", opts: [["foil", "foil bands", [40, 5, 0, 0]], ["chips", "chip bags", [30, 10, 0, 0]], ["tinsel", "tinsel skirt", [8, 38, 0, 0]]] },
+    { id: "charms", t: "CHARMS", k: "SCATTER", opts: [["caps", "bottle caps", [6, 28, 0, 0]], ["keys", "keys", [6, 26, 0, 0]], ["bells", "bells", [4, 30, 0, 0]], ["none", "none", [0, 0, 0, 0]]] },
+    { id: "coil", t: "FIELD COIL", k: "FIELD", opts: [["on", "copper coil", [0, 0, 0, 90]], ["off", "none", [0, 0, 0, 0]]] },
+  ], sel: { piece: "anklet", outer: "foil", charms: "caps", coil: "on" } },
+};
+const BUILD_DEF = {}; for (const k in BUILD) BUILD_DEF[k] = { ...BUILD[k].sel };
+const SCORE = {};
+function score(key) {
+  const B = BUILD[key], v = [0, 0, 0, 0];
+  B.slots.forEach(sl => { if (sl.when && !sl.when(B.sel)) return; sl.opts.find(o => o[0] === B.sel[sl.id])[2].forEach((x, i) => v[i] += x); });
+  const m = v.map(x => Math.min(100, x)), read = Math.round(clamp(95 - m.reduce((a, b) => a + b, 0) * .34, 3, 95));
+  return SCORE[key] = { m, read };
+}
 
 const GADGETS = [
-  { p: head, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [2.0, 2.4, 4.0, 4.2], anchor: () => V(0, 1.78, 0) },
-  { p: shrug, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [4.2, 4.5, 5.0, 5.2], anchor: () => V(0, 1.34, 0) },
-  { p: brace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.2, 5.5, 99, 100], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))) },
+  { key: "helmet", p: head, build: buildHelmet, off: V(0.3, 1.2, 0.4), rot: V(0, 2.4, .2), on: [2.0, 2.4, 4.0, 4.2], anchor: () => V(0, 1.78, 0), amp: wk => .004 + .01 * wk },
+  { key: "body", p: shrug, build: buildBody, off: V(-1.8, .4, .6), rot: V(0, -1.2, .4), on: [4.2, 4.5, 5.0, 5.2], anchor: () => V(0, 1.34, 0), amp: wk => .008 + .02 * wk },
+  { key: "bracelet", p: brace, build: buildBrace, off: V(1.2, .3, .9), rot: V(0, 0, -1.2), on: [5.2, 5.5, 6.0, 6.2], anchor: () => model.worldToLocal(brace.outer.getWorldPosition(V(0, 0, 0))), amp: wk => .01 + .03 * wk },
+  { key: "anklet", p: ank, build: buildAnk, off: V(-1.0, .2, .9), rot: V(0, 0, 1.0), on: [6.2, 6.5, 99, 100], anchor: () => model.worldToLocal(ankMark.getWorldPosition(V(0, 0, 0))), amp: wk => .012 + .04 * wk },
 ];
-const GMATS = [GM.foil, GM.soft]; GMATS.forEach(m => m.userData.base = m.opacity);
+function rebuild(G) { clearGroup(G.p.inner); G.strands = G.build(G.p.inner, BUILD[G.key].sel); score(G.key); }
+GADGETS.forEach(rebuild);
+const GMATS = [GM.foil, GM.soft, GM.dots]; GMATS.forEach(m => m.userData.base = m.opacity);
 
 // ---------- the shield: a glowing hex skin that closes over the body from the gadget ----------
 const SHIELD = new THREE.ShaderMaterial({
@@ -735,7 +1129,7 @@ const RMATS = [RM, RS]; RMATS.forEach(m => m.userData.base = m.opacity);
 // ---------- scenes ----------
 const CAM_DIR = LOOK.clone().sub(SENS[1]).normalize();
 const CAM_BEHIND = SENS[1].clone().addScaledVector(CAM_DIR, -1.05).add(V(0, .22, 0)), CAM_THROUGH = SENS[1].clone().addScaledVector(CAM_DIR, .5);
-// 0 hero · 1 read · 2 helmet · 3 inside the helmet · 4 shrug · 5 bracelet · 6 camera's view · 7 walk
+// 0 hero · 1 read · 2 helmet · 3 inside the helmet · 4 shrug · 5 bracelet · 6 anklet · 7 camera's view · 8 walk
 const K = [
   { pos: [0, 1.15, 4.4], tgt: [-0.55, 0.9, 0], spin: .35 },
   { pos: [0.9, 1.55, 4.9], tgt: [-0.75, 1.15, 0], spin: .18 },
@@ -743,6 +1137,7 @@ const K = [
   { pos: [0.8, 1.72, 0.32], tgt: [0, 1.72, 0.32], spin: 0, lock: 0 },
   { pos: [-0.2, 1.3, 4.0], tgt: [-0.5, 1.05, 0], spin: .3 },
   { pos: [1.6, 1.1, 3.0], tgt: [-0.2, 0.95, 0], spin: .25 },
+  { pos: [1.0, 0.95, 3.7], tgt: [-0.55, 0.85, 0], spin: .25 },
   { pos: CAM_BEHIND.toArray(), tgt: SENS[1].clone().addScaledVector(CAM_DIR, .7).toArray(), spin: 0, lock: 1.01 },
   { pos: [3.0, 1.55, 5.6], tgt: [0.75, 0.95, 0], spin: 0, lock: Math.PI / 2 },
 ];
@@ -752,10 +1147,11 @@ const labelsEl = document.getElementById("labels");
 const L1 = (z, y, html, sc, cls = "mini") => ({ at: () => V(SECTS[sc].X, y, z), html, sc: [3], cls });
 const LABELS = [
   ...SENS.map((p, i) => ({ at: () => p.clone().add(V(0, .14, 0)), html: SENS_NAMES[i], sc: [1], world: true, cls: "sensor" })),
-  { at: () => V(.2, 2.1, -.1), html: "HELMET<small>METAL SHELL · FIELD COIL · PADDING</small>", sc: [2], gate: () => GADGETS[0].vis > .9 },
-  { at: () => V(.3, 1.4, 0), html: "SHRUG<small>CHAINS · BLANKET · BLACK BAG</small>", sc: [4], gate: () => GADGETS[1].vis > .9 },
-  { at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET<small>FOIL CUFF · LINKS · A COIL</small>", sc: [5], gate: () => GADGETS[2].vis > .9 },
-  { at: () => skinPt(Math.PI, 1.05), html: "FIELD<small>FLOWS OVER THE WHOLE BODY</small>", sc: [2, 4, 5], left: true, cls: "field", gate: () => fieldGrow > .7 },
+  { key: "helmet", at: () => V(.2, 2.1, -.1), html: "HELMET", sc: [2], gate: () => GADGETS[0].vis > .9 },
+  { key: "body", at: () => V(.3, 1.4, 0), html: "SHRUG", sc: [4], gate: () => GADGETS[1].vis > .9 },
+  { key: "bracelet", at: () => brace.outer.getWorldPosition(V(0, 0, 0)), world: true, html: "BRACELET", sc: [5], gate: () => GADGETS[2].vis > .9 },
+  { key: "anklet", at: () => ankMark.getWorldPosition(V(0, 0, 0)), world: true, html: "ANKLET", sc: [6], gate: () => GADGETS[3].vis > .9 },
+  { at: () => skinPt(Math.PI, 1.05), html: "FIELD<small>FLOWS OVER THE WHOLE BODY</small>", sc: [2, 4, 5, 6], left: true, cls: "field", gate: () => fieldGrow > .7 },
   L1(.035, 1.865, "HEAD", 0), L1(.08, 1.885, "PADDING", 0), L1(.11, 1.865, "COIL", 0), L1(.15, 1.885, "METAL SHELL", 0),
   L1(.46, 1.79, "SIGNAL IN →", 0, "mini amber"), L1(.42, 1.62, "← BOUNCED", 0, "mini amber"), L1(.36, 1.88, "FIELD OUT", 0, "mini field"), L1(.035, 1.905, "0 REACHES HEAD", 0, "mini field"),
 ].map(l => { const d = document.createElement("div"); d.className = "lab" + (l.left ? " left" : "") + (l.cls ? " " + l.cls : ""); d.innerHTML = `<span>${l.html}</span>`; labelsEl.appendChild(d); return { ...l, el: d }; });
@@ -826,7 +1222,7 @@ function drawPov(t, sRaw) {
     c.fillStyle = rnd() > .85 ? `rgba(255,255,255,${rnd() * .35})` : `rgba(0,0,0,${.3 + rnd() * .5})`; c.fillRect(x, y, s, s);
   }
   for (let i = 0; i < 9; i++) { const y = y0 + rnd() * bh; c.fillStyle = rnd() > .5 ? "rgba(0,0,0,.45)" : "rgba(168,230,255,.12)"; c.fillRect(cx - bw * .9 + (rnd() - .5) * 40, y, bw * 1.8, 2 + rnd() * 7); }
-  const done = sRaw > 6.02;
+  const done = sRaw > 7.02;
   const wx = cx + Math.sin(t * 1.7) * bw * .35 + (done ? 0 : Math.sin(t * 7.3) * 10), wy = y0 + bh * (.35 + .25 * Math.sin(t * 1.1));
   const s = done ? 1.25 : .5 + .35 * Math.abs(Math.sin(t * 2.3));
   povBox.style.left = (done ? x0 - bw * .2 : wx - bw * s / 2) + "px"; povBox.style.top = (done ? y0 - 10 : wy - bh * s / 4) + "px";
@@ -847,6 +1243,122 @@ document.getElementById("camtoggle").addEventListener("click", e => {
   if (open) requestAnimationFrame(sizeCanvases);
 });
 
+// ---------- build your own: pick parts, see them on the figure, test them ----------
+const ICON = {
+  bike: '<path d="M6 19 Q8 5 20 4 Q32 5 34 19 Z"/><path d="M12 8 L14 18 M20 5 V18 M28 8 L26 18"/>',
+  colander: '<path d="M5 9 H35 Q33 22 20 22 Q7 22 5 9 Z"/><path d="M2 9 H5 M35 9 H38"/><circle cx="13" cy="14" r=".8"/><circle cx="20" cy="15" r=".8"/><circle cx="27" cy="14" r=".8"/><circle cx="16" cy="18" r=".8"/><circle cx="24" cy="18" r=".8"/>',
+  bowl: '<path d="M5 8 H35 Q34 22 20 22 Q6 22 5 8 Z"/><path d="M7 11 H33"/>',
+  cardboard: '<path d="M6 8 L20 3 L34 8 L34 20 L20 25 L6 20 Z"/><path d="M6 8 L20 13 L34 8 M20 13 V25"/>',
+  foil: '<path d="M5 18 L10 7 L16 14 L21 5 L27 15 L31 8 L35 19 Z"/><path d="M10 7 L12 18 M21 5 L20 18 M31 8 L29 18"/>',
+  blanket: '<path d="M5 5 H35 V21 H5 Z"/><path d="M5 5 L35 21 M35 5 L5 21"/>',
+  chips: '<path d="M9 3 H31 L29 22 H11 Z"/><path d="M9 3 Q20 6 31 3 M11 22 Q20 19 29 22"/><circle cx="20" cy="12" r="3"/>',
+  mesh: '<path d="M5 4 H35 V22 H5 Z"/><path d="M5 10 H35 M5 16 H35 M12 4 V22 M20 4 V22 M28 4 V22"/>',
+  horns: '<path d="M12 22 Q6 12 9 3 M28 22 Q34 12 31 3"/><path d="M9 8 L12 9 M8 13 L11 13 M10 17 L12 16 M31 8 L28 9 M32 13 L29 13 M30 17 L28 16"/>',
+  forks: '<path d="M10 22 V9 M7 3 V9 H13 V3 M10 3 V9 M30 22 V9 M27 3 V9 H33 V3 M30 3 V9 M20 22 V7 M17 1 V7 H23 V1 M20 1 V7"/>',
+  tinsel: '<path d="M4 6 H36"/><path d="M8 6 L6 22 M12 6 L13 20 M16 6 L15 23 M20 6 L21 21 M24 6 L23 23 M28 6 L29 20 M32 6 L31 22"/>',
+  none: '<circle cx="20" cy="13" r="8"/><path d="M14 19 L26 7"/>',
+  felt: '<path d="M5 8 H35 V19 H5 Z"/><path d="M8 11 h2 M14 13 h2 M20 11 h2 M26 14 h2 M11 16 h2 M23 16 h2 M30 11 h2"/>',
+  sponge: '<path d="M6 7 H34 V20 H6 Z"/><circle cx="12" cy="11" r="1.4"/><circle cx="20" cy="15" r="2"/><circle cx="28" cy="10" r="1.2"/><circle cx="27" cy="16" r="1.4"/><circle cx="14" cy="17" r="1"/>',
+  bag: '<path d="M8 6 H32 V22 H8 Z"/><path d="M8 6 L20 14 L32 6"/>',
+  veil: '<path d="M6 4 Q20 9 34 4"/><path d="M9 5 V20 M14 6.5 V23 M20 7 V24 M26 6.5 V23 M31 5 V20"/>',
+  fringe: '<path d="M4 5 Q20 10 36 5"/><path d="M7 6 V12 M11 7 V14 M15 8 V13 M19 8 V15 M23 8 V13 M27 7 V14 M31 6 V12"/>',
+  visor: '<path d="M5 8 Q20 2 35 8 L33 18 Q20 22 7 18 Z"/><path d="M8 12 H32 M10 15 H30"/>',
+  open: '<circle cx="14" cy="12" r="2"/><circle cx="26" cy="12" r="2"/><path d="M15 19 Q20 21 25 19"/>',
+  on: '<circle cx="20" cy="13" r="9"/><circle cx="20" cy="13" r="6"/><circle cx="20" cy="13" r="3"/>',
+  shrug: '<path d="M6 10 Q20 2 34 10 L32 18 Q20 13 8 18 Z"/>',
+  cape: '<path d="M12 4 Q20 2 28 4 L36 23 H4 Z"/>',
+  vest: '<path d="M12 3 L16 8 H24 L28 3 L33 7 V23 H22 L20 12 L18 23 H7 V7 Z"/>',
+  coat: '<path d="M13 2 L17 6 H23 L27 2 L32 6 V25 H8 V6 Z M20 6 V25"/>',
+  chains: '<ellipse cx="9" cy="8" rx="4" ry="2.5"/><ellipse cx="15" cy="11" rx="2.5" ry="4"/><ellipse cx="21" cy="14" rx="4" ry="2.5"/><ellipse cx="27" cy="17" rx="2.5" ry="4"/><ellipse cx="33" cy="20" rx="4" ry="2.5"/>',
+  spoons: '<ellipse cx="13" cy="7" rx="3" ry="4.5"/><path d="M13 11.5 V24"/><ellipse cx="27" cy="7" rx="3" ry="4.5"/><path d="M27 11.5 V24"/>',
+  keys: '<circle cx="11" cy="9" r="5"/><path d="M15 12 L30 20 M26 18 L28 14 M29 19.5 L31 16"/>',
+  caps: '<circle cx="11" cy="13" r="6"/><circle cx="11" cy="13" r="3.5"/><circle cx="28" cy="13" r="6"/><circle cx="28" cy="13" r="3.5"/>',
+  yoga: '<path d="M6 20 H28"/><circle cx="31" cy="14" r="6"/><circle cx="31" cy="14" r="3"/><path d="M6 20 Q4 14 10 14 H28"/>',
+  waist: '<path d="M14 2 H26 L28 12 H12 Z"/><path d="M15 12 V25 M25 12 V25" stroke-dasharray="2 2"/>',
+  knee: '<path d="M14 2 H26 L29 18 H11 Z"/><path d="M15 18 V25 M25 18 V25" stroke-dasharray="2 2"/>',
+  ankle: '<path d="M14 2 H26 L31 25 H9 Z"/>',
+  bracelet: '<ellipse cx="20" cy="9" rx="13" ry="4"/><ellipse cx="20" cy="15" rx="13" ry="4"/><path d="M7 9 V15 M33 9 V15"/>',
+  strap: '<path d="M16 2 V24 M24 2 V24"/><rect x="13" y="8" width="14" height="10"/><circle cx="20" cy="13" r="3"/>',
+  rings: '<ellipse cx="20" cy="6" rx="11" ry="3"/><ellipse cx="20" cy="13" rx="11" ry="3"/><ellipse cx="20" cy="20" rx="11" ry="3"/>',
+  glove: '<path d="M12 25 V13 L10 7 M14 13 V4 M18 13 V2 M22 13 V3 M26 13 V6 M28 13 V25"/><path d="M12 13 H28"/>',
+  copper: '<path d="M4 20 C8 4 12 4 12 12 C12 20 16 20 18 12 C20 4 24 4 24 12 C24 20 28 20 30 12 C32 4 36 6 36 12"/>',
+  tape: '<path d="M6 7 H34 V12 H6 Z M6 15 H34 V20 H6 Z"/><path d="M10 7 L14 12 M18 7 L22 12 M26 7 L30 12 M10 15 L14 20 M18 15 L22 20 M26 15 L30 20"/>',
+  chain: '<ellipse cx="9" cy="13" rx="4" ry="2.5"/><ellipse cx="15" cy="13" rx="2.5" ry="4"/><ellipse cx="21" cy="13" rx="4" ry="2.5"/><ellipse cx="27" cy="13" rx="2.5" ry="4"/><ellipse cx="33" cy="13" rx="4" ry="2.5"/>',
+  links: '<path d="M8 3 V20 M16 3 V23 M24 3 V19 M32 3 V22"/><path d="M4 3 H36"/>',
+  washers: '<circle cx="12" cy="13" r="6"/><circle cx="12" cy="13" r="2"/><circle cx="28" cy="13" r="6"/><circle cx="28" cy="13" r="2"/>',
+  bells: '<path d="M14 4 Q10 6 10 14 L7 20 H21 L18 14 Q18 6 14 4 Z"/><circle cx="14" cy="22" r="1.5"/><path d="M30 4 Q26 6 26 14 L23 20 H37 L34 14 Q34 6 30 4 Z"/><circle cx="30" cy="22" r="1.5"/>',
+  pins: '<path d="M8 6 Q4 6 4 10 Q4 14 8 14 H34 M8 6 H32 L34 10 L32 14"/>',
+  anklet: '<path d="M14 2 V16 Q14 22 22 22 H34"/><path d="M26 2 V14"/><ellipse cx="20" cy="14" rx="9" ry="3"/>',
+  kneewrap: '<path d="M16 2 V24 M24 2 V24"/><ellipse cx="20" cy="10" rx="7" ry="2.5"/><ellipse cx="20" cy="14" rx="7" ry="2.5"/>',
+  warmers: '<path d="M13 3 H27 V23 H13 Z"/><path d="M16 3 V23 M20 3 V23 M24 3 V23"/>',
+  shoe: '<path d="M8 8 V18 H34 Q36 13 30 12 L20 10 V8 Z"/><path d="M8 18 V21 H34 V18"/>',
+};
+ICON.off = ICON.none;
+const verdict = r => r < 30 ? "NO MATCH" : r < 60 ? "UNSURE" : "PERSON";
+const bEl = document.getElementById("build"), bTab = document.getElementById("btab"), bTabName = document.getElementById("btabname");
+const bSlots = document.getElementById("bslots"), bBars = document.getElementById("bbars"), bRead = document.getElementById("bread"), bName = document.getElementById("bname");
+let building = false, buildKey = "helmet", buildW = 0, testAt = -99, testPts = [], tabShown = null, tabFor = null, testTimer = 0;
+const gOf = key => GADGETS.find(G => G.key === key);
+function updateLabel(key) {
+  const l = LABELS.find(l => l.key === key); if (!l) return;
+  const B = BUILD[key], parts = B.lab.map(id => B.slots.find(sl => sl.id === id).opts.find(o => o[0] === B.sel[id])[1].toUpperCase()).filter(p => p !== "NONE");
+  l.el.innerHTML = `<span>${B.title ? B.title(B.sel) : B.name}<small>${parts.join(" · ")}</small></span>`;
+}
+function readHTML(read) {
+  const v = verdict(read);
+  return `<s>95% PERSON</s> → <b class="${v === "PERSON" ? "bad" : v === "UNSURE" ? "mid" : ""}">${read}% · ${v}</b>`;
+}
+function renderMeter() {
+  const { m, read } = SCORE[buildKey];
+  bBars.innerHTML = ["REFLECT", "SCATTER", "ABSORB", "FIELD"].map((t, i) => `<div class="bbar"><span>${t}</span><span class="bt"><i style="width:${m[i]}%"></i></span><b>${m[i]}</b></div>`).join("");
+  if (!testTimer) bRead.innerHTML = readHTML(read);
+}
+function renderPanel() {
+  const B = BUILD[buildKey];
+  bName.textContent = B.name;
+  bSlots.innerHTML = B.slots.map(sl => {
+    const off = sl.when && !sl.when(B.sel);
+    return `<div class="bslot${off ? " off" : ""}"><div class="bsl"><span>${sl.t}</span><em>${off ? sl.note : sl.k}</em></div><div class="bchips">${sl.opts.map(([id, nm]) =>
+      `<button type="button" class="bchip${B.sel[sl.id] === id ? " on" : ""}" data-s="${sl.id}" data-o="${id}" aria-pressed="${B.sel[sl.id] === id}"${off ? " disabled" : ""}><svg viewBox="0 0 40 26" aria-hidden="true">${ICON[id] || ICON.none}</svg>${nm}</button>`).join("")}</div></div>`;
+  }).join("");
+  renderMeter();
+}
+function changed(key) { rebuild(gOf(key)); updateLabel(key); renderPanel(); }
+bSlots.addEventListener("click", e => {
+  const b = e.target.closest(".bchip"); if (!b || b.disabled) return;
+  BUILD[buildKey].sel[b.dataset.s] = b.dataset.o; changed(buildKey);
+  const nb = bSlots.querySelector(`.bchip[data-s="${b.dataset.s}"][data-o="${b.dataset.o}"]`); if (nb) nb.focus({ preventScroll: true });
+});
+document.getElementById("breset").addEventListener("click", () => { BUILD[buildKey].sel = { ...BUILD_DEF[buildKey] }; changed(buildKey); });
+document.getElementById("btest").addEventListener("click", () => {
+  testAt = performance.now() / 1000;
+  testPts = Array.from({ length: 9 }, () => skinPt(rnd() * TAU, .25 + rnd() * 1.45));
+  const read = SCORE[buildKey].read, t0 = performance.now();
+  clearInterval(testTimer);
+  testTimer = setInterval(() => {
+    const p = Math.min(1, (performance.now() - t0) / 1600), e = 1 - Math.pow(1 - p, 3);
+    if (p < 1) bRead.innerHTML = `<span class="testing">TESTING · ${Math.round(lerp(95, read, e))}%</span>`;
+    else { clearInterval(testTimer); testTimer = 0; bRead.innerHTML = readHTML(read); bRead.classList.remove("flash"); void bRead.offsetWidth; bRead.classList.add("flash"); }
+  }, 50);
+});
+function openBuild(key) {
+  buildKey = key; building = true;
+  document.body.classList.add("building"); document.documentElement.style.overflow = "hidden";
+  bEl.setAttribute("aria-hidden", "false"); bTab.setAttribute("aria-expanded", "true");
+  renderPanel(); document.getElementById("bclose").focus({ preventScroll: true });
+}
+function closeBuild() {
+  if (!building) return;
+  building = false; document.body.classList.remove("building"); document.documentElement.style.overflow = "";
+  bEl.setAttribute("aria-hidden", "true"); bTab.setAttribute("aria-expanded", "false"); bTab.focus({ preventScroll: true });
+}
+bTab.addEventListener("click", () => { if (tabFor) openBuild(tabFor); });
+document.getElementById("bclose").addEventListener("click", closeBuild);
+addEventListener("keydown", e => { if (e.key === "Escape") closeBuild(); });
+GADGETS.forEach(G => updateLabel(G.key));
+const FOCUS = { helmet: [V(0, 1.78, 0), 2.05], body: [V(0, 1.0, 0), 3.4], bracelet: [V(0, .95, 0), 2.0], anklet: [V(0, .42, 0), 1.9] };
+const BDIR = V(.25, .12, 1).normalize(), C_FIELD = new THREE.Color(FIELD), C_ALERT = new THREE.Color(ALERT);
+
 let userRot = 0, dragging = false, lastX = 0, vel = 0;
 canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; canvas.classList.add("drag"); canvas.setPointerCapture(e.pointerId); });
 canvas.addEventListener("pointermove", e => { if (!dragging) return; const dx = e.clientX - lastX; lastX = e.clientX; userRot += dx * .008; vel = dx * .008; });
@@ -864,30 +1376,36 @@ function tick(now) {
   const sRaw = scrollY / innerHeight, s = clamp(sRaw, 0, N);
   const idx = Math.min(N - 1, Math.floor(s)), f = s - idx, b = sm(.5, 1, f);
   const sEff = idx + b;
+  buildW += ((building ? 1 : 0) - buildW) * (1 - Math.exp(-rawDt * 4));
   const w = K.map((_, k) => clamp(1 - Math.abs(sEff - k), 0, 1));
-  const zoomW = w[3];
-  const rT = clamp((sRaw - 6.7) / 1.5, 0, 1), pov = sm(6.14, 6.32, sRaw) * (1 - sm(6.62, 6.82, sRaw));
+  const zoomW = w[3] * (1 - buildW);
+  const rT = clamp((sRaw - 7.7) / 1.5, 0, 1), pov = sm(7.14, 7.32, sRaw) * (1 - sm(7.62, 7.82, sRaw));
   const pastEnd = sRaw > N + 1.75;
 
   // camera
   const k0 = K[idx], k1 = K[Math.min(N, idx + 1)];
   const tp = V(...k0.pos).lerp(V(...k1.pos), b), tt = V(...k0.tgt).lerp(V(...k1.tgt), b);
-  const push = sm(6.0, 6.32, sRaw) * (1 - sm(6.5, 6.6, sRaw));
+  const push = sm(7.0, 7.32, sRaw) * (1 - sm(7.5, 7.6, sRaw));
   if (push > 0) { tp.lerp(CAM_THROUGH, push); tt.lerp(V(0, .95, 0), push); }
+  if (buildW > .001) { const F = FOCUS[buildKey]; tt.lerp(F[0], buildW); tp.lerp(F[0].clone().addScaledVector(BDIR, F[1]), buildW); }
   if (innerWidth < 760) { tt.x *= .2; tp.multiplyScalar(1.1); }
   camPos.lerp(tp, ease); camTgt.lerp(tt, ease);
   if (push > .3) camPos.lerp(tp, ease * 1.6);
   camera.position.copy(camPos); camera.lookAt(camTgt);
   const fov = lerp(38, 58, pov); if (Math.abs(camera.fov - fov) > .01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  // while building, slide the figure out from under the panel
+  const ox = innerWidth >= 760 ? 190 * buildW : 0, oy = innerWidth < 760 ? innerHeight * .2 * buildW : 0;
+  if (ox + oy > .5) camera.setViewOffset(innerWidth, innerHeight, ox, oy, innerWidth, innerHeight);
+  else if (camera.view && camera.view.enabled) camera.clearViewOffset();
 
   // figure rotation: spins while showing, holds still for the inside views and the walk
-  rotY += lerp(k0.spin, k1.spin, b) * dt;
-  K.forEach((k, i) => { if (k.lock != null && w[i] > 0) rotY += angDiff(rotY, k.lock) * .08 * w[i]; });
-  if (!dragging) { userRot += vel; vel *= .92; userRot *= .985; }
+  rotY += lerp(k0.spin, k1.spin, b) * dt * (1 - buildW);
+  K.forEach((k, i) => { if (k.lock != null && w[i] > 0) rotY += angDiff(rotY, k.lock) * .08 * w[i] * (1 - buildW); });
+  if (!dragging) { userRot += vel; vel *= .92; if (!building) userRot *= .985; }
   model.rotation.y = rotY + userRot * (1 - zoomW);
 
   // walking + breathing
-  const walk = w[7] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
+  const walk = w[8] * (1 - sm(.36, .46, rT)), ph = t * 4.2;
   legs[0].rotation.x = Math.sin(ph) * .42 * walk; legs[1].rotation.x = -Math.sin(ph) * .42 * walk;
   arms[0].rotation.x = -Math.sin(ph) * .25 * walk; arms[1].rotation.x = Math.sin(ph) * .25 * walk;
   model.position.y = Math.abs(Math.sin(ph)) * .018 * walk;
@@ -909,25 +1427,32 @@ function tick(now) {
   GMATS.forEach(m => m.opacity = m.userData.base * fadeZ);
   GM.led.opacity = (.5 + .5 * Math.sin(t * 8)) * fadeZ;
   M.body.opacity = .78 * fadeZ; M.bodySoft.opacity = .22 * fadeZ;
-  chainLines.update(t * 1.4, .008 + .02 * walk); braceChains.update(t * 1.6, .01 + .03 * walk);
+  GADGETS.forEach(G => { if (G.p.outer.visible) G.strands.forEach(S => S.update(t * 1.5, G.amp(walk))); });
 
   fieldGrow = grow;
+  // how well the worn build hides you (3 = hidden, 95 = a plain person)
+  let rdS = 0, rdW = 0; GADGETS.forEach(G => { if (G.vis > .01) { rdS += G.vis * SCORE[G.key].read; rdW += G.vis; } });
+  const rd = rdW ? rdS / rdW : 95, strength = clamp((95 - rd) / 70, 0, 1);
   if (aw > 0) anc.multiplyScalar(1 / aw);
   const SU = SHIELD.uniforms;
   SU.uAnchor.value.copy(anc); SU.uEdge.value = grow * 2.15; SU.uFront.value = grow > .01 && grow < .98 ? 1 : 0;
-  SU.uFade.value = (1 - .9 * zoomW) * (1 - .95 * pov); SU.uTime.value = t;
+  SU.uFade.value = (1 - .9 * zoomW) * (1 - .95 * pov) * lerp(.3, 1, strength); SU.uTime.value = t;
 
-  SECTS.forEach(S => S.update(t, w[3]));
+  SECTS.forEach(S => S.update(t, zoomW));
 
   scan.visible = w[0] > .01; M.scan.opacity = .9 * w[0];
   scan.position.y = .9 + .82 * Math.sin(t * .9);
 
-  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[5] + w[7] * .8) * grow };
-  const sW = clamp(w[1] + w[2] + w[4] + w[5] + w[6], 0, 1) * (1 - zoomW) * (1 - pov);
+  const rayW = { read: w[1] * (1 - grow), field: (w[2] + w[4] + w[5] + w[6] + w[8] * .8) * grow };
+  const sW = clamp(w[1] + w[2] + w[4] + w[5] + w[6] + w[7], 0, 1) * (1 - zoomW) * (1 - pov);
   sensorG.visible = sW > .01; sensorMat.opacity = .95 * sW; sensorSoft.opacity = .45 * sW; ledMat.opacity = sW * (.5 + .5 * Math.sin(t * 6));
   waves.forEach(wv => { const u = (t * .7 + wv.userData.k / 3) % 1; wv.scale.setScalar(.03 + u * .16); wv.position.z = .05 + u * .35; wv.material.opacity = (1 - u) * .7 * sW; });
   model.updateMatrixWorld();
   for (const key in R) updateRays(R[key], clamp(rayW[key], 0, 1), t);
+  // test: a burst of hits rippling over the shield; it flushes orange if the build is weak
+  const te = t - testAt, testing = te >= 0 && te < 2.6;
+  if (testing) for (let k = 0; k < 9; k++) { const a = te * 1.15 - k * .14; SU.uHits.value[k].copy(testPts[k]); SU.uAge.value[k] = a < 0 || a > 1 ? 1 : a; }
+  SU.uColor.value.copy(C_FIELD).lerp(C_ALERT, testing ? (rd >= 60 ? 1 : rd >= 30 ? .45 : 0) * Math.sin(te / 2.6 * Math.PI) : 0);
 
   // robot
   robot.visible = rT > .001;
@@ -962,16 +1487,19 @@ function tick(now) {
 
   // captions
   const ci = Math.min(N, Math.floor(s + .25));
-  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 07`; }
+  if (ci !== capOn) { caps[capOn].classList.remove("on"); caps[ci].classList.add("on"); capOn = ci; counter.textContent = `${String(ci).padStart(2, "0")} / 08`; }
   capWrap.style.opacity = pastEnd ? 0 : 1; hdr.style.opacity = sRaw > N + 2.1 ? 0 : 1;
   dragHint.style.opacity = pastEnd ? 0 : .9;
+  const tabKey = { 2: "helmet", 3: "helmet", 4: "body", 5: "bracelet", 6: "anklet" }[capOn], tg = tabKey && gOf(tabKey);
+  const showTab = !!(!building && tg && tg.vis > .9 && !pastEnd && pov < .05);
+  if (showTab !== tabShown || tabKey !== tabFor) { bTab.classList.toggle("show", showTab); if (tabKey) bTabName.textContent = "+ BUILD YOUR OWN " + BUILD[tabKey].name; tabShown = showTab; tabFor = tabKey; }
 
   // radar readout + camera feed
   const panelOp = clamp(s * 2 - .6, 0, 1) * (pastEnd ? 0 : 1);
-  hud.style.opacity = panelOp * (1 - w[6]); camPanel.style.opacity = panelOp * (1 - w[6]); camPanel.style.pointerEvents = panelOp * (1 - w[6]) > .5 ? "auto" : "none";
+  hud.style.opacity = panelOp * (1 - w[7]); camPanel.style.opacity = panelOp * (1 - w[7]); camPanel.style.pointerEvents = panelOp * (1 - w[7]) > .5 ? "auto" : "none";
   povEl.style.opacity = pov > .05 && !pastEnd ? Math.min(1, pov * 1.5) : 0;
   if (pov > .05) drawPov(t, sRaw);
-  const clar = clamp(1 - grow * .97, 0, 1);
+  const clar = clamp(1 - grow * (1 - rd / 100), 0, 1);
   if (frame % 2 === 0) {
     traces.forEach((tr, i) => {
       let clean;
@@ -986,16 +1514,16 @@ function tick(now) {
       x.strokeStyle = clar > .5 ? "#ff8a5c" : "#ffc96b"; x.lineWidth = 2; x.beginPath();
       tr.buf.forEach((y, j) => { const px = j / (tr.buf.length - 1) * W, py = Hh / 2 - y * Hh * .4; j ? x.lineTo(px, py) : x.moveTo(px, py); });
       x.stroke();
-      tr.st.textContent = clar > .6 ? "LOCKED" : clar > .25 ? "WEAK" : "NO PATTERN";
+      tr.st.textContent = clar > .6 ? "LOCKED" : clar > .32 ? "WEAK" : "NO PATTERN";
       tr.st.style.color = clar > .6 ? "#ff8a5c" : "#fff";
     });
-    if (panelOp > 0 && !camPanel.classList.contains("min")) drawFeed(grow, t);
+    if (panelOp > 0 && !camPanel.classList.contains("min")) drawFeed(grow * (rd < 60 ? 1 : .3), t);
   }
   matchShown += (Math.round(97 * clar) - matchShown) * .08;
   const m = Math.round(matchShown);
   matchv.textContent = "MATCH " + m + "%"; matchb.style.width = m + "%";
   matchv.style.color = m > 60 ? "#ff8a5c" : "#fff";
-  statusEl.textContent = m > 60 ? "IDENTIFIED" : m > 20 ? "UNSURE" : "UNKNOWN";
+  statusEl.textContent = m > 60 ? "IDENTIFIED" : m > 30 ? "UNSURE" : "UNKNOWN";
   statusEl.style.color = m > 60 ? "#ff8a5c" : "#ffc96b";
 
   // labels
@@ -1034,7 +1562,7 @@ const ITEMS = [
   { name: "TINSEL", num: "03", props: ["scatter"], line: "Every strand moves on its own.", wear: "SHRUG HEM", spots: [[-60, 190], [60, 190]],
     art: `<path class="ln" d="M66 22 Q108 40 152 20"/><g class="sway"><path class="ls" style="stroke:rgba(255,255,255,.75)" d="${tinsel()}"/></g>`,
     ray: ["scatter", [96, 60], [[22, 30], [28, 104], [62, 108], [12, 70]]] },
-  { name: "SPOONS + FORKS", num: "04", props: ["reflect", "scatter"], line: "Curved metal throws echoes sideways.", wear: "CROWN · SHRUG", spots: [[0, -10], [-40, 196]],
+  { name: "SPOONS + FORKS", num: "04", props: ["reflect", "scatter"], line: "Curved metal throws echoes sideways.", wear: "HELMET · SHRUG", spots: [[0, -10], [-40, 196]],
     art: `<g class="ln"><ellipse cx="92" cy="36" rx="11" ry="16"/><path d="M92 52 L92 100"/><path d="M118 100 L118 54 M110 22 L110 46 Q110 54 118 54 Q126 54 126 46 L126 22 M115 22 L115 44 M121 22 L121 44"/><path d="M142 100 L142 52 Q152 30 144 18 Q137 34 142 52"/></g><path class="ls" d="M86 30 Q88 24 94 24"/>`,
     ray: ["scatter", [82, 40], [[18, 6], [24, 96], [50, 108]]] },
   { name: "COPPER WIRE", num: "05", props: ["field"], line: "Wound into a coil, it sends out a field of its own.", wear: "INSIDE EVERY GADGET", spots: [[0, 30], [0, 140], [84, 340]],
@@ -1043,7 +1571,7 @@ const ITEMS = [
   { name: "CHAINS + RINGS", num: "06", props: ["scatter"], line: "Loose links jingle and hide what your hands are doing.", wear: "SHRUG · BRACELET", spots: [[84, 350], [-44, 200]],
     art: `<g class="swing"><g class="ln" style="stroke-width:1">${chain()}</g></g><g class="ln"><circle cx="92" cy="86" r="10"/><path d="M88 76 L92 70 L96 76"/><ellipse cx="132" cy="88" rx="18" ry="7"/><ellipse cx="132" cy="88" rx="13" ry="4.5"/></g>`,
     ray: ["scatter", [108, 46], [[30, 18], [20, 80], [56, 108]]] },
-  { name: "SIEVE", num: "07", props: ["reflect"], line: "Holes smaller than the signal. It can't get through.", wear: "INSIDE THE CROWN", spots: [[0, 10]],
+  { name: "SIEVE", num: "07", props: ["reflect"], line: "Holes smaller than the signal. It can't get through.", wear: "INSIDE THE HELMET", spots: [[0, 10]],
     art: `<g class="ln"><ellipse cx="104" cy="40" rx="36" ry="9"/><path d="M68 40 Q72 92 104 94 Q136 92 140 40 M140 40 L156 33"/></g><g fill="rgba(255,255,255,.7)">${holes()}</g>`,
     ray: ["reflect", [72, 58], [[8, 104]]] },
   { name: "CHIP BAGS", num: "08", props: ["reflect"], line: "Shiny inside. Free, and everywhere.", wear: "PATCH ANY GADGET", spots: [[50, 170]],
@@ -1052,11 +1580,12 @@ const ITEMS = [
   { name: "BLACK ELECTRONICS BAG", num: "09", props: ["absorb"], line: "The black bags that phone parts come in have carbon inside. Carbon soaks the signal up.", wear: "SHRUG · SECOND LAYER", spots: [[0, 170]],
     art: `<defs><pattern id="bh" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255,255,255,.35)"/></pattern></defs><rect x="80" y="20" width="56" height="76" fill="url(#bh)" class="ln"/><path class="ln" d="M80 30 H136 M84 26 H132"/><text x="104" y="66">C</text>`,
     ray: ["absorb", [80, 60]] },
-  { name: "FELT OR CARDBOARD", num: "10", props: ["hold"], line: "A soft layer between the metal and your skin.", wear: "UNDER THE CROWN AND CUFF", spots: [[0, 20], [84, 330]],
+  { name: "FELT OR CARDBOARD", num: "10", props: ["hold"], line: "A soft layer between the metal and your skin.", wear: "UNDER THE HELMET AND CUFF", spots: [[0, 20], [84, 330]],
     art: `<g class="breathe"><path class="ln" d="M66 18 Q76 58 66 98"/></g><g class="ln"><rect x="96" y="22" width="14" height="72"/><path d="M96 30 Q103 34 110 30 Q103 38 96 42 Q103 46 110 50 Q103 54 96 58 Q103 62 110 66 Q103 70 96 74 Q103 78 110 82 Q103 86 96 90" style="stroke-width:.8"/><path d="M114 16 V102"/></g><path class="ls" d="M114 24 L122 30 M114 40 L122 46 M114 56 L122 62 M114 72 L122 78 M114 88 L122 94"/><text x="56" y="110">YOU</text><text x="92" y="110">FELT</text><text x="118" y="110">FOIL</text>` },
 ];
 
 const LEG = [
+  { t: "THE READ", p: "The echo changes as your chest rises and your heart beats. That's how it knows you.", svg: `<rect class="ln" x="4" y="20" width="12" height="20"/><path class="path" d="M18 30 L118 30"/><circle class="dot" r="3"><animateMotion dur="2.4s" repeatCount="indefinite" path="M18 30 L118 30 L18 30"/></circle><g class="ln"><circle cx="134" cy="10" r="6"/><path d="M124 20 Q134 16 144 20 L143 58 H125 Z"/></g><path class="ls" d="M127 32 Q134 28 141 32"><animate attributeName="d" dur="2.4s" repeatCount="indefinite" values="M127 32 Q134 28 141 32;M127 32 Q134 24 141 32;M127 32 Q134 28 141 32"/></path>` },
   { t: "REFLECT", p: "Metal bounces the signal away.", svg: `<path class="ln" d="M120 6 V54"/><path class="path" d="M4 12 L118 30 L4 50"/><circle class="dot" r="3"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 12 L118 30 L4 50"/></circle>` },
   { t: "SCATTER", p: "Loose pieces split it into noise.", svg: `<path class="ln" d="M120 6 L118 18 L122 30 L118 42 L121 54"/>${[[20, 6], [10, 30], [24, 54]].map(e => `<path class="path" d="M118 30 L${e[0]} ${e[1]}"/><circle class="dot" r="2.4"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 30 L118 30 L${e[0]} ${e[1]}"/></circle>`).join("")}<path class="path" d="M4 30 L118 30"/>` },
   { t: "ABSORB", p: "Carbon soaks it up.", svg: `<defs><pattern id="lh" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255,255,255,.35)"/></pattern></defs><rect x="108" y="6" width="26" height="48" fill="url(#lh)" class="ln"/><path class="path" d="M4 30 L108 30"/><circle class="dot" r="3"><animateMotion dur="2.2s" repeatCount="indefinite" path="M4 30 L108 30 L130 30"/><animate attributeName="r" dur="2.2s" repeatCount="indefinite" values="3;3;0;0" keyTimes="0;.5;.85;1"/></circle>` },
@@ -1084,6 +1613,59 @@ function setActive(i) {
   mapsvg.querySelectorAll(".spot,.spotring").forEach(s => s.classList.toggle("on", +s.dataset.i === i));
   mapnow.textContent = i >= 0 ? `${ITEMS[i].num} · ${ITEMS[i].name}` : "—";
 }
+const T = { R: "REFLECT", S: "SCATTER", A: "ABSORB", F: "FIELD", B: "BASE", H: "HIDES BREATH" };
+const PARTS = [
+  ["HEAD", [["bike helmet · colander · bowl", "B"], ["foil · copper mesh", "R"], ["wire horns · fork spikes", "S"], ["felt · sponge · black bag", "A"], ["chain veil · tinsel fringe", "S"], ["copper wire coil", "F"]]],
+  ["BODY", [["emergency blanket · foil", "R"], ["chip bags", "R"], ["tinsel", "S"], ["chains · spoons · keys · caps", "S"], ["cardboard · yoga mat", "H"], ["copper wire coil", "F"]]],
+  ["WRIST", [["foil cuff · watch strap · glove", "B"], ["foil tape", "R"], ["chain · rings", "S"], ["washers · bells · safety pins", "S"], ["copper wire coil + light", "F"]]],
+  ["LEGS", [["leg warmer · knee wraps · shoe cover", "B"], ["foil bands · chip bags", "R"], ["tinsel skirt", "S"], ["bottle caps · keys · bells", "S"], ["copper wire coil", "F"]]],
+];
+document.getElementById("parts").innerHTML = PARTS.map(([h, list]) => `<div class="part"><h4>${h}</h4><ul>${list.map(([n, k]) => `<li><span>${n}</span><span class="tag ${k === "B" ? "R" : k === "H" ? "A" : k}">${T[k]}</span></li>`).join("")}</ul></div>`).join("");
+
+const DOME = `<path class="ln" d="M40 92 Q46 32 100 28 Q154 32 160 92 Z"/>`;
+const TORSO = `<path class="ln" d="M70 14 Q100 6 130 14 L138 98 H62 Z"/>`;
+const BAND = `<ellipse class="ln" cx="100" cy="58" rx="50" ry="16"/><ellipse class="ln" cx="100" cy="48" rx="50" ry="16"/><path class="ln" d="M50 48 V58 M150 48 V58"/>`;
+const LEGD = `<path class="ln" d="M84 2 L82 46 Q78 56 82 64 L84 88 L88 96 L130 98 Q136 103 130 106 L74 106 L72 94 L72 64 Q66 54 70 44 L68 2"/>`;
+const hang = (xs, y0, kinds) => xs.map((x, i) => { const k = kinds[i % kinds.length], y = y0 + 22; return `<path class="ls" d="M${x} ${y0} V${y}"/>` + (k === "spoon" ? `<ellipse class="am" cx="${x}" cy="${y + 7}" rx="4" ry="7"/>` : k === "cap" ? `<circle class="am" cx="${x}" cy="${y + 5}" r="5"/>` : k === "key" ? `<circle class="am" cx="${x}" cy="${y + 4}" r="4"/><path class="am" d="M${x} ${y + 8} V${y + 18} M${x} ${y + 14} H${x + 4}"/>` : `<path class="am" d="M${x - 5} ${y + 10} Q${x - 5} ${y} ${x} ${y} Q${x + 5} ${y} ${x + 5} ${y + 10} Z"/>`); }).join("");
+const STEPS = {
+  helmet: ["HELMET", [
+    ["START WITH A BASE", "An old bike helmet, a colander or a bowl that fits your head.", `${DOME}<path class="ls" d="M70 42 L76 90 M100 29 V90 M130 42 L124 90"/>`],
+    ["LINE IT INSIDE", "Glue felt or sponge inside. It is soft for you and soaks up signal.", `${DOME}<path class="am" d="M58 74 L72 44 L88 64 L102 34 L118 62 L134 44 L144 76"/>`],
+    ["WRAP THE SHELL", "Cover the outside in foil, shiny side out, smooth and tight.", `<path class="am" d="M40 92 Q46 32 100 28 Q154 32 160 92 Z"/><path class="ls" d="M48 62 L60 60 M62 48 L74 48 M88 36 L100 38 M128 42 L138 46 M146 64 L156 62"/>`],
+    ["ADD HORNS", "Twist stiff wire into two horns and fix them on top.", `${DOME}<path class="am" d="M76 34 Q58 20 66 4 M124 34 Q142 20 134 4"/><path class="ls" d="M66 14 l6 2 M64 22 l6 1 M134 14 l-6 2 M136 22 l-6 1"/>`],
+    ["COIL THE WIRE", "Wind copper wire inside the rim. A small battery light shows it is on.", `<path class="ls" d="M40 92 Q46 32 100 28 Q154 32 160 92 Z"/><ellipse class="fd" cx="100" cy="74" rx="44" ry="8"/><ellipse class="fd" cx="100" cy="68" rx="44" ry="8"/><circle class="am" cx="146" cy="70" r="3"/>`],
+  ]],
+  body: ["BODY PIECE", [
+    ["PICK A SHAPE", "Cut an emergency blanket into a shrug, cape, vest or coat.", `<rect class="ls" x="30" y="10" width="140" height="92"/><path class="am" style="stroke-dasharray:4 4" d="M72 18 Q100 10 128 18 L152 96 H48 Z"/>`],
+    ["ADD A STIFF LAYER", "Tape cardboard or a yoga mat inside, over the chest. It hides your breathing.", `${TORSO}<rect class="am" x="80" y="28" width="40" height="46"/><path class="ls" d="M80 40 L92 28 M80 54 L106 28 M80 68 L120 28 M90 74 L120 44 M104 74 L120 58"/>`],
+    ["COVER THE OUTSIDE", "Glue foil or flattened chip bags on top, shiny side out.", `${TORSO}<path class="am" d="M74 24 L96 22 L98 40 L76 42 Z M104 22 L126 24 L124 44 L102 42 Z M72 50 L98 48 L100 70 L70 72 Z M104 50 L130 52 L132 74 L104 72 Z M70 78 L100 76 L100 94 L68 96 Z M104 78 L134 80 L136 96 L104 96 Z"/>`],
+    ["HANG LOOSE BITS", "Hang chains, spoons or keys along the hem so they swing.", `<path class="ln" d="M30 26 Q100 44 170 26"/>${hang([46, 73, 100, 127, 154], 32, ["spoon", "key", "cap"])}`],
+    ["COIL THE WIRE", "Sew copper wire around the neckline and add a small battery light.", `<path class="ln" d="M60 40 Q100 22 140 40 L150 100 H50 Z"/><ellipse class="fd" cx="100" cy="36" rx="30" ry="8"/><ellipse class="fd" cx="100" cy="40" rx="32" ry="8"/><circle class="am" cx="128" cy="42" r="3"/>`],
+  ]],
+  bracelet: ["BRACELET", [
+    ["START WITH A BAND", "An old watch strap, or a strip of felt that wraps your wrist.", BAND],
+    ["LINE IT WITH FELT", "Felt on the inside, so no metal touches your skin.", `${BAND}<ellipse class="am" style="stroke-dasharray:2 3" cx="100" cy="53" rx="42" ry="11"/>`],
+    ["WRAP IT", "Wrap foil tape or copper wire around the outside.", `${BAND}<path class="am" d="M52 50 L60 64 L68 40 L76 66 L84 38 L92 68 L100 36 L108 68 L116 38 L124 66 L132 40 L140 64 L148 50"/>`],
+    ["ADD CHARMS", "Tie on washers, bells or small spoons on short links.", `<ellipse class="ln" cx="100" cy="30" rx="50" ry="14"/><ellipse class="ln" cx="100" cy="22" rx="50" ry="14"/>${hang([62, 86, 114, 138], 42, ["cap", "bell", "spoon"])}`],
+    ["COIL AND LIGHT", "Wind a small copper coil under the band and add a tiny battery light.", `${BAND}<ellipse class="fd" cx="100" cy="53" rx="60" ry="22"/><ellipse class="fd" cx="100" cy="53" rx="72" ry="28" style="opacity:.5"/><circle class="am" cx="146" cy="44" r="3"/>`],
+  ]],
+  anklet: ["ANKLET", [
+    ["PICK THE SPOT", "Around the ankle, the knee, a leg warmer or a shoe cover.", `${LEGD}<circle class="am" cx="77" cy="56" r="4"/><circle class="am" cx="78" cy="82" r="4"/><circle class="am" cx="108" cy="100" r="4"/>`],
+    ["SOFT LAYER FIRST", "A sock or a leg warmer goes under everything.", `${LEGD}<path class="am" d="M70 60 H86 M70 66 H86 M71 72 H86 M71 78 H87 M72 84 H87"/>`],
+    ["ADD FOIL BANDS", "Wrap foil bands or chip bags around it, loosely.", `${LEGD}<path class="am" d="M70 76 L74 72 L78 77 L82 72 L88 76 M70 84 L74 80 L78 85 L82 80 L88 84"/>`],
+    ["ADD CHARMS", "Bottle caps, keys or bells that clink as you walk.", `${LEGD}<path class="am" d="M70 84 H90"/><path class="ls" d="M74 84 V92 M82 84 V94 M90 84 V91"/><circle class="am" cx="74" cy="95" r="3"/><circle class="am" cx="82" cy="97" r="3"/><circle class="am" cx="90" cy="94" r="3"/>`],
+    ["COIL THE WIRE", "Wind copper wire around the middle and add a small battery light.", `${LEGD}<ellipse class="fd" cx="79" cy="80" rx="16" ry="5"/><ellipse class="fd" cx="79" cy="80" rx="26" ry="9" style="opacity:.5"/><circle class="am" cx="92" cy="78" r="2.5"/>`],
+  ]],
+};
+const mtabs = document.getElementById("mtabs"), stepsEl = document.getElementById("steps");
+mtabs.innerHTML = Object.entries(STEPS).map(([k, [n]], i) => `<button type="button" role="tab" data-k="${k}" aria-selected="${i === 0}" aria-controls="steps">${n}</button>`).join("");
+function showSteps(k) {
+  mtabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+  stepsEl.innerHTML = STEPS[k][1].map(([t, p, svg], i) => `<div class="step"><span class="k">${i + 1}</span><svg viewBox="0 0 200 110" aria-hidden="true">${svg}</svg><b>${t}</b><p>${p}</p></div>`).join("");
+}
+mtabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) showSteps(b.dataset.k); });
+showSteps("helmet");
+
 const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) setActive(+e.target.dataset.i); }); }, { rootMargin: "-45% 0px -45% 0px" });
 document.querySelectorAll(".card").forEach(c => { io.observe(c); c.addEventListener("mouseenter", () => setActive(+c.dataset.i)); });
 })();
